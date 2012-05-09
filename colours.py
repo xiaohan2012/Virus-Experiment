@@ -36,10 +36,6 @@ def read_siftp(filename):
     for interaction in range(9):
       selection = []
       for index in range(len(sift[interaction::9])):
-          if index == len(sift[interaction::9]) - 1:
-              print len(sift[interaction::9])
-              print 'index',index,
-              print 'interaction',sift[interaction::9][index]
           if sift[interaction::9][index].strip() != '0':
               if interaction == 8:
                   print sift[interaction::9][index]
@@ -55,29 +51,6 @@ def read_siftp(filename):
       print InteractionButton[interaction]+'_'+InteractionName[interaction], 'resi ' + "+".join(selection) 
       del selection
 
-    with open(filename) as f:
-        f.readline()
-        #print 'here we go'
-        for line in f.readlines():
-            try:
-                #print line
-                resi= line.split()[0]
-                fp = line.split()[1:]
-                fp =  ''.join(fp)
-                #print resi,fp
-                if fp != '000000000':
-                    #print 'yes',fp
-                    cmd.select('residue '+resi,'resi '+ resi)
-                    cmd.show('sticks','resi '+ resi)
-                    cmd.label('residue '+resi,'resi')
-                else:
-                    #cmd.select('residue '+resi,'resi '+ resi)
-                    #cmd.label('residue '+resi,'"no"')
-                    #print 'no',fp
-                    pass
-            except:
-                pass
-    
   except Exception, e:
     print "Failed to open file %s\n%s" % (filename, e)
 
