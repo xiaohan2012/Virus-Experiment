@@ -45,5 +45,5 @@ def gen_avg_sift(inname,oname):
     for chunk_no in range(len(avg_fp[::13])):
       pattern_fh.write("%i\t\t\t%s\n" % (int(chunk_no)+int(min_aa), ' '.join(str(x) for x in avg_fp[chunk_no*13:(chunk_no+1)*13])))
 
-    print 'write output pattern to %s' %oname
+    #print 'write output pattern to %s' %oname
     pattern_fh.close()

@@ -123,17 +123,22 @@ class distance_tree(object):
                     self.fingerprints.add_sift_chunk_special_case(close.data.atom,  atom,  ligand.title,  atom_atom_dist)
                     
         max_atom_nums = max([len(atom_list) for atom_list in d_.values()])
-
         #modified definition of interaction
+        #print "max in-range atoms count ",max_atom_nums 
+        strong_c = 0;
+        exists_c = 0;
         for close_atom, lig_names in d_.items():
             #print lig_names
-            if len(lig_names) > max_atom_nums / 2:
+            if len(lig_names) >= 3:
                 #print "mark as strong"
                 self.fingerprints.add_sift_chunk_ordinary(close_atom,lig_names[0][0] ,"strong")#we have only on ligand per complex
+                strong_c += 1
             else:
                 #print "mark as exists"
                 self.fingerprints.add_sift_chunk_ordinary(close_atom,lig_names[0][0] ,"exists")
-
+                exists_c += 1
+        print sorted([len(lig_names) for lig_names in d_.values()])
+        #print "strong count",strong_c ,"exists count",exists_c
         #addition of surrounding environment                
         POLAR_RESIDUES = ["ARG","ASP","GLU","HIS","ASN","GLN","LYS","SER","THR","ARN","ASH","GLH","HID","HIE","LYN"]
         HYDROPHOBIC_RESIDUES =["PHE","LEU","ILE","TYR","TRP","VAL","MET","PRO","CYS","ALA","CYX"]
@@ -153,40 +158,47 @@ class distance_tree(object):
                                                     "res. " + ', '.join(CHARGED_RESIDUES))
         charged_set = set( charged_list )
 
-        print polar_set, hydrophobic_set ,aromatic_set , charged_set 
+        #print polar_set, hydrophobic_set ,aromatic_set , charged_set 
         env_d_ = dict()
-          
-         
-         
-         
         for close_atom, lig_names in d_.items():
             for lig_atom in [l[1] for l in lig_names]:
                 lig_atom = int(lig_atom)
                 if close_atom not in env_d_.keys():
                     env_d_[close_atom] = defaultdict(int)
                 if lig_atom in polar_set:
-                    print "it is polar"
+                    #print "it is polar"
                     env_d_[close_atom]['ENV_POLAR'] += 1
                 elif lig_atom in aromatic_set:
-                    print "it is aromatic"
+                    #print "it is aromatic"
                     env_d_[close_atom]['ENV_AROMATIC'] += 1
                 elif lig_atom in hydrophobic_set:
-                    print "it is h"
+                    #print "it is h"
                     env_d_[close_atom]['ENV_HYDROPHOBIC'] += 1
                 elif lig_atom in charged_set:
-                    print "it is c"
+                    #print "it is c"
                     env_d_[close_atom]['ENV_CHARGED'] += 1
+                    
         atom_nums = list()
         for a,fp in env_d_.items():
             atom_nums += fp.values()
         max_atom_nums = max(atom_nums)
-        
+        env_stat = {"p_list":[0],"a_list":[0],"h_list":[0],"c_list":[0]}
+        env_stat["p_list"] += [fp["ENV_POLAR"] for a,fp in env_d_.items() if fp["ENV_POLAR"] != 0]
+        env_stat["a_list"] += [fp["ENV_AROMATIC"] for a,fp in env_d_.items() if fp["ENV_AROMATIC"] != 0]
+        env_stat["h_list"] += [fp["ENV_HYDROPHOBIC"] for a,fp in env_d_.items() if fp["ENV_HYDROPHOBIC"] != 0]
+        env_stat["c_list"] += [fp["ENV_CHARGED"] for a,fp in env_d_.items() if fp["ENV_CHARGED"] != 0]
+        print env_stat
+        print max(env_stat["p_list"]),max(env_stat["a_list"]),max(env_stat["h_list"]),max(env_stat["c_list"])
+        strong_c = 0;
+        exists_c = 0;
         for a,fp in env_d_.items():
             for t,c in fp.items():
-                if c >= float(max_atom_nums) / 2:
+                if c >= 3:
                     self.fingerprints.add_sift_chunk_env(a,lig_name,t,"strong")
+                    strong_c += 1
                 else:                    
                     self.fingerprints.add_sift_chunk_env(a,lig_name,t,"exists")
+                    exists_c += 1
 
 
 
@@ -708,17 +720,13 @@ class sift_gen(object):
             
             self.sifts[lig_name] = new_sift
             cur_sift = new_sift
-            if int(rec_atom) in self.backbone_set:
-                if 'BACKBONE' in self.active_bits:
-                    cur_sift.turn_sift_bit_on(self.bit_pos['BACKBONE'],  rec_atom.resnum, strength)
+        if structureutil.match_hbond(lig_atom,rec_atom,distance= dist):
+            if rec_atom.atomic_number == 1:
+                if 'H_DONOR' in self.active_bits:
+                    cur_sift.turn_sift_bit_on(self.bit_pos['H_DONOR'],  rec_atom.resnum, "exists")
             else:
-                if structureutil.match_hbond(lig_atom,rec_atom,distance= dist):
-                    if rec_atom.atomic_number == 1:
-                        if 'H_DONOR' in self.active_bits:
-                            cur_sift.turn_sift_bit_on(self.bit_pos['H_DONOR'],  rec_atom.resnum, "exists")
-                    else:
-                        if 'H_ACCEPTOR' in self.active_bits:
-                            cur_sift.turn_sift_bit_on(self.bit_pos['H_ACCEPTOR'],  rec_atom.resnum, "exists")
+                if 'H_ACCEPTOR' in self.active_bits:
+                    cur_sift.turn_sift_bit_on(self.bit_pos['H_ACCEPTOR'],  rec_atom.resnum, "exists")
     
 
     def add_sift_chunk_env(self,  rec_atom,lig_name,i_type, strength):
@@ -751,7 +759,7 @@ class sift_gen(object):
             cur_sift = new_sift
         
         if 'CONTACT' in self.active_bits:
-            cur_sift.turn_sift_bit_on(self.bit_pos['CONTACT'],  rec_atom.resnum, strength)
+            cur_sift.turn_sift_bit_on(self.bit_pos['CONTACT'],  rec_atom.resnum, "exists")
         if int(rec_atom) in self.backbone_set:
             if 'BACKBONE' in self.active_bits:
                 cur_sift.turn_sift_bit_on(self.bit_pos['BACKBONE'],  rec_atom.resnum, strength)
@@ -799,7 +807,7 @@ def gen_fp(receptor_file="",binder_file="",fp_path='',cutoff = 4.0):
     rec_tree = distance_tree(receptor_file)
     rec_tree.parse_receptor()
 
-    print 'cutoff %f' %cutoff
+    #print 'cutoff %f' %cutoff
     binder= structure.StructureReader(binder_file).next() #read the binder
     rec_tree.find_close_residues(binder,cutoff = cutoff)
 
@@ -809,7 +817,7 @@ def gen_fp(receptor_file="",binder_file="",fp_path='',cutoff = 4.0):
             fp_string = rec_tree.fingerprints.get_sift_string(key)
             out_fp.write(rec_tree.receptor.title + ':' + key + ':' + str(rec_tree.min_res) + ':' + fp_string + '\n')
 
-    print 'saved to',fp_path
+    #print 'saved to',fp_path
     
     return fp_path
 if __name__ == "__main__":
@@ -822,4 +830,5 @@ if __name__ == "__main__":
     pat_file = '/home/xiaohan/Desktop/1CE1_pat_%d.dat' %(cutoff)
     gen_fp(rec_file,bind_file,fp_file,cutoff = cutoff)
     gen_avg_sift(fp_file,pat_file)
+
 

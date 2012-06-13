@@ -1,3 +1,4 @@
+# coding=utf-8
 __author__ = 'xiaohan'
 from schrodinger import structure
 import fp_gen1
@@ -6,6 +7,7 @@ import schrodinger.utils.fileutils as fileutils
 import os
 import glob
 import re
+import codecs
 def start_with_atom(line):
     """
     tell if the line is atom line
@@ -21,7 +23,7 @@ def belongs_to_antibody(line):
     """
     try:
         #return line.split()[4].upper() in 'HLIMJN'
-        return line.split()[4].upper() in 'ABCD'
+        return line[21] in 'ABCD'
     except:
         return False
 
@@ -34,6 +36,37 @@ def split_big_mol_sml_mol(complex_path='',binder_path='',receptor_path=''):
                         rec_f.write(line[:60]+'\n')
                     elif is_hetatm(line):
                         bnd_f.write(line[:60]+'\n')
+
+def split_big_mol_sml_mol(complex_path='',binder_path='',receptor_path=''):
+    with open(receptor_path,'w') as rec_f:
+        with open(binder_path,'w') as bnd_f:
+            with open(complex_path) as f:
+                for line in f.readlines():
+                    if start_with_atom(line):
+                        rec_f.write(line[:60]+'\n')
+                    elif is_hetatm(line):
+                        bnd_f.write(line[:60]+'\n')
+
+def split_complex_intelligently(complex_path='',binder_path='',receptor_path='',chain_info_file = ""):
+    def is_type(line,c_t_lst):
+        try:
+            #return line.split()[4].upper() in 'HLIMJN'
+            return line[21] in c_t_lst
+        except:
+            return False
+
+    with open(chain_info_file,"r") as f:
+        r_chn = f.readline().split()[1].split(",")
+        b_chn = f.readline().split()[1].split(",")
+    with open(receptor_path,'w') as rec_f:
+        with open(binder_path,'w') as bnd_f:
+            with open(complex_path) as f:
+                for line in f.readlines():
+                    if start_with_atom(line):
+                        if is_type(line,r_chn):
+                            rec_f.write(line[:60]+'\n')
+                        elif is_type(line,b_chn):                            
+                            bnd_f.write(line[:60]+'\n')
 
 
 def split_protein_protein_complex_manual(complex_path='',binder_path='',receptor_path=''):
@@ -74,27 +107,24 @@ def cal_avg_sift_from_complex(complex_path='data/HL_chain/1RD8-1918/complex.1000
         os.mkdir(output_dir);
     binder_path = os.path.join(output_dir,'binder.pdb')
     receptor_path = os.path.join(output_dir,'receptor.pdb')
-    print binder_path,receptor_path 
-
-    split_fun(complex_path = complex_path,binder_path = binder_path ,receptor_path=receptor_path)
-
+    split_fun(complex_path = complex_path,binder_path = binder_path ,receptor_path=receptor_path,chain_info_file = os.path.join(os.path.dirname(complex_path),u"新建文本文档.txt"))
     fp_path = os.path.join(output_dir,'fp.out')
     fp_gen_path = fp_gen1.gen_fp(receptor_file=receptor_path,binder_file = binder_path,fp_path= fp_path)#get the finger print
     #fp_gen_path = fp_gen1.gen_fp(receptor_file = binder_path,binder_file = receptor_path,fp_path= fp_path)#get the finger print
 
     sift_path=os.path.join(output_dir,'avg_sift.out')
-    print sift_path
     avg_sift.gen_avg_sift(fp_gen_path,sift_path)#generate average sift
 
 if __name__ == '__main__':
-    data_src = '/home/xiaohan/Desktop/data/*'
+    data_src = '/home/xiaohan/code/virus_evolv_exp/new_fp_data/data/data HIV/*'
     output_base_dir = '/home/xiaohan/Desktop/result'
     #data_src = 'data/HL_chain/HL_Q464S3/*'
     for fname in glob.glob(data_src):
-        print fname
-        complex_id = fname.split('/')[-1].split('.')[0]
+        complex_id = os.path.basename(fname) 
         output_dir = os.path.join(output_base_dir,complex_id)
+        fname = os.path.join(fname,complex_id+".pdb")
+        print complex_id
         if os.path.exists(os.path.join(output_dir,"avg_sift.out")):
-            print "%s is processed" %complex_id
+            #print "%s is processed" %complex_id
             continue
-        cal_avg_sift_from_complex(fname,output_dir,split_fun=globals()['split_big_mol_sml_mol'])
+        cal_avg_sift_from_complex(fname,output_dir,split_fun=globals()['split_complex_intelligently'])
