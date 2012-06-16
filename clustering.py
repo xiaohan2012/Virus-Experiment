@@ -102,12 +102,12 @@ class dist_mat(UserDict):
         self.clustered_fp1_res.add(ext_res1)
         self.clustered_fp2_res.add(ext_res2)
 
-        print "extending tuple" , self.extending_tuple
+        #print "extending tuple" , self.extending_tuple
 
         while True:
             t = self.find_closest_tuple()#get the next closest(edit distance) tuple
             if t is None:#cannot find any appropriate tuple
-                print "cluster full, step out"
+                #print "cluster full, step out"
                 break
             center_res1 = self.fp1[ext_res1].res
             center_res2 = self.fp2[ext_res2].res
@@ -118,9 +118,9 @@ class dist_mat(UserDict):
 
                 self.clustered_fp1_res.add(res1)
                 self.clustered_fp2_res.add(res2)
-                print "cluster size: %d,total residue number: f1 = %d, f2 = %d" %(len(cluster),len(self.fp1),len(self.fp2))
+                #print "cluster size: %d,total residue number: f1 = %d, f2 = %d" %(len(cluster),len(self.fp1),len(self.fp2))
             else:
-                #print "out of range"
+                ##print "out of range"
                 self.not_suitable_tuple.add(t)
                             
         self.clusters.append(cluster)
@@ -150,18 +150,19 @@ def get_similarity(clusters,pair):
     #calculate value3
     for c in clusters:
         val3 += len(c)#pair count
-    print "value1:%d,value2:%d,value3:%d" %(val1,val2,val3)
+    #print "value1:%d,value2:%d,value3:%d" %(val1,val2,val3)
     return val1+val2+val3
 
-if __name__ == "__main__":
-    data_prefix = "clustering_data"
-    c1_path = '%s/1MEL&&1MLC/receptor1.pdb' %data_prefix 
-    c2_path = '%s/1MEL&&1MLC/receptor2.pdb' %data_prefix 
-    fp1_path = '%s/1MEL&&1MLC/avg_sift1.out' %data_prefix 
-    fp2_path = '%s/1MEL&&1MLC/avg_sift2.out' %data_prefix 
-    pair = dist_mat(c1_path, c2_path ,fp1_path ,fp2_path)
-    print pair.find_cluster()
-    while pair.find_cluster():
-        pass
-    print pair.clusters
-    get_similarity(pair.clusters,pair)
+
+    #data_prefix = "clustering_data"
+    #c1_path = '%s/1MEL&&1MLC/receptor1.pdb' %data_prefix 
+    #c2_path = '%s/1MEL&&1MLC/receptor2.pdb' %data_prefix 
+    #fp1_path = '%s/1MEL&&1MLC/avg_sift1.out' %data_prefix 
+    #fp2_path = '%s/1MEL&&1MLC/avg_sift2.out' %data_prefix 
+
+    #pair = dist_mat(c1_path, c2_path ,fp1_path ,fp2_path)
+    ##print pair.find_cluster()
+    #while pair.find_cluster():
+        #pass
+    ##print pair.clusters
+    #get_similarity(pair.clusters,pair)

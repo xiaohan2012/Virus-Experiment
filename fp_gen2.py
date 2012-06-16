@@ -4,6 +4,8 @@ from schrodinger import structure, structureutil
 from collections import defaultdict
 from cgkit.cgtypes import *
 from numpy import *
+import os
+import glob
 
 class Residue(object):
     def __init__(self,res,comp):
@@ -125,22 +127,36 @@ class Complex(object):
             self.residues.append(Residue(res,self))
 
     def get_fp(self):
-        self.fp_list = []
+        self.res_list = []
         for i , res in enumerate(self.residues):
             print "residue %d" %i
             res.get_surrounding_fp()
             res.get_struct_fp()
-            print res.fp,len(res.fp)
-            self.fp_list.append(res.fp)
+            #print res.fp,len(res.fp)
+            self.res_list.append(res)
             
     def write_fp_to_file(self,path):
         with open(path,'w') as f:
             temp_list = []
-            for fp in self.fp_list:
-                temp_list.append(",".join(map(str,fp)))
+            for res in self.res_list:
+                temp_list.append("%s\t%s" %(res.body.resnum," ".join(map(str,res.fp))))
             f.write("\n".join(temp_list))
             
 if __name__ == "__main__":
-    c = Complex("new_fp_data/data/data HIV/1E6J/1E6J.pdb")
-    c.get_fp()
-    c.write_fp_to_file("/home/xiaohan/Desktop/temp.dat")
+    #c = Complex("new_fp_data/data/data HIV/1E6J/1E6J.pdb")
+    #c.get_fp()
+    #c.write_fp_to_file("/home/xiaohan/Desktop/temp.dat")
+    
+    data_src = "epi_166/pdb_file/*"
+    output_dir = "epi_166/fp_result"
+    for fname in glob.glob(data_src):
+        complex_id = os.path.basename(fname).split('.')[0] 
+        fp_path = os.path.join(output_dir,complex_id + ".fp" )
+        if os.path.exists(fp_path):
+            print "%s processed" %complex_id
+            continue
+        print fname , fp_path 
+        c = Complex(fname)
+        c.get_fp()
+        c.write_fp_to_file(fp_path)
+
