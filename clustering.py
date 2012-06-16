@@ -3,6 +3,7 @@ from schrodinger.structure import StructureReader
 from collections import OrderedDict,defaultdict
 from UserDict import UserDict
 import math
+from numpy import corrcoef,array,vstack
 
 from time_measure import measure_time
 
@@ -17,7 +18,8 @@ class residue_fp(object):
                 break
 
     def get_edit_dist_to(self,residue_fp1):
-        return Levenshtein.distance(self.fp_str,residue_fp1.fp_str)
+        return corrcoef(vstack((self.fp_str,residue_fp1.fp_str)))[0,1]
+        #return Levenshtein.distance(self.fp_str,residue_fp1.fp_str)
 
     #@measure_time
     def within_range_of(self,o_res,range_dist = 20):
@@ -52,8 +54,8 @@ class residue_fp_list(UserDict):
         with open(fp_path,'r') as f:
             for line in f.readlines()[2:]:
                 residue_id = int(line.split()[0])
-                fp_str= ''.join(["%d" %float(item) for item in line.split()[1:]])
-                self.data[residue_id] = residue_fp(fp_str,self.comp,residue_id)
+                fp = [float(item) for item in line.split()[1:]]
+                self.data[residue_id] = residue_fp(fp,self.comp,residue_id)
 
 
 class dist_mat(UserDict):
@@ -67,7 +69,7 @@ class dist_mat(UserDict):
 
         for res1, fp1 in self.fp1.items():
             for res2, fp2 in self.fp2.items():
-                self.data[res1][res2] = Levenshtein.distance(fp1.get_string(),fp2.get_string())
+                self.data[res1][res2] = fp1.get_edit_dist_to(fp2)
 
         self.clustered_fp1_res = set()
         self.clustered_fp2_res = set()
@@ -102,8 +104,8 @@ class dist_mat(UserDict):
         self.clustered_fp1_res.add(ext_res1)
         self.clustered_fp2_res.add(ext_res2)
 
-        #print "extending tuple" , self.extending_tuple
 
+        #print "extending tuple" , self.extending_tuple
         while True:
             t = self.find_closest_tuple()#get the next closest(edit distance) tuple
             if t is None:#cannot find any appropriate tuple
@@ -135,7 +137,7 @@ def get_similarity(clusters,pair):
     #calculate value1
     for c in clusters:
         for t in c:
-            val1 -= t[2]#the edit distance
+            val1 -= t[2] * 10#the edit distance
     #calculate value2
     for c in clusters:
         for t in c:
@@ -151,6 +153,7 @@ def get_similarity(clusters,pair):
     for c in clusters:
         val3 += len(c)#pair count
     #print "value1:%d,value2:%d,value3:%d" %(val1,val2,val3)
+    #print "edit distance:%f,value2:%f,value3:%f" %(val1,val2,val3)
     return val1+val2+val3
 
 
