@@ -80,17 +80,21 @@ class dist_mat(UserDict):
         get the minimum distance in distance matrix
         and return the corresponding residue pair
         """
-        min_dist = float("inf")
-        min_tuple = None
+        #min_dist = float("inf")
+        max_sim = 0
+        #min_tuple = None
+        sim_tuple = None
         for res1,_ in self.data.items():
             for res2,dist in _.items():
-                if dist < min_dist and \
+                #if dist < min_dist and \
+                if dist > max_sim and \
                    res1 not in self.clustered_fp1_res and \
                    res2 not in self.clustered_fp2_res and \
                    (res1,res2,dist) not in self.not_suitable_tuple:
-                    min_dist = dist
-                    min_tuple  = (res1,res2,dist)
-        return min_tuple                    
+                    #min_dist = dist
+                    max_sim = dist
+                    sim_tuple  = (res1,res2,dist)
+        return sim_tuple                    
 
     def find_cluster(self):
         cluster = set()
@@ -137,7 +141,7 @@ def get_similarity(clusters,pair):
     #calculate value1
     for c in clusters:
         for t in c:
-            val1 -= t[2] * 10#the edit distance
+            val1 += t[2] * 10#the edit distance
     #calculate value2
     for c in clusters:
         for t in c:
@@ -154,7 +158,7 @@ def get_similarity(clusters,pair):
         val3 += len(c)#pair count
     #print "value1:%d,value2:%d,value3:%d" %(val1,val2,val3)
     #print "edit distance:%f,value2:%f,value3:%f" %(val1,val2,val3)
-    return val1+val2+val3
+    return val1 , val2 , val3
 
 
     #data_prefix = "clustering_data"
