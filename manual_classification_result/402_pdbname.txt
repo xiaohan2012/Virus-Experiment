@@ -1,0 +1,474 @@
+3LH2    S
+3LH2    T
+3LH2    V
+3LH2    U
+3LHP    S
+3LHP    T
+3H3P    S
+3H3P    T
+    
+2IWG    E
+2IWG    B
+2VOL    B
+    
+1H0D    C
+    
+3O9W    A
+3O8X    A
+    
+2J5L    A
+2J4W    D
+2Q8A    A
+2Q8B    A
+    
+3LIZ    A
+2NR6    A
+2NR6    B
+    
+1EXU    B
+2R56    A
+2R56    B
+2YC1    F
+2YC1    C
+2YBR    F
+2YBR    C
+2YBR    I
+    
+3LD8    A
+    
+3NH7    A
+3NH7    B
+3NH7    D
+3NH7    C
+    
+2NYY    A
+    
+1E6J    P
+    
+3KS0    A
+3KS0    B
+    
+1WEJ    F
+1AR1    B
+1QLE    B
+    
+1EGJ    A
+    
+3I50    E
+    
+1ZTX    E
+2NY1    A
+2NY3    A
+2NY4    A
+2NY6    A
+2NY5    G
+2NY0    A
+2NY2    A
+2NXZ    A
+2NY7    G
+2NXY    A
+1G9M    G
+1RZJ    G
+1G9N    G
+1RZK    G
+1GC1    G
+3NGB    A
+3NGB    D
+3NGB    I
+3NGB    G
+2XQY    A
+2XQY    E
+2R29    A
+    
+3B2U    S
+3B2U    E
+3B2U    V
+3B2U    M
+3B2U    A
+3B2U    P
+3B2U    B
+3B2U    I
+1YY9    A
+    
+1YYL    P
+1YYL    G
+2I5Y    P
+2I5Y    G
+1YYM    P
+1YYM    G
+2I60    P
+2I60    G
+    
+1NL0    G
+    
+3GRW    A
+    
+1FC2    C
+    
+3HI1    J
+3HI1    G
+    
+2VH5    R
+2UZI    R
+    
+3GBM    D
+3GBM    B
+3GBN    B
+1EO8    A
+3LZF    A
+1QFU    A
+    
+2R0L    A
+3K2U    A
+2WUB    A
+2WUB    C
+2WUC    A
+    
+2JEL    P
+    
+2HMI    B
+    
+3IDX    G
+    
+1W72    A
+1W72    D
+    
+1IQD    C
+    
+2J88    A
+    
+1XGU    A
+1XGR    A
+1XGT    A
+    
+2J6E    A
+2J6E    B
+    
+1DEE    H
+1DEE    G
+    
+3KR3    D
+    
+1MHP    A
+1MHP    B
+2B2X    A
+2B2X    B
+3HI6    A
+3HI6    B
+3EOA    J
+3EOA    I
+    
+1JRH    I
+    
+2XQB    A
+1LK3    A
+1LK3    B
+3HMX    A
+3L5W    J
+3L5W    I
+3L5X    A
+3L5Y    A
+2VXS    A
+2VXS    B
+2VXS    C
+2VXS    D
+2VXT    I
+3IU3    J
+3IU3    K
+3IU3    I
+3NFP    K
+3NFP    I
+3D85    C
+    
+3MJ9    A
+    
+1T83    C
+    
+1BQL    Y
+1FBI    X
+1FBI    Y
+1VFB    C
+1FDL    Y
+1MLC    F
+1MLC    E
+3HFM    Y
+2IFF    Y
+1YQV    Y
+1MEL    M
+1MEL    L
+1C08    C
+1DQJ    C
+1JTO    M
+1JTO    L
+1JTT    L
+1KIR    C
+1KIQ    C
+1KIP    C
+1A2Y    C
+1BVK    F
+1BVK    C
+1JHL    A
+2ZNX    Z
+2ZNX    Y
+1OP9    B
+1P2C    F
+1P2C    C
+1T6V    M
+1T6V    L
+1SQ2    L
+2I26    Q
+2I26    M
+2I26    L
+2I25    M
+2I25    L
+1NDM    C
+1NDG    C
+1G7I    C
+1G7J    C
+1G7L    C
+1G7M    C
+1G7H    C
+2YSS    C
+2EIZ    C
+2EKS    C
+2DQJ    Y
+2DQD    Y
+2DQE    Y
+2DQG    Y
+2DQH    Y
+2DQI    Y
+2DQF    F
+2DQF    C
+3A67    Y
+3A6B    Y
+3A6C    Y
+1J1P    Y
+1J1X    Y
+1J1O    Y
+1UA6    Y
+1UAC    Y
+1IC4    Y
+1IC7    Y
+1IC5    Y
+2DQC    Y
+2ZNW    Z
+2ZNW    Y
+1RI8    B
+1RJC    B
+1ZV5    L
+1JTP    M
+1JTP    L
+3D9A    C
+1XGP    C
+1XGQ    C
+1DZB    X
+1DZB    Y
+    
+1FSK    A
+1FSK    J
+1FSK    D
+1FSK    G
+1TPX    A
+2W9E    A
+    
+3PGF    A
+    
+2VYR    A
+2VYR    B
+2VYR    C
+2VYR    D
+    
+3BN9    A
+3BN9    B
+1OB1    F
+1OB1    C
+    
+1PKQ    J
+1PKQ    E
+    
+1NFD    B
+1NFD    D
+    
+1NMB    N
+1NCB    N
+1NCC    N
+1NCA    N
+1NCD    N
+2AEQ    A
+2AEP    A
+1NMC    A
+1NMC    N
+1A14    N
+    
+3L95    X
+3L95    Y
+    
+2QQN    A
+2QQK    A
+    
+3O0R    B
+3O0R    C
+    
+1OSP    O
+1FJ1    F
+1FJ1    E
+1RJL    C
+    
+3FFD    P
+    
+2VXQ    A
+    
+1ORS    C
+1K4C    C
+1K4D    C
+2BOB    C
+    
+1TQC    A
+1TQB    A
+    
+2XTJ    A
+3H42    A
+3H42    B
+    
+2ZCH    P
+    
+1BZQ    A
+1BZQ    B
+1BZQ    C
+1BZQ    D
+1QKZ    A
+1UWX    A
+1UWX    B
+    
+1YMH    F
+1YMH    E
+1HEZ    E
+1XF5    L
+1MHH    F
+1MHH    E
+    
+1N8Z    C
+3BE1    A
+3H3B    A
+3H3B    B
+    
+2P45    A
+2P49    A
+2P43    A
+2P42    A
+2P42    C
+2P44    A
+2P48    A
+2P46    A
+2P46    C
+2P47    A
+2P4A    A
+2P4A    C
+    
+3LEV    A
+    
+2BDN    A
+    
+3MXW    A
+    
+2GHW    A
+2GHW    C
+2DD8    S
+3BGF    A
+3BGF    S
+    
+1NSN    S
+1IGC    A
+    
+1BGX    T
+    
+1XIW    A
+1XIW    E
+1SY6    A
+3O2D    A
+2ARJ    Q
+2ARJ    R
+3B9K    F
+3B9K    B
+1YJD    C
+    
+1OAZ    A
+1OAZ    B
+    
+1V7M    X
+1V7M    V
+    
+2XWT    C
+3G04    C
+    
+1AHW    F
+1AHW    C
+1UJ3    C
+1JPS    T
+    
+3MA9    A
+3MAC    A
+2CMR    A
+2XRA    A
+    
+3PNW    F
+3PNW    C
+3PNW    L
+3PNW    O
+3PNW    X
+3PNW    R
+3PNW    I
+3PNW    U
+    
+2HFG    R
+2H9G    S
+2H9G    R
+    
+1EZV    E
+    
+3DVG    Y
+3DVN    Y
+3DVN    V
+3DVG    X
+    
+3GI8    C
+3GI9    C
+2FD6    U
+    
+1BJ1    W
+1BJ1    V
+1CZ8    W
+1CZ8    V
+1TZH    W
+1TZH    V
+1TZI    V
+3BDY    V
+2FJG    W
+2FJG    V
+    
+1OTS    A
+1OTS    B
+1OTT    A
+1OTT    B
+2HVJ    C
+2DWE    C
+2DWD    C
+2HVK    C
+2NLJ    C
+2ITD    C
+1R3L    C
+1R3J    C
+3GB7    C
+3IGA    C
+1R3K    C
+1R3I    C
+1S5H    C
+2HJF    C
+2W0F    C
+    
+2ADF    A
+1FNS    A
+1OAK    A
+1FE8    A
+1FE8    B
+1FE8    C
