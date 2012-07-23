@@ -7,11 +7,19 @@ from pickle import dump,load
 from collections import defaultdict
 
 
-def get_codes_from_file(path):
+def get_codes_from_file(pdb_src):
     codes = {}
     for i,pdb_path in enumerate(glob.glob(pdb_src)):
         code= os.path.basename(pdb_path).split('.')[0] 
         codes[i] = code
+    
+    return codes
+
+def get_inv_codes_from_file(pdb_src):
+    codes = {}
+    for i,pdb_path in enumerate(glob.glob(pdb_src)):
+        code= os.path.basename(pdb_path).split('.')[0] 
+        codes[code] = i
     
     return codes
 
@@ -44,7 +52,7 @@ def get_matrix(code_map):
     return mat
 
 def write_to_file(code_map,mat):
-    f = open("epi_166/dist_table/dist_mat_sum.csv",'w')
+    f = open("epi_166/dist_table/dist_mat_sum_norm.csv",'w')
     #f = open("epi_166/dist_table/dist_mat_val1.csv",'w')
     #f = open("epi_166/dist_table/dist_mat_val2.csv",'w')
     #f = open("epi_166/dist_table/dist_mat_val3.csv",'w')

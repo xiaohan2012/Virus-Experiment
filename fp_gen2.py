@@ -4,11 +4,10 @@ from schrodinger import structure, structureutil
 from collections import defaultdict
 from cgkit.cgtypes import *
 from numpy import *
-import os
 import glob
 
 class Residue(object):
-    def __init__(self,res,comp):
+    def __init__(self , res , comp , hydro_dict , charged_dict , h_bond_dict):
         self.c = comp
         self.fp = [0] * 110
         self.ca = None
@@ -34,6 +33,11 @@ class Residue(object):
         self.dist_step = 2
         self.dist_ind_min = self.dist_min / self.dist_step
         self.dist_ind_max = self.dist_max / self.dist_step - 1
+
+        self.hydro_dict = hydro_dict
+        self.charged_dict = charged_dict
+        self.h_bond_dict = h_bond_dict 
+        
         for a in res.atom:
             if a.pdbname.strip() == "CA":
                 self.ca = a
@@ -98,18 +102,15 @@ class Residue(object):
                 #within range
                 d_[dist_ind].append(res)
 
-        hydro_dict={'A':0.61,'C':1.07,'D':0.46,'E':0.47,'F':2.02,'G':0.07,'H':0.61,'I':2.22,'K':1.15,'L':1.53,'M':1.18,'N':0.06,'P':1.95,'Q':0.0,'R':0.6,'S':0.05,'T':0.05,'V':1.32,'W':2.65,'Y':1.88}
-        charged_dict={'A':-0.01,'C':0.12,'D':0.15,'E':0.07,'F':0.03,'G':0.0,'H':0.08,'I':-0.01,'K':0.0,'L':-0.01,'M':0.04,'N':0.06,'P':0.0,'Q':0.05,'R':0.04,'S':0.11,'T':0.04,'V':0.01,'W':0.0,'Y':0.03}
-        h_bond_dict={'A':0,'C':0,'D':1,'E':1,'F':0,'G':0,'H':1,'I':0,'K':2,'L':0,'M':0,'N':2,'P':0,'Q':2,'R':4,'S':1,'T':1,'V':0,'W':1,'Y':1}
         for i in xrange(self.dist_ind_max - self.dist_ind_min + 1):
             # for layer i
             h_bond, charged , hydro = 0 , 0 , 0
             for res in d_[i]:
                 # for res in layer i
                 code = res.body.getCode()
-                hydro += hydro_dict[code]
-                charged += charged_dict[code]
-                h_bond += h_bond_dict[code]
+                hydro += self.hydro_dict[code]
+                charged += self.charged_dict[code]
+                h_bond += self.h_bond_dict[code]
             
             #fp for layer i,in the 3 aspects
             self.turn_on_bit(80 + i , hydro)
@@ -120,16 +121,18 @@ class Residue(object):
         return "ca atom index:%d" %(self.ca.index)
 
 class Complex(object):
-    def __init__(self,pdb_fp):
+    def __init__(self , pdb_fp , hydro_dict = {'A':0.61,'C':1.07,'D':0.46,'E':0.47,'F':2.02,'G':0.07,'H':0.61,'I':2.22,'K':1.15,'L':1.53,'M':1.18,'N':0.06,'P':1.95,'Q':0.0,'R':0.6,'S':0.05,'T':0.05,'V':1.32,'W':2.65,'Y':1.88},\
+                charged_dict={'A':-0.01,'C':0.12,'D':0.15,'E':0.07,'F':0.03,'G':0.0,'H':0.08,'I':-0.01,'K':0.0,'L':-0.01,'M':0.04,'N':0.06,'P':0.0,'Q':0.05,'R':0.04,'S':0.11,'T':0.04,'V':0.01,'W':0.0,'Y':0.03},\
+                h_bond_dict={'A':0,'C':0,'D':1,'E':1,'F':0,'G':0,'H':1,'I':0,'K':2,'L':0,'M':0,'N':2,'P':0,'Q':2,'R':4,'S':1,'T':1,'V':0,'W':1,'Y':1}):
         self.st = structure.StructureReader(pdb_fp).next()
         self.residues = []
         for res in self.st.residue:
-            self.residues.append(Residue(res,self))
+            self.residues.append(Residue(res,self, hydro_dict , charged_dict , h_bond_dict))
 
     def get_fp(self):
         self.res_list = []
         for i , res in enumerate(self.residues):
-            print "residue %d" %i
+            #print "residue %d" %i
             res.get_surrounding_fp()
             res.get_struct_fp()
             #print res.fp,len(res.fp)
@@ -155,7 +158,7 @@ if __name__ == "__main__":
         if os.path.exists(fp_path):
             print "%s processed" %complex_id
             continue
-        print fname , fp_path 
+        print "processing %s,fp saved as %s" %(fname , fp_path )
         c = Complex(fname)
         c.get_fp()
         c.write_fp_to_file(fp_path)
