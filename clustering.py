@@ -1,4 +1,3 @@
-import Levenshtein
 from schrodinger.structure import StructureReader
 from collections import OrderedDict,defaultdict
 from UserDict import UserDict

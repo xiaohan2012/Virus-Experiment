@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/software/python.2.7.3/bin/python
 import os,  sys
 from schrodinger import structure, structureutil
 from collections import defaultdict
@@ -150,8 +150,8 @@ if __name__ == "__main__":
     #c.get_fp()
     #c.write_fp_to_file("/home/xiaohan/Desktop/temp.dat")
     
-    data_src = "402/pdb/*"
-    output_dir = "402/fp_result"
+    data_src = "/home/rxzhu/code/Virus-Experiment/402/pdb_file/*"
+    output_dir = "/home/rxzhu/code/Virus-Experiment/402/fp_result"
     for fname in glob.glob(data_src):
         complex_id = os.path.basename(fname).split('.')[0] 
         fp_path = os.path.join(output_dir,complex_id + ".fp" )

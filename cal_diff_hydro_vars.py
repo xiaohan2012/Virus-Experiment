@@ -1,13 +1,15 @@
 import os,  sys
 import glob
 import pymongo
+from getopt import getopt
 
 from fp_gen2 import Complex
 from fp2_clustering import gen_sim_matrix
 from logger import TaskFileLogger
+from config import *
 
 h_fp = "hydro_variations.dat"
-def load_hydro_var(h_fp = "hydro_variations.dat"):
+def load_hydro_var(h_fp = "/home/rxzhu/code/Virus-Experiment/hydro_variations.dat"):
     with open(h_fp,'r') as f:
         reses = f.readline().split()
         d_ = {}
@@ -20,11 +22,10 @@ def load_hydro_var(h_fp = "hydro_variations.dat"):
 
 def gen_fps():
     """generate finger print files"""
+    global data_src ,output_dir 
     logger = TaskFileLogger("GenFP")
 
     h_vars = load_hydro_var()
-    data_src = "402/pdb_file/*"
-    output_dir = "402/fp_result"
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
 
@@ -41,7 +42,7 @@ def gen_fps():
             complex_id = os.path.basename(fname).split('.')[0] 
             fp_path = os.path.join(t_output_dir,complex_id + ".fp" )
             if os.path.exists(fp_path):
-                print "%s processed" %complex_id
+                #print "%s processed" %complex_id
                 continue
             print "processing %s,fp saved as %s" %(fname , fp_path )
             c = Complex(fname,hydro_dict = var_d)
@@ -50,26 +51,20 @@ def gen_fps():
 
         logger.log("%s finished" %(h_type))
 
-def gen_sim_mats():
+def do_gen_mat_task(h_name):
     """generate the distance matrix"""
     logger = TaskFileLogger("GenMat")
 
-    h_vars = load_hydro_var()
-    h_names = h_vars.keys()
-    fp_root = '402/fp_result'
+    global fp_root,db
     
-    conn = pymongo.Connection()
-    dbname = "virus_cluster"
-    db = pymongo.database.Database(conn , dbname)
+    logger.log("%s started" %(h_name))
+    gen_sim_matrix(db,\
+                    col_name = "%s_dist_mat" %h_name,\
+                    fp_dir = os.path.join(fp_root,h_name))
+    logger.log("%s finished" %(h_name))
 
-    for h_name in h_names:
-
-        logger.log("%s started" %(h_name))
-        gen_sim_matrix(db,\
-                        col_name = "%s_dist_mat" %h_name,\
-                        fp_dir = os.path.join(fp_root,h_name))
-        logger.log("%s finished" %(h_name))
 
 if __name__ == "__main__":
-    gen_fps()
-    gen_sim_mats()
+    #gen_fps()
+    h_names = load_hydro_var().keys()
+    #gen_sim_mats(h_names)
