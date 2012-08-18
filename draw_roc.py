@@ -1,33 +1,21 @@
 import os
 import glob
-from collections import defaultdict,OrderedDict
-from customcollections import OrderedDefaultdict
+from collections import OrderedDict
+from customcollections import OrderedDefaultDict
 from numpy import linspace,min,max
 from pickle import dump,load
 import matplotlib.pyplot as plt
 
-from kmeans import get_inv_codes_from_file
+from util import *
+from sim_mat import  load_sim_mat
+from manual_classification import *
+from config import *
 
-class PdbGroupRelation(defaultdict):
-    def __init__(self,groups):
-        defaultdict.__init__(self,dict)
-        for g in groups:
-            for i in xrange(len(g)):
-                for j in xrange( i+1 ,len(g)):
-                    pdb_i = g[i]
-                    pdb_j = g[j]
-                    self[pdb_i][pdb_j] = 1
-                    self[pdb_j][pdb_i] = 1
-                    
-    def is_in_one_group(self,pdb1,pdb2):
-        try:
-            return self[pdb1][pdb2]
-        except KeyError:
-            return -1
+
 
 class DistanceMatrix(object):
-    def __init__(self,mat_fp = "dist_mat_402.dat",code_map = {}):
-        self.data = load(open(mat_fp,'r'))
+    def __init__(self,mat_id = "dist_mat_402",code_map = {}):
+        self.data = load_sim_mat(mat_id)
         self.data = self.data / self.data.diagonal()
         self.cm = code_map
 
@@ -36,31 +24,6 @@ class DistanceMatrix(object):
         ind2 = self.cm[pdb2]
         return self.data[ind1][ind2]
 
-def get_166_manual_groups():
-    pdb_names = []
-    data_src = "epi_166/pdb_file/*"
-    
-    for fname in glob.glob(data_src):
-        complex_id = os.path.basename(fname).split('.')[0]
-        pdb_names.append(complex_id.strip())
-    print pdb_names,len(pdb_names)
-    
-    pdb_fp = 'manual_classification_result/166_pdbname.txt'
-    type_fp = 'manual_classification_result/166_type.txt'
-    
-    class_d = OrderedDefaultdict(list)
-    for name,c_type in zip(open(pdb_fp).readlines(),\
-                           open(type_fp).readlines()):
-        name = '_'.join(name.strip().split())
-        c_type = c_type.strip()
-        if name and c_type and name in pdb_names:#not empty line
-            class_d[c_type].append(name)
-    count = 0                    
-    for c,pdbs in class_d.items():
-        print c,pdbs
-        count += len(pdbs)
-    print count        
-    return class_d.values()
 
 def get_roc_data(pdbs, groups , mat,roc_step_count = 11):
     roc_data = OrderedDict()
@@ -98,11 +61,8 @@ def get_roc_data(pdbs, groups , mat,roc_step_count = 11):
     print cutoff_array
     return roc_data                    
 
-def generate_yard_file(pdbs, groups , mat):
-    min_val = min([i for i in (r for r in mat.data)])
-    max_val = max([i for i in (r for r in mat.data)])
-    print min_val
-    with open("yard_output.txt",'w') as f:
+def generate_yard_file(pdbs, groups , mat , yard_file_name = "yard_output.txt"):
+    with open(yard_file_name ,'w') as f:
         f.write("output\tmethod1\n")
         for i in xrange(len(pdbs)):
             for j in xrange(i + 1,len(pdbs)):
@@ -138,11 +98,10 @@ if __name__ == "__main__":
     #print set(wanted).difference(set(pdbs))
     #print len(pdbs),len(set(pdbs))
     inv_code_map = get_inv_codes_from_file(pdb_src)
-    mat  = DistanceMatrix(mat_fp  = "dist_mat_epi_166.dat" , code_map = inv_code_map)
+    mat  = DistanceMatrix(mat_id  = "dist_mat_epi_166.dat" , code_map = inv_code_map)
 
     roc_data = get_roc_data(pdbs, group_rel , mat,roc_step_count = 21)
     for cutoff,stat in roc_data.items():
         print "cutoff:%f\tsensitivity:%f\tspecificity:%f" %(cutoff,stat["sensitivity"],stat["specificity"])
 
     generate_yard_file(pdbs, group_rel , mat)
-

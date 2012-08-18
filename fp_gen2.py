@@ -139,6 +139,8 @@ class Complex(object):
             self.res_list.append(res)
             
     def write_fp_to_file(self,path):
+        if not os.path.exists( os.path.dirname(path) ):
+            os.mkdir(os.path.dirname(path))
         with open(path,'w') as f:
             temp_list = []
             for res in self.res_list:
@@ -150,8 +152,8 @@ if __name__ == "__main__":
     #c.get_fp()
     #c.write_fp_to_file("/home/xiaohan/Desktop/temp.dat")
     
-    data_src = "/home/rxzhu/code/Virus-Experiment/402/pdb_file/*"
-    output_dir = "/home/rxzhu/code/Virus-Experiment/402/fp_result"
+    data_src = "/home/rxzhu/code/Virus-Experiment/parallel/pdb_file/*"
+    output_dir = "/home/rxzhu/code/Virus-Experiment/parallel/fp_result"
     for fname in glob.glob(data_src):
         complex_id = os.path.basename(fname).split('.')[0] 
         fp_path = os.path.join(output_dir,complex_id + ".fp" )

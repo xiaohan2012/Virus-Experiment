@@ -6,50 +6,10 @@ from scipy.cluster.vq import vq, kmeans, whiten
 from pickle import dump,load
 from collections import defaultdict
 
+from util import *
+from sim_mat import get_sim_matrix_from_db
 
-def get_codes_from_file(pdb_src):
-    codes = {}
-    for i,pdb_path in enumerate(glob.glob(pdb_src)):
-        code= os.path.basename(pdb_path).split('.')[0] 
-        codes[i] = code
-    
-    return codes
 
-def get_inv_codes_from_file(pdb_src):
-    codes = {}
-    for i,pdb_path in enumerate(glob.glob(pdb_src)):
-        code= os.path.basename(pdb_path).split('.')[0] 
-        codes[code] = i
-    
-    return codes
-
-def get_matrix(code_map):
-    conn = pymongo.Connection()
-    db = pymongo.database.Database(conn , "virus_cluster")
-    col = db["epi_166_sim_dat"]
-    size = len(code_map.keys())
-    mat = zeros((size,size))
-
-    for i1,code1 in code_map.items():
-        print i1
-        for i2,code2 in code_map.items():
-            res = col.find_one({"complex1":code1,"complex2":code2})
-            if res:
-                mat[i1,i2] = res["val1"] + res["val2"] + res["val3"]
-                #mat[i1,i2] = res["val1"] 
-                #mat[i1,i2] = res["val2"]
-                #mat[i1,i2] = res["val3"]
-                continue
-
-            res = col.find_one({"complex1":code2,"complex2":code1})
-            if res:
-                mat[i1,i2] = res["val1"] + res["val2"] + res["val3"]
-                #mat[i1,i2] = res["val1"] 
-                #mat[i1,i2] = res["val2"]
-                #mat[i1,i2] = res["val3"]
-                continue
-    
-    return mat
 
 def write_to_file(code_map,mat):
     f = open("epi_166/dist_table/dist_mat_sum_norm.csv",'w')
@@ -85,7 +45,7 @@ if __name__ == "__main__":
     try:
         mat = load(open(obj_fp,'r'))
     except IOError:
-        mat = get_matrix(code_map)
+        mat = get_sim_matrix_from_db(code_map)
         dump(mat,open(obj_fp,'w'))
 
     for k in xrange(3,10):
