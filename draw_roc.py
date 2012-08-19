@@ -6,9 +6,9 @@ from numpy import linspace,min,max
 from pickle import dump,load
 import matplotlib.pyplot as plt
 
-from util import *
+from util.aa2code import *
 from sim_mat import  load_sim_mat
-from manual_classification import *
+from util.manual_classification import *
 from config import *
 
 
@@ -86,8 +86,6 @@ def draw_roc():
 
 
 if __name__ == "__main__":
-    pdb_src = "epi_166/pdb_file/*"
-
     groups = get_166_manual_groups()
     group_rel = PdbGroupRelation(groups)
 
@@ -97,8 +95,8 @@ if __name__ == "__main__":
             pdbs.append(i)
     #print set(wanted).difference(set(pdbs))
     #print len(pdbs),len(set(pdbs))
-    inv_code_map = get_inv_codes_from_file(pdb_src)
-    mat  = DistanceMatrix(mat_id  = "dist_mat_epi_166.dat" , code_map = inv_code_map)
+    inv_code_map = get_inv_codes_from_file(data_src)
+    mat  = DistanceMatrix(mat_id  = "ARGP820101" , code_map = inv_code_map)
 
     roc_data = get_roc_data(pdbs, group_rel , mat,roc_step_count = 21)
     for cutoff,stat in roc_data.items():

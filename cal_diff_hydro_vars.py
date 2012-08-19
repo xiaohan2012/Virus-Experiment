@@ -1,11 +1,16 @@
+"""
+taking into account of different hydrogen contexts,
+gen the fp files
+calcualte the similarity matrix
+"""
 import os,  sys
 import glob
 import pymongo
 from getopt import getopt
 
-from fp_gen2 import Complex
-from fp2_clustering import gen_sim_matrix
-from logger import TaskFileLogger
+from fp.fp_gen2 import Complex
+from cal_sim_mat import gen_sim_matrix
+from util.logger import TaskFileLogger
 from config import *
 
 h_fp = "hydro_variations.dat"
@@ -52,7 +57,7 @@ def gen_fps():
         logger.log("%s finished" %(h_type))
 
 def do_gen_mat_task(h_name):
-    """generate the distance matrix"""
+    """generate the similarity matrix"""
     logger = TaskFileLogger("GenMat")
 
     global fp_root,db

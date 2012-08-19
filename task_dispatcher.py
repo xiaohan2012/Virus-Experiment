@@ -1,3 +1,8 @@
+"""
+using the lifehpc.tongji.edu.cn computing nodes to perform calculation tasks
+module including task assigment manager
+"""
+
 import os
 import time
 import random
@@ -63,7 +68,7 @@ def notify_task_done(task_name,node):
 
     db["log"].save({"node":node,"type":"finished","task_name":task_name,"time":time.time()})
 
-def gen_shell_scripts(nodes = []):
+def gen_shell_scripts(script_name  , nodes = []):
     script_tmpl = """
 #!/bin/bash
 #$ -S /bin/bash
@@ -74,14 +79,14 @@ export MMSHARE_EXEC=$SCHRODINGER/mmshare-v21025/bin/Linux-x86_64
 export PYTHONPATH=$SCHRODINGER_PATH:~/.local/lib/python2.7/site-packages/
 export LD_LIBRARY_PATH=$SCHRODINGER/mmshare-v21025/lib/Linux-x86_64:$LD_LIBRARY_PATH
 
-time /software/python.2.7.3/bin/python /home/rxzhu/code/Virus-Experiment/lonely_program.py -n %s
+time /software/python.2.7.3/bin/python /home/rxzhu/code/Virus-Experiment/%s.py -n %s
     """ 
 
     script_fps = []
     for node in nodes:
-        fp = "assign_work_to_%s.sh" %(node)
+        fp = os.path.join(qsub_scripts_path ,"%s_at_%s.sh" %(script_name , node))
         with open(fp,'w') as f:
-            f.write(script_tmpl %(node,node))
+            f.write(script_tmpl %(node , script_name , node))
         script_fps.append(fp)            
     return script_fps 
 

@@ -1,17 +1,25 @@
+"""
+real-time monitoring computing progress utility
+"""
 import pymongo as pm
 from cal_diff_hydro_vars import load_hydro_var
+from config import *
 
 class HydroVarProgStates(object):
     
-    def __init__(self):
+    def __init__(self,additional_cols = []):
         self.all_var_names = load_hydro_var().keys()
         self.total = 81003
-        self.conn = pm.Connection("10.10.20.200")
+        self.conn = pm.Connection("anode4")
         self.db = self.conn["virus_cluster"]
         self.states = {}
         self.all = ["%s_dist_mat" %name for name in self.all_var_names]
 
+
+        self.all += additional_cols
+        self.all_var_names += additional_cols
         self.refresh()
+
 
     def _get_stat(self):
         for c_name , h_name in zip(self.all,self.all_var_names):
@@ -60,5 +68,5 @@ class HydroVarProgStates(object):
         self.get_unfinished()
 
 if __name__ == "__main__":
-    hs = HydroVarProgStates()
+    hs = HydroVarProgStates(["thread_level_parallel_test"])
     hs.display_progress()
