@@ -649,6 +649,7 @@ class sift_gen(object):
 
         # Bit positions for each interaction:
         self.bit_pos = {'CONTACT' : 0,  'BACKBONE' : 1,  'SIDECHAIN' : 2,  'POLAR' : 3,  'HYDROPHOBIC' : 4,  'H_ACCEPTOR' : 5,  'H_DONOR' : 6,  'AROMATIC' : 7,  'CHARGED' : 8, 'ENV_POLAR' : 9,  'ENV_HYDROPHOBIC' : 10,'ENV_AROMATIC' : 11,  'ENV_CHARGED' : 12}
+
         self.active_bits = ['CONTACT',  'BACKBONE',  'SIDECHAIN',  'POLAR', 'HYDROPHOBIC',  'H_ACCEPTOR',  'H_DONOR',  'AROMATIC',  'CHARGED','ENV_POLAR' ,  'ENV_HYDROPHOBIC' ,'ENV_AROMATIC',  'ENV_CHARGED']
         self.max_bits_per_residue =  13 
         self.used_bits_number = len(self.active_bits)
