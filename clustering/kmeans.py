@@ -13,19 +13,6 @@ from util import *
 from sim_mat import get_sim_matrix_from_db
 
 
-
-def write_to_file(code_map,mat):
-    f = open("epi_166/dist_table/dist_mat_sum_norm.csv",'w')
-    #f = open("epi_166/dist_table/dist_mat_val1.csv",'w')
-    #f = open("epi_166/dist_table/dist_mat_val2.csv",'w')
-    #f = open("epi_166/dist_table/dist_mat_val3.csv",'w')
-    f.write(",%s\n" %",".join(code_map.values()))
-
-    for i1,code1 in code_map.items():
-        f.write("%s,%s\n" %(code1,','.join(map(str,mat[i1,:]))))
-
-    f.close()
-
 def assign(centroids , observations , code_map):
     assignment = defaultdict(list)
     for ob_i , ob in enumerate(observations):

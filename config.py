@@ -4,7 +4,7 @@ Configuration files for data file path, database connection,etc
 """
 import pymongo
 
-host = "anode4"
+host = "anode2"
 dbname = "virus_cluster"
 
 boss_root = "/home/rxzhu/code/Virus-Experiment/data"
@@ -15,6 +15,7 @@ sim_dist_pickle_dir = "/home/rxzhu/code/Virus-Experiment/data/402/sim_dist_pickl
 hydro_yard_dir = "/home/rxzhu/code/Virus-Experiment/data/402/yard_file"
 hydro_roc_curve_dir = "/home/rxzhu/code/Virus-Experiment/data/402/roc_curve"
 qsub_scripts_path = "/home/rxzhu/code/Virus-Experiment/qsubscripts"
+mat_csv_path = "/home/rxzhu/code/Virus-Experiment/data/402/mat_csv"
 
 db = pymongo.database.Database(pymongo.Connection(host), dbname)
 
