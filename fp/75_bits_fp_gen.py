@@ -9,6 +9,7 @@ from collections import defaultdict
 import numpy as np
 from UserList import UserList
 from schrodinger import structure, structureutil
+from customcollections import OrderedDefaultDict
 
 import os
 
@@ -18,121 +19,150 @@ from util import load_pdb_struct
 
 from fp_gen import distance_tree , distance_data , sift_gen , sift
 
-def get_dist_group(dist , bound_list = [4. , 8. , 12. , 16. , 20.]):
-    """
-    get the group index of the distance it should belong to
-    for example:
-        distance groups are :
-            0 -> 4 , 4 -> 8 ,  8 -> 12
-        then disttance like :
-            1.2 belong to dist group 1 (0 -> 4)
-            4.8 belong to dist group 2 (4 -> 8)
-            etc
-    """
-    for level,upper_bound in enumerate(bound_list):
-        #print upper_bound,dist
-        if dist <= upper_bound:
-            return level
-    #not in the surrounding
-    return -1            
+class FingerPrint_60(OrderedDefaultDict):
+    def __init__(self , antigen , antibody):
+        OrderedDefaultDict.__init__(self , lambda :list([0] * 60))
 
-def get_dist_between_res(res1,res2):
-    """
-    the spatial distance(defined) of two residues
-    """
-    center1_xyz = np.average([atom.xyz for atom in res1.atom],axis = 0)
-    center2_xyz = np.average([atom.xyz for atom in res2.atom],axis = 0)
-    diff = np.matrix( center1_xyz - center2_xyz )
-    return np.sqrt(( diff * diff.T ).sum())
+        self.antigen = antigen
+        self.antibody = antibody
+        self.nearby_relation = defaultdict(dict)#for cache
 
+        self.nearby_reses_in_antigen = OrderedDefaultDict(lambda : defaultdict(list))#surrouding residues in antigen for each residue 
+        self.nearby_reses_in_antibody = OrderedDefaultDict(lambda : defaultdict(list))#surrouding residues in antibody for each residue
 
-def get_dist_group_relation(complex1 , complex2):
-    """
-    get the distance group relations of the residues in the given complexes
-    """
-    rlt = defaultdict(dict)
-    for res1 in complex1.residue:
-        for res2 in complex2.residue:
-            dist_group = get_dist_group(get_dist_between_res(res1 , res2)) #get the group number id
-            rlt[res1][res2] = dist_group 
-            rlt[res2][res1] = dist_group 
-    return rlt
+        self.fp_rule = {#property id and the corresponding residue code
+             0 : ['TYR', 'ASN', 'GLU', 'SER', 'CYS', 'THR', 'GLY'],         #polar 
+             1 : ['PHE', 'LEU', 'ILE', 'TRP', 'VAL', 'MET', 'PRO', 'ALA'],  #hydrop
+             2 : ['ARG', 'ASP', 'GLU', 'LYS', 'HIS'],                       #charged
+             3 : ['ALA', 'VAL', 'LEU', 'ILE', 'MET', 'ASN', 'GLU', 'LYS',\
+              'ARG', 'GLY', 'SER', 'THR', 'CYS', 'ASP', 'PHE'],             #lipids
+             4 : ['PHE', 'TYR', 'TRP'],                                     #aromatic
+             5 : ['PRO','HIS'],                                             #heterocyclic
+        }#the key represents the group index, value for the residue code
 
+        self.res_prop_ids = defaultdict(list)#the property ids that a given residue has
+        #we need to do some conversion for fp_rule for better performance
 
-def get_res_groups_by_dist(complex1 , complex2):
-    """
-    assign residues to their belonging distance groups,
-    return two lists, in which complex1 and complex2 take turns as the host body
-    """
-    rlt = get_dist_group_relation(complex1 , complex2)
-    #print rlt
-    host1_list = defaultdict(list)
-    host2_list = defaultdict(list)
-    for res1 , res2_list in rlt.items():
-        for res2 in res2_list:
-            group = rlt[res1][res2]
-            if group == -1:continue#ignore residues too far away
-            host1_list[group].append(res2)
-            host2_list[group].append(res1)
-    return host1_list , host2_list
+        for prop_id , residues in self.fp_rule.items():
+            for res_code in residues:
+                self.res_prop_ids[res_code].append(prop_id)
+        #print "res_prop_ids",self.res_prop_ids                
 
-class fingerprint_60_bits(UserList):
-    """
-    the 60 bit finger print class
-    """
-    def __init__(self):
-        UserList.__init__(self,[0] * 60)
+        self.atom_dist_cutoff = 4.0
 
-    def inc_bit(self, dist_group , inner_bit_ind , is_first_complex):
-        if is_first_complex:
-            self[dist_group * 6 + inner_bit_ind] += 1#the former 30 bits
-        else:         
-            self[30 + dist_group * 6 + inner_bit_ind] += 1#the latter 30 bits
+    def residue_nearby_enough(self,res1 , res2):
+        """
+        determine whether two atoms are nearby enough given the `atom_dist_cutoff`
+        """
+        def atom_distance(atom1 , atom2):#the distance between two atoms
+            diff = np.matrix( np.array(atom1.xyz) - np.array(atom2.xyz))
+            return np.sqrt(( diff * diff.T ).sum())
+
+        if self.nearby_relation[res1].has_key(res2):#if it has been computed
+            return  self.nearby_relation[res1][res2]
+
+        for atom1 in res1.atom:
+            for atom2 in res2.atom:
+                if atom_distance(atom1 , atom2) <= self.atom_dist_cutoff:
+                    self.nearby_relation[res1][res2] = True#cache the result
+                    self.nearby_relation[res2][res1] = True#the symetrical case
+                    return True
+        self.nearby_relation[res1][res2] = False#cache the result
+        self.nearby_relation[res2][res1] = False#the symetrical case
+        return False                
+
+    def grouping_residue_by_distance(self):
+        """iterate every residue in the complex and group their surrounding residues by distance"""
+        def res_distance(res1,res2):
+            """residues distance """
+            diff = np.matrix( np.average([atom.xyz for atom in res1.atom],axis = 0) - \
+                              np.average([atom.xyz for atom in res2.atom],axis = 0) )
+            return np.sqrt(( diff * diff.T ).sum())
+
+        def get_dist_group(dist , bound_list = [4. , 8. , 12. , 16. , 20.]):
+            """get the group index it should belong to according to the distance """
+            for level,upper_bound in enumerate(bound_list):
+                #print upper_bound,dist
+                if dist <= upper_bound:
+                    return level
+            #not in the surrounding
+            return -1            
         
-def get_the_60_bits_fp(complex1,complex2):
-    """
-    physical properties:
+        #grouping the residues in antigen
+        for res1 in self.antigen.residue:
+            for res2 in self.antigen.residue:
+                if res1 is res2:continue
+                if self.residue_nearby_enough(res1 , res2):
+                    dist = res_distance(res1 , res2 )#get the distance between res1 and res2
+                    dist_group = get_dist_group(dist)#fit it into a group 
+                    self.nearby_reses_in_antigen[res1][dist_group].append(res2)#updating the group list
 
-    Polar :TYR,ASN,GLU,SER,CYS,THR,GLY
-    Hydrop: PHE, LEU, ILE, TRP, VAL, MET, PRO, ALA
-    Charged: ARG, ASP, GLU, LYS, HIS
+        #grouping the residues in antibody
+        for res1 in self.antigen.residue:
+            for res2 in self.antibody.residue:
+                if res1 is res2:continue
+                if self.residue_nearby_enough(res1 , res2):
+                    dist = res_distance(res1 , res2 )#get the distance between res1 and res2
+                    dist_group = get_dist_group(dist)#fit it into a group 
+                    self.nearby_reses_in_antibody[res1][dist_group].append(res2)#updating the group list
 
-    chemical properties:
+        #print "nearby_reses_in_antigen" , self.nearby_reses_in_antigen
 
-    Lipids: ALA, VAL, LEU, ILE, MET, ASN, GLU, LYS, ARG, GLY, SER, THR, CYS, ASP, PHE
-    Aromatic: PHE, TYR, TRP
-    Heterocyclic: PRO, HIS
-    """
-    fp = fingerprint_60_bits() # 30 bits in this part of finger print
-    fp_info = [
-     ['TYR', 'ASN', 'GLU', 'SER', 'CYS', 'THR', 'GLY'],#polar 
-     ['PHE', 'LEU', 'ILE', 'TRP', 'VAL', 'MET', 'PRO', 'ALA'],#hydrop
-     ['ARG', 'ASP', 'GLU', 'LYS', 'HIS'],#charged
-     ['ALA', 'VAL', 'LEU', 'ILE', 'MET', 'ASN', 'GLU', 'LYS', 'ARG', 'GLY', 'SER', 'THR', 'CYS', 'ASP', 'PHE'],#lipids
-     ['PHE', 'TYR', 'TRP'],#aromatic
-     ['PRO','HIS'],#heterocyclic
-    ]
-    #convert it to inverted index
-    inv_fp_info = defaultdict(list)
-    for group_index , group_items in enumerate(fp_info):
-        for item in group_items:
-            inv_fp_info[item].append(group_index)
-
-    host1_list , host2_list = get_res_groups_by_dist(complex1,complex2)
-    #print host1_list
-    for dist_group , residues in host1_list.items():
-        for res in residues:
-            res_code = res.pdbres.strip()
-            for inner_pos in inv_fp_info[res_code]:
-                fp.inc_bit(dist_group , inner_pos , is_first_complex = True)
-
-    for dist_group , residues in host2_list.items():
-        for res in residues:
-            res_code = res.pdbres.strip()
-            for inner_pos in inv_fp_info[res_code]:
-                fp.inc_bit(dist_group , inner_pos , is_first_complex = False)
+    def get_fingerprint(self):
+        if not self:#not computed
+            self.grouping_residue_by_distance()#first group those residues
             
-    return fp
+            #the first 30 bits
+            for res , groups in self.nearby_reses_in_antigen.items():
+                for group_index , residues in groups.items():
+                    for residue in residues:
+                        for prop_id in self.res_prop_ids[residue.pdbres.strip().upper()]:
+                            #increment the count of property at given position
+                            self[res][group_index * 6 + prop_id] += 1
+                            #print "#####for residue %d" %res.resnum
+                            #print "%s" %(" ".join("%dp%d" %(g,p) for g in xrange(5) for p in xrange(6)))
+                            #print ' '.join("%2d " %count for count in self[res])
+                            #print res.resnum , group_index , prop_id
+            #the 30 ~ 60 bits                            
+            for res , groups in self.nearby_reses_in_antibody.items():
+                for group_index , residues in groups.items():
+                    for residue in residues:
+                        for prop_id in self.res_prop_ids[residue.pdbres.strip().upper()]:
+                            #increment the count of property at given position, offset by 30
+                            self[res][30 + group_index * 6 + prop_id] += 1
+            return self
+
+    def display_fingerprint(self , start = None , end = None):
+        print "%s%s" %(' ' * 11 , " ".join("%dp%d" %(g,p) for g in xrange(5) for p in xrange(6)))
+        for residue , fp in self.items():
+            if start and end:
+                fp = fp[start:end]
+            elif not start and end:
+                fp = fp[:end]
+            elif start and not end:
+                fp = fp[start:]
+
+            print "%8d : %s" %(residue.resnum , ' '.join("%2d " %count for count in fp))
+
+
+        
+    def display_group_info(self):
+        def _display_group_info(nearby_reses):
+            for residue , groups in nearby_reses :
+                print "%8d" %residue.resnum , 
+                for group_index , residues in groups.items():
+                    #twisted statement, hehe!
+                    print "%d:%d(%s)" %( group_index , len(residues) ,\
+                             ' '.join("%s(%s)" %(res.pdbres.strip().upper(),\
+                                                ','.join('%d'%prop_id  for prop_id in self.res_prop_ids[res.pdbres.strip().upper()]))\
+                                                     for res in  residues)),
+                print                
+            return#for clearity
+
+        print "antigen part(first 30 bit)"
+        _display_group_info(self.nearby_reses_in_antigen.items())
+        print "antibody part(30 ~ 60 bit)"
+        _display_group_info(self.nearby_reses_in_antibody.items())
 
 #########################
 ######the 15 bit section
@@ -294,11 +324,17 @@ def gen_fp_to_file(receptor=None,binder=None,fp_path=''):
     return fp_path
 
 if __name__ == "__main__":
-    comp1 = load_pdb_struct( os.path.join(os.path.dirname( data_src) ,\
+    antigen = load_pdb_struct( os.path.join(os.path.dirname( data_src) ,\
                                                      "1DEE_G.pdb") )
-    comp2 = load_pdb_struct( os.path.join(os.path.dirname( data_src) ,\
+    antibody  = load_pdb_struct( os.path.join(os.path.dirname( data_src) ,\
                                                      "1DEE_H.pdb") )
+    fp = FingerPrint_60(antigen , antibody)
 
-    fp = get_the_60_bits_fp(comp1 , comp2 )
-    print fp
-    gen_fp_to_file(comp1 , comp2 , "tmp.txt")
+    fp.get_fingerprint()
+
+    #print ' '.join("%d" %res.resnum for res in antigen.residue)#check it now
+
+    fp.display_fingerprint(start = 30)
+    fp.display_group_info()
+
+    #gen_fp_to_file(antigen , antibody , "tmp.txt")
