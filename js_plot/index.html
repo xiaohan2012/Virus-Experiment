@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Using jqplot to plot the roc of virus experiment</title>
+    <script type="text/javascript" src="data.js"></script>
+
+    <script type="text/javascript" src="jqplot/jquery.min.js"></script>
+
+    <script type="text/javascript" src="jqplot/jquery.jqplot.js"></script>
+    <script type="text/javascript" src="jqplot/plugins/jqplot.canvasTextRenderer.min.js"></script>
+    <script type="text/javascript" src="jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
+
+    <script type="text/javascript" src="jqplot/plugins/jqplot.highlighter.min.js"></script>
+    <script type="text/javascript" src="jqplot/plugins/jqplot.cursor.min.js"></script>
+
+    <link rel="stylesheet" href="jqplot/jquery.jqplot.min.css" />
+
+    <script type="text/javascript" src="options.js"></script>
+    <link rel="stylesheet" href="chart.css" />
+    <script type="text/javascript">
+        $(document).ready(function(){
+            var plot0 = $.jqplot ('chart0',data ,{
+                    seriesDefaults :    seriesDefaultsOptions, 
+                    axes:               axesOptions 
+            });
+            for(var i = 0; i < 6; i++){
+                var group = groups[i];
+                legendOptions.labels = group.names;//update the labels
+
+                $.jqplot ('chart' + ( i + 1 ), group.data ,{
+                        seriesDefaults :    seriesDefaultsOptions, 
+                        axes:               axesOptions ,
+                        legend:             legendOptions , 
+                        highlighter:        {
+                                                show: true,
+                                                sizeAdjust: 7.5
+                                            },
+                        cursor:             {
+                                                show: false,
+                        }
+                });
+            }
+            $(".jqplot-table-legend").css({fontSize:"18px"});
+        });
+    
+    </script>
+</head>
+<body>
+    <div id="chart0" class="chart"></div>
+    <div id="chart1" class="chart"></div>
+    <div id="chart2" class="chart"></div>
+    <div id="chart3" class="chart"></div>
+    <div id="chart4" class="chart"></div>
+    <div id="chart5" class="chart"></div>
+    <div id="chart6" class="chart"></div>
+</body>
+</html>
