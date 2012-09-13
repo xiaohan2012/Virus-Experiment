@@ -6,7 +6,7 @@ import schrodinger.utils.fileutils as fileutils
 import numpy as np
 from collections import defaultdict
 
-from fp_gen import distance_tree , distance_data , sift , gen_fp_to_filegen_fp_to_file
+from fp_gen import distance_tree , distance_data , sift , gen_fp_to_file
 
 
 BLACK = 0

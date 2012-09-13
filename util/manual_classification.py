@@ -35,6 +35,7 @@ def get_166_manual_groups():
     return class_d.values()
 
 class PdbGroupRelation(defaultdict):
+    """Matrix that indicate whether two pdbs are in one group"""
     def __init__(self,groups):
         defaultdict.__init__(self,dict)
         for g in groups:
@@ -44,6 +45,7 @@ class PdbGroupRelation(defaultdict):
                     pdb_j = g[j]
                     self[pdb_i][pdb_j] = 1
                     self[pdb_j][pdb_i] = 1
+        self.pdbs = [pdb for g in groups for pdb in g]
                     
     def is_in_one_group(self,pdb1,pdb2):
         try:

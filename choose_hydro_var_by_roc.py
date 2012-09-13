@@ -2,37 +2,30 @@
 compare different hydrogen contexts by drawing the corresponding roc curves
 the roc curve source files are in the format of `yard` file
 """
-import os
+import os , re, sys
 
-from draw_roc import generate_yard_file , DistanceMatrix
+from roc import generate_yard_file , print_auc , perform_roc_test
+from dist_mat import DistanceMatrix
 from sim_mat import *
 from config import *
 from util.manual_classification import get_166_manual_groups , PdbGroupRelation
-from util.aa2code import  get_inv_codes_from_file
 from sim_mat import load_sim_mat
 from cal_diff_hydro_vars import load_hydro_var
 
-def init_groups_and_pdbs():
+def init_pdb_groups_relation():
     groups = get_166_manual_groups()
     group_rel = PdbGroupRelation(groups)
 
-    pdbs = []
-    for g in groups:
-        for i in g:
-            pdbs.append(i)
-    return pdbs , group_rel
-                
-def plot_roc_curve_for_hydro_vars(mat_ids):
-    pdbs , group_rel = init_groups_and_pdbs()
+    return group_rel
+
+####using yard                
+def plot_roc_for_hydro_vars(mat_ids):
+    group_rel = init_pdb_groups_relation()
     for mat_id in mat_ids:
-        inv_code_map = get_inv_codes_from_file(data_src)
-        try:
-            mat  = DistanceMatrix(mat_id  = mat_id , code_map = inv_code_map)
-        except EOFError:
-            print "unexpected"            
+        mat  = DistanceMatrix(mat_id  = mat_id )
 
         print "roc curve for %s generated" %mat_id
-        generate_yard_file(pdbs, group_rel , mat , os.path.join(hydro_yard_dir,"%s.txt" %mat_id))
+        generate_yard_file(group_rel , mat , os.path.join(hydro_yard_dir,"%s.txt" %mat_id))
 
         yard_path = os.path.join(hydro_yard_dir,"%s.txt" %mat_id)
         gen_img_from_yard_file( yard_path ,\
@@ -43,19 +36,47 @@ def gen_img_from_yard_file(i_path,o_path):
     print cmd
     os.system(cmd)
 
-def get_auc(i_path):
-    cmd = "yard-auc %s" %i_path
-    os.system(cmd)
 
 def get_all_auc():
     hydros = map(lambda a:a + "_dist_mat" , load_hydro_var()) #append `_dist_mat` to hydro names
     for mat_id in hydros:
         yard_path = os.path.join(hydro_yard_dir,"%s.txt" %mat_id)
         print mat_id
-        get_auc(yard_path)
+        print_auc(yard_path)
+
+####using matplotlib to plot###
+import matplotlib.pyplot as plt
+
+def batch_plot(mat_ids , test_iter_counts = 22):
+    """ plot the given ids in one plot"""
+
+    group_rel = init_pdb_groups_relation()
+    plt.hold(True)
+    color_scheme = []
+    for mat_id in mat_ids:
+        mat  = DistanceMatrix(mat_id  = mat_id )
+        x , y , _ = perform_roc_test(group_rel  , mat , test_iter_counts )
+        plt.plot(x , y )
+    plt.savefig("tmp.jpg")
+
+def print_js_style_roc_test_result(mat_id):
+    group_rel = init_pdb_groups_relation()
+    mat  = DistanceMatrix(mat_id  = mat_id )
+    x_arr , y_arr , _ = perform_roc_test(group_rel  , mat  ,101)
+    xy_arr = []
+    x_arr.reverse();y_arr.reverse();#reverse the order so that jqplot can draw properly
+    for x,y in zip(x_arr , y_arr):
+        xy_arr.append("[%f , %f]" %(x , y))
+    sys.stderr.write("var $%s = [ %s ];\n" %(re.findall(r"(\w+)_dist_mat" , mat_id )[0], ','.join(xy_arr)))        
 
 if __name__ == "__main__":
     hydros = map(lambda a:a + "_dist_mat" , load_hydro_var()) #append `_dist_mat` to hydro names
-    plot_roc_curve_for_hydro_vars(hydros)
+    for mat_id in hydros:
+        #var_name = re.findall(r"(\w+)_dist_mat" , mat_id )[0]
+        #sys.stderr.write("$%s ," %var_name );
+        print_js_style_roc_test_result(mat_id);
+
+    #plot_roc_for_hydro_vars(hydros)
+    #batch_plot(hydros[:2])
 
     #get_all_auc()
