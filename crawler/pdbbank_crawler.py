@@ -48,7 +48,10 @@ class ItemPage(pq):
         return desc            
     
     def getDownloadUrl(self):
-        return self._prepare_url(pq(self("#se_downloadFiles").find("a:contains('PDB File (Text)')")).attr("href"))
+        try:
+            return self._prepare_url(pq(self("#se_downloadFiles").find("a:contains('PDB File (Text)')")).attr("href"))
+        except:
+            return self._prepare_url(pq(self("#se_downloadFiles").find("a")[2]).attr("href"))
 
     def _prepare_url(self , url):
         """prepend the url with the baseurl"""
