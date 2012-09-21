@@ -14,7 +14,7 @@ from customcollections import OrderedDefaultDict
 import os
 
 from config import *
-from util import load_pdb_struct
+from util.load_pdb import load_pdb_struct
 
 
 from fp_gen import distance_tree , distance_data , sift_gen , sift
