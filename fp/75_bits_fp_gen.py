@@ -4,7 +4,7 @@ the first 15 bits are from the original SIFT algorithm
 the next 30 bits describes the spacial features in respective of the antigen
 the last 30 bits describes the same thing inrespective of the antiboby
 """
-
+from itertools import chain
 from collections import defaultdict
 import numpy as np
 from UserList import UserList
@@ -16,8 +16,32 @@ import os
 from config import *
 from util import load_pdb_struct
 
+from threading import Thread
+from Queue import Queue
 
 from fp_gen import distance_tree , distance_data , sift_gen , sift
+class GroupingWorker(Thread):
+    def __init__(self,q):
+        Thread.__init__(self)
+        self.q = q
+        self.setDaemon(True)
+
+    def addTask(self,info):
+        self.q.put(info)
+
+    def run(self):
+        while True:
+            fp , res1 , target_res= self.q.get()
+
+            for res2 in target_res:
+                if res1 is res2:continue
+                if fp.residue_nearby_enough(res1 , res2):
+                    dist = fp._res_distance(res1 , res2 )#get the distance between res1 and res2
+                    dist_group = fp._get_dist_group(dist)#fit it into a group 
+                    fp.nearby_reses_in_antigen[res1][dist_group].append(res2)#updating the group list
+
+            self.q.task_done()
+            print "unfinished tasks:%d" %self.q.unfinished_tasks
 
 class FingerPrint_60(OrderedDefaultDict):
     def __init__(self , antigen , antibody):
@@ -42,13 +66,15 @@ class FingerPrint_60(OrderedDefaultDict):
 
         self.res_prop_ids = defaultdict(list)#the property ids that a given residue has
         #we need to do some conversion for fp_rule for better performance
-
+        print "initializing FingerPrint_60 object"
         for prop_id , residues in self.fp_rule.items():
             for res_code in residues:
                 self.res_prop_ids[res_code].append(prop_id)
         #print "res_prop_ids",self.res_prop_ids                
 
         self.atom_dist_cutoff = 4.0
+
+        self.dist_group_cache = defaultdict(dict)
 
     def residue_nearby_enough(self,res1 , res2):
         """
@@ -58,6 +84,8 @@ class FingerPrint_60(OrderedDefaultDict):
             diff = np.matrix( np.array(atom1.xyz) - np.array(atom2.xyz))
             return np.sqrt(( diff * diff.T ).sum())
 
+        return self._res_distance(res1,res2) <= self.atom_dist_cutoff
+        """
         if self.nearby_relation[res1].has_key(res2):#if it has been computed
             return  self.nearby_relation[res1][res2]
 
@@ -70,48 +98,88 @@ class FingerPrint_60(OrderedDefaultDict):
         self.nearby_relation[res1][res2] = False#cache the result
         self.nearby_relation[res2][res1] = False#the symetrical case
         return False                
+        """
+
+    def _res_distance(self,res1,res2):
+        """residues distance """
+        diff = np.matrix( np.average([atom.xyz for atom in res1.atom],axis = 0) - \
+                          np.average([atom.xyz for atom in res2.atom],axis = 0) )
+        return np.sqrt(( diff * diff.T ).sum())
+
+    def _get_dist_group(self, dist, bound_list = [4. , 8. , 12. , 16. , 20.]):
+        """get the group index it should belong to according to the distance """
+        for level,upper_bound in enumerate(bound_list):
+            #print upper_bound,dist
+            if dist <= upper_bound:
+                return level
+        #not in the surrounding
+        return -1            
+
+    def _init_workers(self,w_count):
+        """init workers preparing for parallel computing"""
+        self.workers = []
+        self.task_queue = Queue()
+        for i in xrange(w_count):
+            worker = GroupingWorker(self.task_queue)
+            self.workers.append(worker)
+            worker.start()
+    
+    def _is_dist_group_cached(self,res1,res2):
+        """check if the group dist info is caculated already"""
+        if self.dist_group_cache[res1.resnum].has_key(res2.resnum):
+            return True
+        else:    
+            return False
+
+    def _get_dist_group_from_cache(self,res1,res2):
+        """as the function name indicates"""
+        return self.dist_group_cache[res1.resnum][res2.resnum]
+
+    def _cache_dist_group(self,res1,res2,dist_group):
+        """cache the fruit"""
+
+        self.dist_group_cache[res1.resnum][res2.resnum] = dist_group
+        self.dist_group_cache[res2.resnum][res1.resnum] = dist_group
 
     def grouping_residue_by_distance(self):
         """iterate every residue in the complex and group their surrounding residues by distance"""
-        def res_distance(res1,res2):
-            """residues distance """
-            diff = np.matrix( np.average([atom.xyz for atom in res1.atom],axis = 0) - \
-                              np.average([atom.xyz for atom in res2.atom],axis = 0) )
-            return np.sqrt(( diff * diff.T ).sum())
 
-        def get_dist_group(dist , bound_list = [4. , 8. , 12. , 16. , 20.]):
-            """get the group index it should belong to according to the distance """
-            for level,upper_bound in enumerate(bound_list):
-                #print upper_bound,dist
-                if dist <= upper_bound:
-                    return level
-            #not in the surrounding
-            return -1            
-        
+        print "grouping antigen side,total count: %d"     %(len(self.antigen.residue))
         #grouping the residues in antigen
+        
+        #assign tasks
+        count = 0
+        hit_count = 0
+        miss_count = 0
+        tmp = defaultdict(dict)
         for res1 in self.antigen.residue:
-            for res2 in self.antigen.residue:
-                if res1 is res2:continue
-                if self.residue_nearby_enough(res1 , res2):
-                    dist = res_distance(res1 , res2 )#get the distance between res1 and res2
-                    dist_group = get_dist_group(dist)#fit it into a group 
+            for res2 in chain(self.antigen.residue, self.antibody.residue):
+                if res1.resnum is res2.resnum:continue
+                if self._is_dist_group_cached(res1,res2):#it is computing already
+                    print "hit"
+                    dist_group = self._get_dist_group_from_cache(res1,res2)#use it directly
+                    print res1.resnum, res2.resnum
                     self.nearby_reses_in_antigen[res1][dist_group].append(res2)#updating the group list
+                    hit_count += 1
+                else:#it is new, we need to start from scratch
+                    if self.residue_nearby_enough(res1 , res2):
+                        dist = self._res_distance(res1 , res2 )#get the distance between res1 and res2
+                        dist_group = self._get_dist_group(dist)#fit it into a group 
+                        self.nearby_reses_in_antigen[res1][dist_group].append(res2)#updating the group list
 
-        #grouping the residues in antibody
-        for res1 in self.antigen.residue:
-            for res2 in self.antibody.residue:
-                if res1 is res2:continue
-                if self.residue_nearby_enough(res1 , res2):
-                    dist = res_distance(res1 , res2 )#get the distance between res1 and res2
-                    dist_group = get_dist_group(dist)#fit it into a group 
-                    self.nearby_reses_in_antibody[res1][dist_group].append(res2)#updating the group list
+                        self._cache_dist_group(res1,res2,dist_group)#cache the fruit
+                        #print self.dist_group_cache
+                        miss_count += 1
+            count += 1 
+            print count
+        print hit_count,miss_count
 
-        #print "nearby_reses_in_antigen" , self.nearby_reses_in_antigen
 
     def get_fingerprint(self):
         if not self:#not computed
+            print "grouping by distance"
             self.grouping_residue_by_distance()#first group those residues
-            
+            print "fisrt 30 bits started"    
             #the first 30 bits
             for res , groups in self.nearby_reses_in_antigen.items():
                 for group_index , residues in groups.items():
@@ -124,6 +192,7 @@ class FingerPrint_60(OrderedDefaultDict):
                             #print ' '.join("%2d " %count for count in self[res])
                             #print res.resnum , group_index , prop_id
             #the 30 ~ 60 bits                            
+            print "second 30 bits started"    
             for res , groups in self.nearby_reses_in_antibody.items():
                 for group_index , residues in groups.items():
                     for residue in residues:
@@ -324,10 +393,11 @@ def gen_fp_to_file(receptor=None,binder=None,fp_path=''):
     return fp_path
 
 if __name__ == "__main__":
-    antigen = load_pdb_struct( os.path.join(os.path.dirname( data_src) ,\
-                                                     "1DEE_G.pdb") )
-    antibody  = load_pdb_struct( os.path.join(os.path.dirname( data_src) ,\
-                                                     "1DEE_H.pdb") )
+    #antigen = load_pdb_struct( os.path.join(os.path.dirname( data_src) ,"1DEE_G.pdb") )
+    #antibody  = load_pdb_struct( os.path.join(os.path.dirname( data_src) ,"1DEE_H.pdb") )
+    antigen = load_pdb_struct(os.path.join(data_root,"complex/1A14","antigen.pdb"))
+    antibody = load_pdb_struct(os.path.join(data_root,"complex/1A14","antibody.pdb"))
+    print "loaded"
     fp = FingerPrint_60(antigen , antibody)
 
     fp.get_fingerprint()
