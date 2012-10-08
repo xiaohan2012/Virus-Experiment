@@ -1,8 +1,12 @@
 """
 load hydrio variables from file
 """
-h_fp = "hydro_variations.dat"
-def load_hydro_var(h_fp):
+import os
+
+from machine_setting import base
+
+def load_hydro_var(h_fp = "hydro_variations.dat"):
+    h_fp = os.path.join(base,h_fp)
     with open(h_fp,'r') as f:
         reses = f.readline().split()
         d_ = {}
@@ -14,6 +18,6 @@ def load_hydro_var(h_fp):
     return d_
 
 if __name__ == "__main__":
-    hydro_vars = load_hydro_var(h_fp)
+    hydro_vars = load_hydro_var()
     print hydro_vars 
 

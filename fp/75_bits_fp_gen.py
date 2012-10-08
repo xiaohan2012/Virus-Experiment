@@ -14,7 +14,7 @@ from customcollections import OrderedDefaultDict
 import os
 
 from config import *
-from util import load_pdb_struct
+from util.load_pdb import load_pdb_struct
 
 from threading import Thread
 from Queue import Queue

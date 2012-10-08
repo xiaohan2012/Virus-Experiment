@@ -2,16 +2,10 @@
 
 Configuration files for data file path, database connection,etc
 """
-import pymongo
 import os
 
 from machine_setting import base
-
-host = "anode2"
-dbname = "virus_cluster"
-
-
-
+from dbconfig import *
 
 data_root = os.path.join(base,"data")
 fp_root = os.path.join(base,"data/402/fp_result")
@@ -22,6 +16,4 @@ hydro_yard_dir = os.path.join(base,"data/402/yard_file")
 hydro_roc_curve_dir = os.path.join(base,"data/402/roc_curve")
 qsub_scripts_path = os.path.join(base,"qsubscripts")
 mat_csv_path = os.path.join(base,"data/402/mat_csv")
-
-db = pymongo.database.Database(pymongo.Connection(host), dbname)
 
