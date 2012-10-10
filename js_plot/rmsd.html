@@ -1,0 +1,128 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Curve fitting for RMSD matrix and our similarity matrix</title>
+
+    <!--libraries start-->
+    <link rel="stylesheet" href="chart.css" />
+
+    <script type="text/javascript" src="jqplot/jquery.min.js"></script>
+
+    <script type="text/javascript" src="jqplot/jquery.jqplot.js"></script>
+    <script type="text/javascript" src="jqplot/plugins/jqplot.canvasTextRenderer.min.js"></script>
+    <script type="text/javascript" src="jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
+    <script type="text/javascript" src="jqplot/plugins/jqplot.categoryAxisRenderer.min.js"></script>
+
+    <script type="text/javascript" src="jqplot/plugins/jqplot.barRenderer.min.js"></script>
+
+    <script type="text/javascript" src="jqplot/plugins/jqplot.highlighter.min.js"></script>
+    <script type="text/javascript" src="jqplot/plugins/jqplot.cursor.min.js"></script>
+
+    <link rel="stylesheet" href="jqplot/jquery.jqplot.min.css" />
+    <!--libraries end-->
+
+    <!--my own stuff start-->
+    <script type="text/javascript" src="rmsd/data.js"></script>
+    <script type="text/javascript" src="rmsd/options.js"></script>
+    <!--my own stuff end-->
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            for(var name in cols){
+                var chart_id = 'chart_'+ name;
+                $("body").append('<div id="'+ chart_id+ '" class="chart">');
+                var col = cols[name];
+
+                console.log(col);
+                $.jqplot(chart_id,[col.xy, col.cf_xy],{
+                    title:            "Curve fitting result for " + name +" column of RMSD matrix and similarity matrix",
+                    series:[
+                        {
+                            showLine:false,
+                            showMarker:true,
+                            markerOptions:{
+                                size:9,
+                            }
+                        },
+                        {
+                            showLine:true,
+                            showMarker:false,
+                        }
+                    ],
+                    axes:{
+                        xaxis:{
+                            label:'RMSD vector',
+                            labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                        },
+                        yaxis:{
+                            label:'Our similarity vector',
+                            labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                            min:0,
+                            max:1,
+                        },
+                    }
+                });
+            }
+            //above line data
+            $.jqplot("above_line",[above_line.xy, above_line.cf_xy],{
+                title:"Curving fitting for points above line y = -0.02*x + 0.6",
+                series:[
+                    {
+                        showLine:false,
+                        showMarker:true,
+                        markerOptions:{
+                            size:9,
+                        }
+                    },
+                    {
+                        showLine:true,
+                        showMarker:false,
+                    }
+                ],
+                axes:{
+                    xaxis:{
+                        label:'RMSD matrix',
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    },
+                    yaxis:{
+                        label:'Our similarity matrix',
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    }
+                }
+            })
+            //all data
+            $.jqplot("all",[all.xy, all.cf_xy],{
+                title:"Curve fitting result for all items in RMSD and our similarity matrix",
+                series:[
+                    {
+                        showLine:false,
+                        showMarker:true,
+                        markerOptions:{
+                            size:4,
+                        }
+                    },
+                    {
+                        showLine:true,
+                        showMarker:false,
+                    }
+                ],
+                axes:{
+                    xaxis:{
+                        label:'RMSD matrix',
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    },
+                    yaxis:{
+                        label:'Our similarity matrix',
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    }
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="all" class="chart"></div>
+    <div id="above_line" class="chart"></div>
+</body>
+</html>

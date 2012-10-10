@@ -32,12 +32,13 @@ class CustomFreqDist(FreqDist):
         pylab.xlabel("Samples")
         pylab.ylabel(ylabel)
         pylab.show()
+
     def save_fig(self, *args, **kwargs):
         if len(args) == 0:
             args = [len(self)]
         samples = self.original_keys
         freqs = [self[sample] for sample in samples]
-        ylabel = "Counts"
+        ylabel = "Count"
         # percents = [f * 100 for f in freqs]  only in ProbDist?
         
         pylab.grid(True, color="silver")
@@ -45,24 +46,42 @@ class CustomFreqDist(FreqDist):
             kwargs["linewidth"] = 2
 
         title = kwargs["title"]
-        pylab.title(title)
         del kwargs["title"]
 
+        if not "save_path" in kwargs:
+            path = "/home/xiaohan/Desktop/distribution_step_0.02"
+        else:
+            path = kwargs["save_path"]
+        del kwargs["save_path"]
+
+        if not "step" in kwargs:
+            step = 0.05
+        else:
+            step = kwargs["step"]
+        del kwargs["step"]
+
         pylab.plot(freqs, **kwargs)
-        pylab.xticks(range(len(samples)), [str(s) for s in samples], rotation=90)
+
+        xticks = pylab.linspace(0,1,1/step + 1)
+        pylab.xticks(pylab.arange(0,1/step + 1,1), map(str,xticks) , rotation=90)
         pylab.xlabel("Samples")
         pylab.ylabel(ylabel)
+        pylab.title(title)
         
         #F = pylab.gcf()
         #DefaultSize = F.get_size_inches()
         #F.set_size_inches( (DefaultSize[0]*2, DefaultSize[1]*2) )
 
-        pylab.savefig(os.path.join("/home/xiaohan/Desktop/distribution_step_0.02" , title+".png"))
+        pylab.savefig(os.path.join(path , title+".png"))
 
         pylab.hold(False)
+    
+    def sequential_items(self):
+        return [(key,self[key]) for key in self.original_keys]
 
 def get_freq_dist(matrix , step=0.05):
-    return CustomFreqDist([math.floor(c/step) * step for r in matrix for c in r])
+    return CustomFreqDist([math.floor(i/step) * step for i in matrix.flatten()])
+
             
 
 

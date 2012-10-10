@@ -32,7 +32,7 @@ def load_sim_mat(mat_obj_id , force_refresh = False):
     
     print obj_fp
 
-    code_map = get_codes_from_file(data_src)
+    code_map = gen_402_codemap()
     try:
         mat = load(open(obj_fp,'r'))
         print "cached already"
