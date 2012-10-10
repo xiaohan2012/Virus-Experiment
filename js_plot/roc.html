@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Using jqplot to plot the roc of virus experiment</title>
-    <script type="text/javascript" src="data.js"></script>
+    <!--my own stuff start-->
+    <script type="text/javascript" src="roc/data.js"></script>
+    <script type="text/javascript" src="roc/options.js"></script>
+    <!--my own stuff end-->
+
+    <!--libraries start-->
+    <link rel="stylesheet" href="chart.css" />
 
     <script type="text/javascript" src="jqplot/jquery.min.js"></script>
 
@@ -15,9 +21,8 @@
     <script type="text/javascript" src="jqplot/plugins/jqplot.cursor.min.js"></script>
 
     <link rel="stylesheet" href="jqplot/jquery.jqplot.min.css" />
+    <!--libraries end-->
 
-    <script type="text/javascript" src="options.js"></script>
-    <link rel="stylesheet" href="chart.css" />
     <script type="text/javascript">
         $(document).ready(function(){
             var plot0 = $.jqplot ('chart0',data ,{

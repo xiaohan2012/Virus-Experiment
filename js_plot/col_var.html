@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Curve fitting for RMSD matrix and our similarity matrix</title>
+
+    <!--libraries start-->
+    <link rel="stylesheet" href="chart.css" />
+
+    <script type="text/javascript" src="jqplot/jquery.min.js"></script>
+
+    <script type="text/javascript" src="jqplot/jquery.jqplot.js"></script>
+    <script type="text/javascript" src="jqplot/plugins/jqplot.canvasTextRenderer.min.js"></script>
+    <script type="text/javascript" src="jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
+    <script type="text/javascript" src="jqplot/plugins/jqplot.categoryAxisRenderer.min.js"></script>
+
+    <script type="text/javascript" src="jqplot/plugins/jqplot.barRenderer.min.js"></script>
+
+    <script type="text/javascript" src="jqplot/plugins/jqplot.highlighter.min.js"></script>
+    <script type="text/javascript" src="jqplot/plugins/jqplot.cursor.min.js"></script>
+
+    <link rel="stylesheet" href="jqplot/jquery.jqplot.min.css" />
+    <!--libraries end-->
+
+    <!--my own stuff start-->
+    <script type="text/javascript" src="col_var/data.js"></script>
+    <script type="text/javascript" src="col_var/options.js"></script>
+    <!--my own stuff end-->
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            for(var i= 0; i< data.length; i++){
+                var chart_id = 'chart'+ i;
+                $("body").append('<div id="'+ chart_id+ '" class="chart">');
+                console.log("data", data[i].length);
+                $.jqplot(chart_id,[data[i]],{
+                    title:          names[i],
+                    seriesDefaults:    seriesDefaultsOptions, 
+                    axes:               axesOptions ,
+                });
+            }
+
+        });
+    </script>
+</head>
+<body>
+</body>
+</html>
