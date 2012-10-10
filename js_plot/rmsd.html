@@ -54,6 +54,7 @@
                         xaxis:{
                             label:'RMSD vector',
                             labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                            min:0,
                         },
                         yaxis:{
                             label:'Our similarity vector',
@@ -88,6 +89,8 @@
                     yaxis:{
                         label:'Our similarity matrix',
                         labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                        min:0,
+                        max:1,
                     }
                 }
             })
@@ -115,6 +118,8 @@
                     yaxis:{
                         label:'Our similarity matrix',
                         labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                        min:0,
+                        max:1,
                     }
                 }
             });
