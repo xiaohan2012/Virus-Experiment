@@ -116,15 +116,19 @@ def cal_avg_sift_from_complex(complex_path='data/HL_chain/1RD8-1918/complex.1000
     avg_sift.gen_avg_sift(fp_gen_path,sift_path)#generate average sift
 
 if __name__ == '__main__':
-    data_src = '/home/xiaohan/code/virus_evolv_exp/new_fp_data/data/data HIV/*'
-    output_base_dir = '/home/xiaohan/Desktop/result'
+    from config import *
+    data_root = os.path.join(data_root ,"complex/*")
     #data_src = 'data/HL_chain/HL_Q464S3/*'
-    for fname in glob.glob(data_src):
+    for fname in glob.glob(data_root ):
         complex_id = os.path.basename(fname) 
-        output_dir = os.path.join(output_base_dir,complex_id)
-        fname = os.path.join(fname,complex_id+".pdb")
+        complex_path = os.path.join(fname,complex_id+".pdb")
         print complex_id
-        if os.path.exists(os.path.join(output_dir,"avg_sift.out")):
-            #print "%s is processed" %complex_id
-            continue
-        cal_avg_sift_from_complex(fname,output_dir,split_fun=globals()['split_complex_intelligently'])
+        binder_path = os.path.join(fname, 'antigen.pdb')
+        receptor_path = os.path.join(fname, 'antibody.pdb')
+        
+        note_path = os.path.join(fname, "note.txt")
+        print "mv %s/*.txt %s/note.txt" %(fname,fname)
+        #os.system("mv %s/*.txt %s/note.txt" %(fname,fname))
+
+        split_complex_intelligently(complex_path , binder_path, receptor_path, note_path)
+        #cal_avg_sift_from_complex(fname,output_dir,split_fun=globals()['split_complex_intelligently'])
