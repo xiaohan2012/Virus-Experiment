@@ -50,7 +50,7 @@ def perform_roc_test(groups , mat,roc_step_count = 11):
         specificity_array.append(temp["specificity"])
         cutoff_array.append(cutoff)
 
-    return  specificity_array , sensitivity_array , cutoff_array
+    return  specificity_array , sensitivity_array 
 
 def generate_yard_file(groups , mat , yard_file_name = "yard_output.txt"):
     with open(yard_file_name ,'w') as f:
@@ -76,11 +76,12 @@ if __name__ == "__main__":
 
     pdbs = [pdb for g in groups for pdb in g]
 
-    inv_code_map = get_inv_codes_from_file(data_src)
-    mat  = DistanceMatrix(mat_id  = "ARGP820101" , code_map = inv_code_map)
+    inv_code_map = get_inv_codes_from_file(pdb_src)
+    mat  = DistanceMatrix(mat_id  = "ARGP820101_dist_mat" , code_map = inv_code_map)
 
-    roc_data = perform_roc_test(pdbs, group_rel , mat,roc_step_count = 21)
-    #for cutoff,stat in roc_data.items():
-        #print "cutoff:%f\tsensitivity:%f\tspecificity:%f" %(cutoff,stat["sensitivity"],stat["specificity"])
+    roc_data = perform_roc_test(group_rel, mat,roc_step_count = 21)
+    print roc_data
+    for cutoff,stat in roc_data:
+        print "cutoff:%f\tsensitivity:%f\tspecificity:%f" %(cutoff,stat["sensitivity"],stat["specificity"])
 
-    #generate_yard_file(pdbs, group_rel , mat)
+    generate_yard_file(pdbs, group_rel , mat)

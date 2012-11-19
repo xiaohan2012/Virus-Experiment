@@ -5,7 +5,6 @@
     <title>Using jqplot to plot the roc of virus experiment</title>
     <!--my own stuff start-->
     <script type="text/javascript" src="roc/data.js"></script>
-    <script type="text/javascript" src="roc/options.js"></script>
     <!--my own stuff end-->
 
     <!--libraries start-->
@@ -23,6 +22,9 @@
     <link rel="stylesheet" href="jqplot/jquery.jqplot.min.css" />
     <!--libraries end-->
 
+    <!--common options-->
+    <script type="text/javascript" src="roc/options.js"></script>
+    <!--common options end-->
     <script type="text/javascript">
         $(document).ready(function(){
             var plot0 = $.jqplot ('chart0',data ,{

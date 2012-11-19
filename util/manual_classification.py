@@ -12,13 +12,13 @@ from config import *
 def get_166_manual_groups():
     pdb_names = []
     
-    for fname in glob.glob(data_src):
+    for fname in glob.glob(pdb_src):
         complex_id = os.path.basename(fname).split('.')[0]
         pdb_names.append(complex_id.strip())
     print pdb_names,len(pdb_names)
     
-    pdb_fp = os.path.join(boss_root , 'manual_classification_result/166_pdbname.txt')
-    type_fp = os.path.join(boss_root , 'manual_classification_result/166_type.txt')
+    pdb_fp = os.path.join(data_root , 'manual_classification_result/166_pdbname.txt')
+    type_fp = os.path.join(data_root , 'manual_classification_result/166_type.txt')
     
     class_d = OrderedDefaultDict(list)
     for name,c_type in zip(open(pdb_fp).readlines(),\

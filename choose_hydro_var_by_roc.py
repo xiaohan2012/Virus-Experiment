@@ -69,13 +69,18 @@ def print_js_style_roc_test_result(mat_id):
         xy_arr.append("[%f , %f]" %(x , y))
     sys.stderr.write("var $%s = [ %s ];\n" %(re.findall(r"(\w+)_dist_mat" , mat_id )[0], ','.join(xy_arr)))        
 
-if __name__ == "__main__":
-    hydros = map(lambda a:a + "_dist_mat" , load_hydro_var()) #append `_dist_mat` to hydro names
+def batch_plotting(hydros):
+    hydros = map(lambda a:a + "_dist_mat" , hydros) #append `_dist_mat` to hydro names
     for mat_id in hydros:
         #var_name = re.findall(r"(\w+)_dist_mat" , mat_id )[0]
         #sys.stderr.write("$%s ," %var_name );
         print_js_style_roc_test_result(mat_id);
 
+    
+if __name__ == "__main__":
+    #load_hydro_var()
+
+    batch_plotting(["ARGP820101"])
     #plot_roc_for_hydro_vars(hydros)
     #batch_plot(hydros[:2])
 
