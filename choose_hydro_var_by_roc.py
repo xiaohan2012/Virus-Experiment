@@ -75,7 +75,23 @@ def batch_plotting(hydros):
         #var_name = re.findall(r"(\w+)_dist_mat" , mat_id )[0]
         #sys.stderr.write("$%s ," %var_name );
         print_js_style_roc_test_result(mat_id);
-
+    
+    #write other js snippets
+    sys.stderr.write("var hydro_names = [%s];\n" %(",".join(["\"%s\"" %hydro[:-9] for hydro in hydros])))
+    sys.stderr.write("var data = [%s];\n" %(",".join(["$%s" %hydro[:-9] for hydro in hydros])))
+    if len(hydros) <= 6:
+        sys.stderr.write("var groups = [{data:data,\nnames:hydro_names}];\n")
+    else:
+        sys.stderr.write("""
+var groups = []; 
+//divide the data into 6 groups, each containing 6 cases.
+for(var i = 0; i < 6 ;i++){
+    groups.push({
+    data:data.slice(i * 6 , i * 6 + 6), 
+    names:hydro_names.slice(i * 6 , i * 6 + 6)
+    }); 
+}
+""")
     
 if __name__ == "__main__":
     #load_hydro_var()

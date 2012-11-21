@@ -9,7 +9,7 @@ class DistanceMatrix(object):
         if code_map:
             self.cm = code_map
         else:            
-            self.cm = get_inv_codes_from_file(data_src)
+            self.cm = get_inv_codes_from_file(pdb_src)
 
     def get_distance_between(self,pdb1,pdb2):
         ind1 = self.cm[pdb1]

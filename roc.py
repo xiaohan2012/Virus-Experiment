@@ -50,7 +50,7 @@ def perform_roc_test(groups , mat,roc_step_count = 11):
         specificity_array.append(temp["specificity"])
         cutoff_array.append(cutoff)
 
-    return  specificity_array , sensitivity_array 
+    return  specificity_array , sensitivity_array , cutoff_array
 
 def generate_yard_file(groups , mat , yard_file_name = "yard_output.txt"):
     with open(yard_file_name ,'w') as f:
