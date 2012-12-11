@@ -5,8 +5,8 @@ import os
 from pickle import dump,load
 from numpy import array,zeros
 
-from util.aa2code import *
-from config import *
+from ve.util.aa2code import *
+from ve.config import *
 
 def get_sim_matrix_from_db(code_map , col):
     size = len(code_map.keys())
@@ -47,4 +47,4 @@ def load_sim_mat(mat_obj_id , force_refresh = False):
 
 
 if __name__ == "__main__":
-    load_sim_mat("WILM950103_dist_mat" , force_refresh = True)
+    load_sim_mat("WILM950103" , force_refresh = True)

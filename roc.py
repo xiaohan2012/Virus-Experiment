@@ -7,7 +7,7 @@ provides ROC related functionality
 import os
 import glob
 from collections import OrderedDict
-from customcollections import OrderedDefaultDict
+from util.customcollections import OrderedDefaultDict
 from numpy import linspace,min,max
 from pickle import dump,load
 import matplotlib.pyplot as plt
@@ -71,7 +71,7 @@ def draw_roc(x_arr  , y_arr ):
     plt.show()        
     
 if __name__ == "__main__":
-    groups = get_166_manual_groups()
+    groups = get_manual_groups()
     group_rel = PdbGroupRelation(groups)
 
     pdbs = [pdb for g in groups for pdb in g]

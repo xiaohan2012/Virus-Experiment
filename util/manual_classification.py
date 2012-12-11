@@ -10,12 +10,13 @@ from customcollections import OrderedDefaultDict
 from config import *
 
 def get_manual_groups(group_id = "157" ):
+    print "generating manual classification and grouping"
     pdb_names = []
     
     for fname in glob.glob(pdb_src):
         complex_id = os.path.basename(fname).split('.')[0]
         pdb_names.append(complex_id.strip())
-    print pdb_names,len(pdb_names)
+    #print pdb_names,len(pdb_names)
     
     pdb_fp = os.path.join(data_root , 'manual_classification_result/%s_pdbname.txt' %group_id)
     type_fp = os.path.join(data_root , 'manual_classification_result/%s_type.txt' %group_id)
@@ -29,9 +30,9 @@ def get_manual_groups(group_id = "157" ):
             class_d[c_type].append(name)
     count = 0                    
     for c,pdbs in class_d.items():
-        print c,pdbs
+        #print c,pdbs
         count += len(pdbs)
-    print count        
+    #print count        
     return class_d.values()
 
 class PdbGroupRelation(defaultdict):

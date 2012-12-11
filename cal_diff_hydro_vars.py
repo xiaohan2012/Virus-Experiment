@@ -13,8 +13,7 @@ from cal_sim_mat import gen_sim_matrix
 from util.logger import TaskFileLogger
 from config import *
 
-h_fp = "hydro_variations.dat"
-def load_hydro_var(h_fp = "/home/rxzhu/code/Virus-Experiment/hydro_variations.dat"):
+def load_hydro_var(h_fp = "hydro_variations.dat"):
     with open(h_fp,'r') as f:
         reses = f.readline().split()
         d_ = {}
