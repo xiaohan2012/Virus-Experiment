@@ -8,7 +8,7 @@ from roc import generate_yard_file , print_auc , perform_roc_test
 from dist_mat import DistanceMatrix
 from sim_mat import *
 from config import *
-from util.manual_classification import get_166_manual_groups , PdbGroupRelation
+from util.manual_classification import get_manual_groups , PdbGroupRelation
 from sim_mat import load_sim_mat
 from cal_diff_hydro_vars import load_hydro_var
 
@@ -94,10 +94,10 @@ for(var i = 0; i < 6 ;i++){
 """)
     
 if __name__ == "__main__":
-    #load_hydro_var()
+    hydros = load_hydro_var()
 
-    batch_plotting(["ARGP820101"])
-    #plot_roc_for_hydro_vars(hydros)
+    #batch_plotting(["ARGP820101"])
+    plot_roc_for_hydro_vars(hydros)
     #batch_plot(hydros[:2])
 
     #get_all_auc()
