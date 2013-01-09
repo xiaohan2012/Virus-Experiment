@@ -6,10 +6,11 @@ from glob import glob
 
 from fp_75_gen import get_15bits
 from fp_gen2 import Residue, Complex
-from util.load_pdb import load_pdb_struct
-from util.file import fpstr2file
 
-from config import *
+from ve.util.load_pdb import load_pdb_struct
+from ve.util.file import fpstr2file
+
+from ve.config import *
 class FP75(object):
     def __init__(self,antigen,antibody):
         self.antigen = antigen
@@ -59,9 +60,12 @@ class FP75(object):
 
     def concat_fps(self):
         self.fp = OrderedDict()
+
+        print self.fp_15.keys()
+        print self.fp_first_30.keys()
+        print self.fp_last_30.keys()
+
         for res,fp in self.fp_15.items():
-            print "first 30", self.fp_first_30[res]
-            print "second 30", self.fp_last_30[res]
             self.fp[res] = fp + self.fp_first_30[res] + self.fp_last_30[res]
 
 

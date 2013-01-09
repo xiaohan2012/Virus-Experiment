@@ -8,12 +8,12 @@ from roc import generate_yard_file , print_auc , perform_roc_test
 from dist_mat import DistanceMatrix
 from sim_mat import *
 from config import *
-from util.manual_classification import get_166_manual_groups , PdbGroupRelation
+from util.manual_classification import get_manual_groups , PdbGroupRelation
 from sim_mat import load_sim_mat
 from cal_diff_hydro_vars import load_hydro_var
 
 def init_pdb_groups_relation():
-    groups = get_166_manual_groups()
+    groups = get_manual_groups()
     group_rel = PdbGroupRelation(groups)
 
     return group_rel
@@ -67,18 +67,18 @@ def print_js_style_roc_test_result(mat_id):
     x_arr.reverse();y_arr.reverse();#reverse the order so that jqplot can draw properly
     for x,y in zip(x_arr , y_arr):
         xy_arr.append("[%f , %f]" %(x , y))
-    sys.stderr.write("var $%s = [ %s ];\n" %(mat_id , ','.join(xy_arr)))
+    sys.stderr.write("var $%s = [ %s ];\n" %(mat_id , ','.join(xy_arr)))        
 
-def batch_plotting(hydros):
-    #hydros = map(lambda a:a + "_dist_mat" , hydros) #append `_dist_mat` to hydro names
+def gen_jqplot_data(hydros):
     for mat_id in hydros:
         #var_name = re.findall(r"(\w+)_dist_mat" , mat_id )[0]
         #sys.stderr.write("$%s ," %var_name );
         print_js_style_roc_test_result(mat_id);
     
     #write other js snippets
-    sys.stderr.write("var hydro_names = [%s];\n" %(",".join(["\"%s\"" %hydro for hydro in hydros])))
-    sys.stderr.write("var data = [%s];\n" %(",".join(["$%s" %hydro for hydro in hydros])))
+
+    sys.stderr.write("var hydro_names = [%s];\n" %(",".join(map(lambda s: "\"%s\"" %s, hydros))))
+    sys.stderr.write("var data = [%s];\n" %(",".join(map(lambda a: "$%s" %a,hydros))))
     if len(hydros) <= 6:
         sys.stderr.write("var groups = [{data:data,\nnames:hydro_names}];\n")
     else:
@@ -95,9 +95,7 @@ for(var i = 0; i < 6 ;i++){
     
 if __name__ == "__main__":
     hydros = load_hydro_var()
-
-    #batch_plotting(hydros )#["ARGP820101"]
     #plot_roc_for_hydro_vars(hydros)
-    #batch_plot(hydros[:2])
+    gen_jqplot_data(hydros)
 
     get_all_auc()

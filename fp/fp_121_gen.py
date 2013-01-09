@@ -8,9 +8,9 @@ from collections import defaultdict,OrderedDict
 from itertools import izip
 from cgkit.cgtypes import *
 
-from util.load_pdb import load_pdb_struct
-from util.file import fpstr2file
-from config import *
+from ve.util.load_pdb import load_pdb_struct
+from ve.util.file import fpstr2file
+from ve.config import *
 
 from geom import *
 
@@ -177,4 +177,4 @@ def data237_fp_gen(refresh = True):
             print "fingerprint saved"
 
 if __name__ == "__main__":
-    data237_fp_gen(True)
+    data237_fp_gen(False)

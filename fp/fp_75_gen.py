@@ -13,13 +13,14 @@ from customcollections import OrderedDefaultDict
 
 import os
 
-from config import *
-from util.load_pdb import load_pdb_struct
+from ve.config import *
+from ve.util.load_pdb import load_pdb_struct
 
 from threading import Thread
 from Queue import Queue
 
 from fp_gen import distance_tree , distance_data , sift_gen , sift
+
 class GroupingWorker(Thread):
     def __init__(self,q):
         Thread.__init__(self)
@@ -245,9 +246,7 @@ class distance_tree_15(distance_tree):
         
 
     def set_resnum_limit(self):
-        resnums = [res.resnum for res in self.receptor.residue]
-        self.min_resnum = min(resnums)
-        self.max_resnum = max(resnums)
+        self.resnums = [res.resnum for res in self.receptor.residue]
 
     def find_close_residues(self,  ligand,  cutoff = 4.0):
         self.ligand = ligand
@@ -283,7 +282,7 @@ class distance_tree_15(distance_tree):
         default_fp = ['0', '00', '00', '00', '00', '0', '0', '00', '00']
         return OrderedDict([(i, 
                              d.get(i,sift_bitset_15(i,default_fp)).bit_set) \
-                                for i in xrange(self.min_resnum, self.max_resnum+1)])
+                                for i in self.resnums])
             
 
 class sift_bitset_15(object):

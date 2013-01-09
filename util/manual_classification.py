@@ -9,16 +9,17 @@ import glob
 from customcollections import OrderedDefaultDict
 from config import *
 
-def get_166_manual_groups():
+def get_manual_groups(group_id = "157" ):
+    print "generating manual classification and grouping"
     pdb_names = []
     
     for fname in glob.glob(pdb_src):
         complex_id = os.path.basename(fname).split('.')[0]
         pdb_names.append(complex_id.strip())
-    print pdb_names,len(pdb_names)
+    #print pdb_names,len(pdb_names)
     
-    pdb_fp = os.path.join(data_root , 'manual_classification_result/157_pdbname.txt')
-    type_fp = os.path.join(data_root , 'manual_classification_result/157_type.txt')
+    pdb_fp = os.path.join(data_root , 'manual_classification_result/%s_pdbname.txt' %group_id)
+    type_fp = os.path.join(data_root , 'manual_classification_result/%s_type.txt' %group_id)
     
     class_d = OrderedDefaultDict(list)
     for name,c_type in zip(open(pdb_fp).readlines(),\
@@ -29,9 +30,9 @@ def get_166_manual_groups():
             class_d[c_type].append(name)
     count = 0                    
     for c,pdbs in class_d.items():
-        print c,pdbs
+        #print c,pdbs
         count += len(pdbs)
-    print count        
+    #print count        
     return class_d.values()
 
 class PdbGroupRelation(defaultdict):
@@ -52,3 +53,5 @@ class PdbGroupRelation(defaultdict):
             return self[pdb1][pdb2]
         except KeyError:
             return -1
+if __name__ == "__main__"        :
+    get_manual_groups()

@@ -1,9 +1,9 @@
 import xlrd
 import xlwt
 
-from draw_roc import get_166_manual_groups
+from util.manual_classification import get_manual_groups
 
-groups = get_166_manual_groups()
+groups = get_manual_groups("166")
 pdbs = []
 for g in groups:
     for i in g:

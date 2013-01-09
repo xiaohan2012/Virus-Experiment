@@ -3,7 +3,7 @@ import re
 from glob import glob
 
 
-from config import sim_dist_pickle_dir 
+from ve.config import sim_dist_pickle_dir 
 def fix_mat_name():
     for fp in glob(os.path.join(sim_dist_pickle_dir,"*")):
         mat_id = re.findall(r"[A-Z]{3,}\d{3,}",fp)[0]
