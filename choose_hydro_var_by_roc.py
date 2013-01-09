@@ -38,7 +38,7 @@ def gen_img_from_yard_file(i_path,o_path):
 
 
 def get_all_auc():
-    hydros = map(lambda a:a + "_dist_mat" , load_hydro_var()) #append `_dist_mat` to hydro names
+    hydros = load_hydro_var() #append `_dist_mat` to hydro names
     for mat_id in hydros:
         yard_path = os.path.join(hydro_yard_dir,"%s.txt" %mat_id)
         print mat_id
@@ -67,18 +67,18 @@ def print_js_style_roc_test_result(mat_id):
     x_arr.reverse();y_arr.reverse();#reverse the order so that jqplot can draw properly
     for x,y in zip(x_arr , y_arr):
         xy_arr.append("[%f , %f]" %(x , y))
-    sys.stderr.write("var $%s = [ %s ];\n" %(re.findall(r"(\w+)_dist_mat" , mat_id )[0], ','.join(xy_arr)))        
+    sys.stderr.write("var $%s = [ %s ];\n" %(mat_id , ','.join(xy_arr)))
 
 def batch_plotting(hydros):
-    hydros = map(lambda a:a + "_dist_mat" , hydros) #append `_dist_mat` to hydro names
+    #hydros = map(lambda a:a + "_dist_mat" , hydros) #append `_dist_mat` to hydro names
     for mat_id in hydros:
         #var_name = re.findall(r"(\w+)_dist_mat" , mat_id )[0]
         #sys.stderr.write("$%s ," %var_name );
         print_js_style_roc_test_result(mat_id);
     
     #write other js snippets
-    sys.stderr.write("var hydro_names = [%s];\n" %(",".join(["\"%s\"" %hydro[:-9] for hydro in hydros])))
-    sys.stderr.write("var data = [%s];\n" %(",".join(["$%s" %hydro[:-9] for hydro in hydros])))
+    sys.stderr.write("var hydro_names = [%s];\n" %(",".join(["\"%s\"" %hydro for hydro in hydros])))
+    sys.stderr.write("var data = [%s];\n" %(",".join(["$%s" %hydro for hydro in hydros])))
     if len(hydros) <= 6:
         sys.stderr.write("var groups = [{data:data,\nnames:hydro_names}];\n")
     else:
@@ -94,10 +94,10 @@ for(var i = 0; i < 6 ;i++){
 """)
     
 if __name__ == "__main__":
-    #load_hydro_var()
+    hydros = load_hydro_var()
 
-    batch_plotting(["ARGP820101"])
+    #batch_plotting(hydros )#["ARGP820101"]
     #plot_roc_for_hydro_vars(hydros)
     #batch_plot(hydros[:2])
 
-    #get_all_auc()
+    get_all_auc()

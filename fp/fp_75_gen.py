@@ -5,7 +5,7 @@ the next 30 bits describes the spacial features in respective of the antigen
 the last 30 bits describes the same thing inrespective of the antiboby
 """
 from itertools import chain
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 import numpy as np
 from UserList import UserList
 from schrodinger import structure, structureutil
@@ -242,8 +242,15 @@ class distance_tree_15(distance_tree):
     def __init__(self,  pv_file = None):
         distance_tree.__init__(self , pv_file)
         self.fingerprints = sift_gen_15(self.receptor)
+        
+
+    def set_resnum_limit(self):
+        resnums = [res.resnum for res in self.receptor.residue]
+        self.min_resnum = min(resnums)
+        self.max_resnum = max(resnums)
 
     def find_close_residues(self,  ligand,  cutoff = 4.0):
+        self.ligand = ligand
         lig_name = ligand.title
         d_ = defaultdict(list)
         for atom in ligand.atom:
@@ -263,12 +270,21 @@ class distance_tree_15(distance_tree):
                     #Just take into account the special case, H_DONOR and H_RECEPTOR
                     self.fingerprints.add_sift_chunk_special_case(close.data.atom,  atom,  ligand.title,  atom_atom_dist)
                     
-        max_atom_nums = max([len(atom_list) for atom_list in d_.values()])
+        #max_atom_nums = max([len(atom_list) for atom_list in d_.values()])
         #modified definition of interaction
         #print "max in-range atoms count ",max_atom_nums 
         for close_atom, atoms in d_.items():
             #print lig_names
             self.fingerprints.add_sift_chunk_ordinary(close_atom,ligand.title , atoms)#we have only on ligand per complex
+
+    def get_fp_dict(self):
+        lig_name = self.ligand.title
+        d = self.fingerprints.sifts[lig_name].sift
+        default_fp = ['0', '00', '00', '00', '00', '0', '0', '00', '00']
+        return OrderedDict([(i, 
+                             d.get(i,sift_bitset_15(i,default_fp)).bit_set) \
+                                for i in xrange(self.min_resnum, self.max_resnum+1)])
+            
 
 class sift_bitset_15(object):
     """ one single sift vector"""
@@ -279,7 +295,7 @@ class sift_bitset_15(object):
         self.bit_len_config = [2] * 9
         self.bit_len_config[0] = self.bit_len_config[5] = self.bit_len_config[6] = 1
         self.bit_set = ["0" * length for length in self.bit_len_config]
-        print "bit set" , self.bit_set
+        #print "bit set" , self.bit_set
 
     def turn_sift_bit_on(self,  sift_bit, strength):
         if strength == "strong":
@@ -311,7 +327,7 @@ class sift_gen_15(sift_gen):
         self.stren_threshold = {'BACKBONE' : 3,  'SIDECHAIN' : 3,  'POLAR' : 3,  'HYDROPHOBIC' : 3,  'H_ACCEPTOR' : 3,  'H_DONOR' : 3,  'AROMATIC' : 3,  'CHARGED' : 1}
 
     def get_cur_sift(self , lig_name , rec_atom):
-        print "resnum:%4d" %rec_atom.resnum
+        #print "resnum:%4d" %rec_atom.resnum
         if self.sifts.has_key(lig_name):
             if rec_atom.resnum in self.sifts[lig_name].sift.keys():
                 cur_sift = self.sifts[lig_name]
@@ -373,6 +389,21 @@ class sift_gen_15(sift_gen):
                 if 'CHARGED' in self.active_bits:
                     strength = "strong" if len(atoms) >= self.stren_threshold['CHARGED'] else "exists"
                     cur_sift.turn_sift_bit_on(self.bit_pos['CHARGED'],  rec_atom.resnum, strength)
+                    
+def get_15bits(receptor, binder):
+    rec_tree = distance_tree_15()
+
+    rec_tree.set_receptor_structure(receptor)
+    rec_tree.parse_receptor()
+    
+    rec_tree.set_resnum_limit()
+
+    print "15 bits calculating" 
+    rec_tree.find_close_residues(binder , 10.0)
+
+    lig_name = rec_tree.fingerprints.sifts.keys()[0]
+
+    return rec_tree.get_fp_dict()
 
 def gen_fp_to_file(receptor=None,binder=None,fp_path=''):
     rec_tree = distance_tree_15()

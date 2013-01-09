@@ -3,13 +3,15 @@
 Configuration files for data file path, database connection,etc
 """
 import os
+import logging
 
 from machine_setting import base
-from dbconfig import *
+#from dbconfig import *
 
 data_root = os.path.join(base,"data")
 fp_root = os.path.join(base,"data/402/fp_result")
 pdb_src = os.path.join(base,"data/402/pdb_file/*")
+complex_dir = os.path.join(data_root,"complex")
 output_dir = os.path.join(base,"data/402/fp_result")
 sim_dist_pickle_dir = os.path.join(base,"data/402/sim_dist_pickle")
 hydro_yard_dir = os.path.join(base,"data/402/yard_file")
@@ -25,3 +27,10 @@ epi166_root = os.path.join(data_root, "epi_166")
 pdb_166_src = os.path.join(epi166_root ,"pdb_file/*")
 chain_list_path = os.path.join(epi166_root ,"chains.txt")
 dist_mat_path = os.path.join(epi166_root, "dist_mat_csv/dist_mat.csv")
+
+data237_root = os.path.join(data_root,"data237")
+data237_complex_root = os.path.join(data237_root,"splitted_complex")
+data237_fp_root = os.path.join(data237_root,"fp")
+data237_fp75_root = os.path.join(data237_root,"fp_75")
+
+logger = logging.getLogger()

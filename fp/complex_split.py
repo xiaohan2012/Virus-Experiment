@@ -119,7 +119,7 @@ if __name__ == '__main__':
     from config import *
     data_root = os.path.join(data_root ,"complex/*")
     #data_src = 'data/HL_chain/HL_Q464S3/*'
-    for fname in glob.glob(data_root ):
+    for fname in glob.glob(pdb_src):
         complex_id = os.path.basename(fname) 
         complex_path = os.path.join(fname,complex_id+".pdb")
         print complex_id

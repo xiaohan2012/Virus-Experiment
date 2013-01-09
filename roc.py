@@ -53,6 +53,7 @@ def perform_roc_test(groups , mat,roc_step_count = 11):
     return  specificity_array , sensitivity_array , cutoff_array
 
 def generate_yard_file(groups , mat , yard_file_name = "yard_output.txt"):
+    pdbs = groups.keys()
     with open(yard_file_name ,'w') as f:
         f.write("output\tmethod1\n")
         for i in xrange(len(groups.keys())):

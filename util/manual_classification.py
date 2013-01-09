@@ -17,8 +17,8 @@ def get_166_manual_groups():
         pdb_names.append(complex_id.strip())
     print pdb_names,len(pdb_names)
     
-    pdb_fp = os.path.join(data_root , 'manual_classification_result/166_pdbname.txt')
-    type_fp = os.path.join(data_root , 'manual_classification_result/166_type.txt')
+    pdb_fp = os.path.join(data_root , 'manual_classification_result/157_pdbname.txt')
+    type_fp = os.path.join(data_root , 'manual_classification_result/157_type.txt')
     
     class_d = OrderedDefaultDict(list)
     for name,c_type in zip(open(pdb_fp).readlines(),\
