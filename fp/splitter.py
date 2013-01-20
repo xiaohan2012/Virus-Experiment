@@ -3,7 +3,7 @@ import re
 
 from glob import glob
 
-from config import *
+from ve.config import *
 
 def read_237_config(fp = os.path.join(data237_root,"list_237.txt")):
     cfg = {}
@@ -41,7 +41,7 @@ def split():
 def filter_file(file_obj,g_chain, b_chain):
     g_lines,b_lines = [],[]
     for l in file_obj.readlines():
-        if not l.startswith("ATOM"):
+        if not (l.startswith("ATOM") or l.startswith("TER")):
             continue
         chain_name = l[21]
         if chain_name in g_chain:g_lines.append(l)

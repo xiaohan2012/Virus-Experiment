@@ -401,9 +401,24 @@ def get_15bits(receptor, binder):
     rec_tree.find_close_residues(binder , 10.0)
 
     lig_name = rec_tree.fingerprints.sifts.keys()[0]
+    
+    fp_dict = rec_tree.get_fp_dict()
 
-    return rec_tree.get_fp_dict()
+    from fp import BaseComplexFingerprint,BaseResidueFingerprint
 
+    fp = BaseComplexFingerprint()
+
+    for res in receptor.residues:
+        #reconstruct
+        res_fp = BaseResidueFingerprint(res,15)
+
+        string = ''.join(fp_dict[res.resnum])
+        for idx,bit in enumerate(string):
+            res_fp[idx]= int(bit)
+
+        fp[res] = res_fp
+
+    return fp
 def gen_fp_to_file(receptor=None,binder=None,fp_path=''):
     rec_tree = distance_tree_15()
 

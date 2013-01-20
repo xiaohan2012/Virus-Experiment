@@ -11,6 +11,13 @@ from cgkit.cgtypes import *
 from numpy import *
 import glob
 
+from ve.util.dist import res_ca_dist
+from ve.util.residue import BaseResidue
+from ve.config import *
+
+
+
+
 class Residue(object):
     def __init__(self , res , comp):
         self.hydro_dict = {'A':0.61,'C':1.07,'D':0.46,'E':0.47,'F':2.02,'G':0.07,'H':0.61,'I':2.22,'K':1.15,'L':1.53,'M':1.18,'N':0.06,'P':1.95,'Q':0.0,'R':0.6,'S':0.05,'T':0.05,'V':1.32,'W':2.65,'Y':1.88}
@@ -50,7 +57,9 @@ class Residue(object):
                 self.ca = a
                 break
         if self.ca is None:
+            print "resnum %d" %res.resnum
             raise ValueError("self.ca should not be none")
+
     def turn_on_bit(self,bit_num,count):
         self.fp[bit_num] = count
 
@@ -95,18 +104,18 @@ class Residue(object):
             self.turn_on_bit(bit_num,count)
 
         return self.fp           
+    
 
     def get_surrounding_fp(self):
         #type two fp
         d_ = defaultdict(list)
-        for res in self.get_surrounding_res():
-            ca = res.ca
-            dist = sqrt(sum(power(array(ca.xyz) - array(self.ca.xyz),2)))#distance
+        for other in self.get_surrounding_res():
+            dist = res_ca_dist(other,self)
             dist_ind = floor( dist / self.dist_step )
 
             if dist_ind > self.dist_ind_min and dist_ind < self.dist_ind_max:
                 #within range
-                d_[dist_ind].append(res)
+                d_[dist_ind].append(other)
 
         for i in xrange(self.dist_ind_max - self.dist_ind_min + 1):
             # for layer i
@@ -136,6 +145,8 @@ class Complex(object):
             self.st = structure.StructureReader(pdb_fp).next()
         elif isinstance(pdb_fp,Structure):#it is structure already
             self.st = pdb_fp
+        else:
+            self.st = pdb_fp
         self.residues = []
         for res in self.st.residue:
             self.residues.append(Residue(res,self))
@@ -164,16 +175,13 @@ if __name__ == "__main__":
     #c.get_fp()
     #c.write_fp_to_file("/home/xiaohan/Desktop/temp.dat")
     
-    data_src = "/home/rxzhu/code/Virus-Experiment/parallel/pdb_file/*"
-    output_dir = "/home/rxzhu/code/Virus-Experiment/parallel/fp_result"
-    for fname in glob.glob(data_src):
+    #output_dir = "/home/rxzhu/code/ve/parallel/fp_result"
+    for fname in glob.glob(pdb_src):
         complex_id = os.path.basename(fname).split('.')[0] 
-        fp_path = os.path.join(output_dir,complex_id + ".fp" )
-        if os.path.exists(fp_path):
-            print "%s processed" %complex_id
-            continue
-        print "processing %s,fp saved as %s" %(fname , fp_path )
+
         c = Complex(fname)
         c.get_fp()
-        c.write_fp_to_file(fp_path)
+
+        #fp_path = os.path.join(output_dir,complex_id + ".fp" )
+        #c.write_fp_to_file(fp_path)
 

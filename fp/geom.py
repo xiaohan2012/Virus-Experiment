@@ -75,8 +75,8 @@ class Plane(Array):
         self.A, self.B, self.C, self.D = self
 
     def dist2point(self,point):
-        return abs((sum(point * self[:3]) - self[3]) /\
-                np.sqrt(np.sum(self[:3] ** 2)))
+        return (sum(point * self[:3]) - self[3]) /\
+                np.sqrt(np.sum(self[:3] ** 2))
 
     def get_perp_point(self,ext_point):
         """get perpendicular point of a external point"""
