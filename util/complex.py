@@ -3,4 +3,3 @@ class BaseComplex(object):
         self.atg = antigen
         self.atb = antibody
 
-

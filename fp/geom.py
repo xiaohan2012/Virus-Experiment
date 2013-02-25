@@ -100,7 +100,7 @@ def get_perp_point(line_point1,line_point2,ext_point):
     m,n,p    = ext_point
     t = ((x1-m)*(x1-x2) + (y1-n)*(y1-y2) + (z1-p)*(z1-z2)) /\
         ((x1-x2)**2 + (y1-y2)**2 + (z1-z2)**2)
-    print 
+
     cx,cy,cz = x1+t*(x2-x1),\
                y1+t*(y2-y1),\
                z1+t*(z2-z1)

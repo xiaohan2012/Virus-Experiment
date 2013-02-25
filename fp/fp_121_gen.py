@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*- 
+"""
+120 bits finger print
+
+"""
 from __future__ import division
 
 import os

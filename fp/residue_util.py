@@ -1,5 +1,7 @@
 
 from collections import defaultdict
+
+from geom import get_perp_plane
 from fp import BaseResidueFingerprint
 
 from types import MethodType
@@ -26,9 +28,18 @@ def init_neighbour_util(self):
     self.find_neighbours = MethodType(find_neighbours,self)
     self.get_neighbours = MethodType(get_neighbours,self)
 
+def set_axial_plane(self, other_center):
+    vec = self.center - other_center
+    self.axial_plane = get_perp_plane(vec, self.center)
+
+def init_axial_plane_util(self):
+    self.set_axial_plane = MethodType(set_axial_plane,self)
+
+
 #electric finger print calculation
 
 def gen_electric_fp(self,others):
+    bitlength=30
     layer_res_list = defaultdict(list)
     for other in others:
         dist = self.distcache.get(other,self)
@@ -38,7 +49,7 @@ def gen_electric_fp(self,others):
         if dist >= self.dist_min and dist <= self.dist_max:
             layer_res_list[dist_ind].append(other)
     
-    fp = BaseResidueFingerprint(self,self.bitlength)
+    fp = BaseResidueFingerprint(self,bitlength)
 
     for i in xrange(self.layer_count):# at layer i
         h_bond,charged,hydro = 0,0,0
@@ -56,6 +67,8 @@ def gen_electric_fp(self,others):
     self.fp = fp
 
 def gen_electric_fp_triangle(self,others):
+    bitlength=30
+
     layer_tri_list = defaultdict(list)
     for other in others:
         dist = self.distcache.get(other,self)
@@ -65,7 +78,7 @@ def gen_electric_fp_triangle(self,others):
         if dist >= self.dist_min and dist <= self.dist_max:
             layer_tri_list[dist_ind].append(other)
     
-    fp = BaseResidueFingerprint(self,self.bitlength)
+    fp = BaseResidueFingerprint(self,bitlength)
     
     #for layer,lst in layer_tri_list.items():
         #print layer,lst
@@ -96,9 +109,8 @@ def init_electric_fp_util(self,dist_max=20, dist_step=2):
 
     self.gen_electric_fp = MethodType(gen_electric_fp,self)
     self.gen_electric_fp_triangle = MethodType(gen_electric_fp_triangle,self)
-
+    
+    self.dist_min = 0
     self.dist_max = dist_max
     self.dist_step = dist_step
     self.layer_count = self.dist_max / self.dist_step
-
-

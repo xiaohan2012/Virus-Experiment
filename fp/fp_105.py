@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*- 
+"""
+105 bit fingerprint
+0 -15 :相互作用力(最早版本的那个fp)
+16-35 :物化性质,以抗原侧氨基酸为单位
+36-75 :物化性质,以抗体侧氨基酸为单位
+76-105:物化性质,以抗原侧三角形为单位
+"""
+
 import sys
 import os
 
@@ -21,8 +30,6 @@ class ElectricResidue(BaseResidue):
     def __init__(self,residue):
         BaseResidue.__init__(self,residue)
         self._set_ca_atom()
-
-        self.dist_min = 0
 
         self.fp = None
     
@@ -62,10 +69,6 @@ class ElectricResidue(BaseResidue):
     def gen_fp_triangle(self,others):
         self.gen_electric_fp_triangle(others)
         return self.fp
-
-
-
-        
 
 
 class Complex(TriangleComplex):
