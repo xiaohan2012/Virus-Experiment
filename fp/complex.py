@@ -7,8 +7,8 @@ from complex_util import init_find_epiparatope_util, init_triangle_util
 
 
 class TriangleComplex(BaseComplex):
-    def __init__(self,antigen, antibody):
-        BaseComplex.__init__(self,antigen,antibody)
+    def __init__(self,complex_id, antigen, antibody):
+        BaseComplex.__init__(self,complex_id, antigen,antibody)
 
         self.distcache = ResDistCache()
 

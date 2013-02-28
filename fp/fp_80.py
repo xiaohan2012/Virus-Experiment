@@ -33,8 +33,8 @@ class Residue(BaseResidue):
         return self.fp
 
 class Complex(TriangleComplex):
-    def __init__(self,antigen, antibody):
-        TriangleComplex.__init__(self,antigen,antibody)
+    def __init__(self,complex_id, antigen, antibody):
+        TriangleComplex.__init__(self,complex_id, antigen,antibody)
         
         init_split_cylinder_util(self)
 
@@ -76,17 +76,27 @@ class Complex(TriangleComplex):
 
 def single_test(complex_id):            
     data_dir = os.path.join(data237_complex_root,complex_id)
+
+    print data237_complex_root
+
     antigen = load_pdb_struct(os.path.join(data_dir,"antigen.pdb"),residue_cls = Residue)
     antibody = load_pdb_struct(os.path.join(data_dir,"antibody.pdb"),residue_cls = Residue)
 
     c = Complex(antigen, antibody)
     atg_fp = c.gen_antigen_fp()
     atb_fp = c.gen_antibody_fp()
-    print atb_fp.fp_str()
-    atb_fp.tofile("80bitss.fp")
+    
+    
+    atb_fp.tofile("%s_atb.fp" %complex_id)
+    atg_fp.tofile("%s_atg.fp" %complex_id)
+
     return atg_fp, atb_fp
 
 if __name__ == "__main__":
-    atg_fp, atb_fp = single_test("1SLG_D")
+    single_test("1SLG_D")
+    single_test("1N4X_L")
+    single_test("1JV5_A")
+    single_test("1STS_B")
+
 
 

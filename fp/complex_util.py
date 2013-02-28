@@ -1,4 +1,5 @@
 import math
+import os
 
 from types import MethodType
 
@@ -73,33 +74,101 @@ def init_split_cylinder_util(self,cylinder_radius = 10,
 
 
 
+from pickle import load, dump
 def _find_paratope(self):
     """antibody side"""
+    attr_name = "paratope"
+
+    if self.cache_exists(attr_name):
+        setattr(self, attr_name, self.load_cache(attr_name))
+        return 
+
     for b_r in self.atb.residues:
         for g_r in self.atg.residues:
-                #print b_r.dist2residue(g_r)
             dist =b_r.dist2residue(g_r)
             if dist <=self.paratope_threshold:
                 self.paratope.append(b_r)
                 break
-        #print len(self.paratope)
-            
+    self.save_cache(attr_name)
+
 def _find_epitope(self):
     """antigen side"""
+    attr_name = "epitope"
+
+    if self.cache_exists(attr_name):
+        setattr(self, attr_name, self.load_cache(attr_name))
+        return 
+
     for g_r in self.atg.residues:
         for b_r in self.atb.residues:
-                #print g_r.dist2residue(b_r)
             if g_r.dist2residue(b_r) <= self.paratope_threshold:
                 self.epitope.append(g_r)
                 break
-        #print len(self.epitope)                    
+    self.save_cache(attr_name)
 
+
+def cache_exists(self,cache_type):
+    par_dir = ".cache/%s" %cache_type
+    if not os.path.exists(par_dir):
+        os.makedirs(par_dir)
+
+    cache_path = os.path.join(".cache/%s" %cache_type,
+                              self.id)
+    mark = os.path.exists(cache_path)
+    if mark:
+        print "cache exists", self.id,cache_type
+    return mark
+
+def paratope_cl_process(self,content):
+    return filter(lambda r: r.resnum in content, 
+                  self.atb.residues)
+
+def epitope_cl_process(self,content):
+    return filter(lambda r: r.resnum in content, 
+                  self.atg.residues)
+
+def epi_para_cd_process(self,obj):
+    return map(lambda r: r.resnum, obj)
+
+
+def load_cache(self,cache_type):
+    cache_path = os.path.join(".cache/%s" %cache_type,
+                              self.id)
+    cache_content = load(open(cache_path,"r"))
+    return self.cache_load_methods[cache_type](cache_content)
+
+def save_cache(self,cache_type):
+    cache_path = os.path.join(".cache/%s" %cache_type,
+                              self.id)
+    val = self.cache_dump_methods[cache_type](getattr(self,cache_type))
+    print val
+    dump(val, open(cache_path,"w"))
+    
 def init_find_epiparatope_util(self):
     self.paratope_threshold = 5
     self.epitope_threshold = 5
 
     self._find_paratope = MethodType(_find_paratope, self)
     self._find_epitope = MethodType(_find_epitope, self)
+
+    self.cache_exists = MethodType(cache_exists, self)
+    self.load_cache = MethodType(load_cache, self)
+    self.save_cache = MethodType(save_cache, self)
+
+    self.paratope_cl_process = MethodType(paratope_cl_process, self)
+    self.epitope_cl_process = MethodType(epitope_cl_process, self)
+
+    self.epi_para_cd_process = MethodType(epi_para_cd_process, self)
+
+    
+    self.cache_load_methods = {
+        "paratope": self.paratope_cl_process,
+        "epitope": self.epitope_cl_process,
+        }
+    self.cache_dump_methods = {
+        "paratope": self.epi_para_cd_process,
+        "epitope": self.epi_para_cd_process,
+        }
 
 def _find_triangles(self):
     for r in self.epitope:
