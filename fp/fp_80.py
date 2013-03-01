@@ -5,7 +5,7 @@ from ve.util.load_pdb import load_pdb_struct
 from ve.util.dist import ResDistCache,FP105DistCache
 
 from residue_util import init_resdist_util, init_neighbour_util, init_axial_plane_util, init_electric_fp_util
-from complex_util import init_split_cylinder_util,init_triangle_util
+from complex_util import init_split_cylinder_util,init_triangle_util, init_complex_axial_plane_util, init_atg_atb_axial_plane_util
 from complex import TriangleComplex
 from res_triangle import ResTriangle
 
@@ -43,15 +43,20 @@ class Residue(BaseResidue):
         return self.fp
 
 class GenericComplex(TriangleComplex):
-    def __init__(self,complex_id, antigen, antibody, atg_params_wrapper, atb_params_wrapper):
+    def __init__(self,complex_id, antigen, antibody):
         TriangleComplex.__init__(self,complex_id, antigen,antibody)
         
         init_split_cylinder_util(self)
 
-        self.atg_param_50, self.atg_param_30 = atg_params_wrapper()#use wrapper to delay expression evaluation
-        self.atb_param_50, self.atb_param_30 = atb_params_wrapper()
+        self.atg_param_50 = dict(name="antigen",
+                                 bases=self.atg.residues,
+                                 targets=[(0,self.triangles)])
+        self.atg_param_30 = self.triangles
 
-        self.set_atg_atb_center()
+        self.atb_param_50 = dict(name="antibody",
+                                 bases=self.atb.residues,
+                                 targets=[(0,self.atb.residues)])
+        self.atb_param_30 = self.atb.residues
 
         self.distcache = FP105DistCache()
 
@@ -67,49 +72,21 @@ class GenericComplex(TriangleComplex):
             fp[r].append(r.gen_last30_fp(self.atb_param_30))
         return fp
 
-    def set_atg_atb_center(self):
-        """antigen and antibody center"""
-        pts = [a.xyz for r in self.atg.residues for a in r.atom]
-        self.atg_center = np.average(np.array(pts),0)
-
-        pts = [a.xyz for r in self.atb.residues for a in r.atom]
-        self.atb_center = np.average(np.array(pts),0)
-
-        for r in self.atg.residues:
-            r.set_axial_plane(self.atg_center)
-        for r in self.atb.residues:
-            r.set_axial_plane(self.atb_center)
-
 class ComplexSingle(GenericComplex):
-    def __init__(self,complex_id, antigen, antibody):
-        GenericComplex.__init__(self,complex_id, antigen, antibody,
-                                lambda :
-                                    (dict(name="antigen",
-                                          bases=self.atg.residues,
-                                          targets=[(0,self.triangles)]),
-                                     
-                                     self.triangles),
-                                lambda :
-                                    (dict(name="antibody",
-                                          bases=self.atb.residues,
-                                          targets=[(0,self.atb.residues)]),
-                                     self.atb.residues))
+    def __init__(self,*args):
+        GenericComplex.__init__(self,*args)
+
+        init_atg_atb_axial_plane_util(self)
+        self.set_atg_atb_center()#this is necessary
+
+
 
 class ComplexDual(GenericComplex):
-    def __init__(self,complex_id, antigen, antibody):
-        GenericComplex.__init__(self,complex_id, antigen, antibody,
-                                lambda :
-                                    (dict(name="antigen",
-                                          bases=self.atg.residues,
-                                          targets=[(0,self.atb.residues)]),
-                                     self.atb.residues),
-                                lambda :
-                                    (dict(name="antibody",
-                                          bases=self.atb.residues,
-                                          targets=[(0,self.triangles)]),
-                                     self.triangles))
+    def __init__(self,*args):
+        GenericComplex.__init__(self,*args)
 
-    
+        init_complex_axial_plane_util(self)
+        self.set_axial_plane()
 
 def single_test(complex_id):            
     data_dir = os.path.join(data237_complex_root,complex_id)
@@ -123,9 +100,9 @@ def single_test(complex_id):
     atg_fp = c.gen_antigen_fp()
     atb_fp = c.gen_antibody_fp()
     
-    
-    atb_fp.tofile("%s_atb.fp" %complex_id)
-    atg_fp.tofile("%s_atg.fp" %complex_id)
+    type = "double"
+    atb_fp.tofile("%s_atb_%s.fp" %(complex_id, type))
+    atg_fp.tofile("%s_atg_%s.fp" %(complex_id, type))
 
     return atg_fp, atb_fp
 

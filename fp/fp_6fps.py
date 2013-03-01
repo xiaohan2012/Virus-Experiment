@@ -22,10 +22,10 @@ from types import MethodType
 
 from complex import TriangleComplex
 
-from geom import *
+
 
 from residue_util import init_resdist_util,init_neighbour_util
-from complex_util import init_split_cylinder_util
+from complex_util import init_split_cylinder_util, init_complex_axial_plane_util
 
 from ve.util.load_pdb import load_pdb_struct
 from ve.util.file import fpstr2file
@@ -46,14 +46,14 @@ class Residue(BaseResidue):
         init_neighbour_util(self)
   
 class Complex(TriangleComplex):
-    def __init__(self,antigen, antibody):
-        TriangleComplex.__init__(self,antigen,antibody)
+    def __init__(self,complex_id, antigen, antibody):
+        TriangleComplex.__init__(self, complex_id, antigen,antibody)
         
         init_split_cylinder_util(self)
 
-        print "setting axial plane"
-        self._set_pe_center()
-        self._set_axial_plane()
+        init_complex_axial_plane_util(self)
+
+        self.set_axial_plane()
         
         
         params =[
@@ -99,28 +99,7 @@ class Complex(TriangleComplex):
     def gen_fps(self):
         return [self.nth_fp(i) for i in xrange(1,7)]
 
-    def _set_pe_center(self):
-        """epitope and paratope center"""
-        pts = []
-        for r in chain(self.epitope):
-            for a in r.atom:
-                pts.append(a.xyz)
 
-        self.epi_center = np.average(np.array(pts),0)
-
-        for r in chain(self.paratope):
-            for a in r.atom:
-                pts.append(a.xyz)
-
-        self.pe_center = np.average(np.array(pts),0)
-
-        self.epi_center, self.pe_center
-    
-    def _set_axial_plane(self):
-        norm_vec = self.epi_center - self.pe_center
-        point = self.pe_center
-        plane = get_perp_plane(norm_vec, point)
-        self.axial_plane = plane
 
 ### this time, we mean it ###
 def data237_fp_gen(refresh=False):
@@ -138,7 +117,7 @@ def data237_fp_gen(refresh=False):
         antigen = load_pdb_struct(os.path.join(data_dir,"antigen.pdb"),residue_cls = Residue)
         antibody = load_pdb_struct(os.path.join(data_dir,"antibody.pdb"),residue_cls = Residue)
         try:
-            c = Complex(antigen,antibody)
+            c = Complex(complex_id, antigen,antibody)
             fps = c.gen_fps()
         except:
             sys.stderr.write("complex %s encountered error.\n" %complex_id)
@@ -155,7 +134,7 @@ def single_test(complex_id):
     data_dir = os.path.join(data237_complex_root,complex_id)
     antigen = load_pdb_struct(os.path.join(data_dir,"antigen.pdb"),residue_cls = Residue)
     antibody = load_pdb_struct(os.path.join(data_dir,"antibody.pdb"),residue_cls = Residue)
-    c = Complex(antigen,antibody)
+    c = Complex(complex_id, antigen,antibody)
     c.nth_fp(1)
     fps = c.gen_fps()
     print fps[2].fp_str()

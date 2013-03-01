@@ -1,10 +1,12 @@
 import math
 import os
 
+import numpy as np
+
 from types import MethodType
 
 from fp import FP0112, BaseComplexFingerprint
-
+from geom import *
 from res_triangle import ResTriangle
 
 def split_cylinder_method(self, name="",bases=[],targets=[]):
@@ -207,3 +209,56 @@ def _find_triangles(self):
 def init_triangle_util(self):
     self.neighbour_threshold = 4
     self._find_triangles = MethodType(_find_triangles, self)
+
+
+#calculate axial plane utility
+def _set_pe_center(self):
+    """epitope and paratope center"""
+    pts = []
+    for r in self.epitope:
+        for a in r.atom:
+            pts.append(a.xyz)
+
+    self.epi_center = np.average(np.array(pts),0)
+
+    for r in self.paratope:
+        for a in r.atom:
+            pts.append(a.xyz)
+
+    self.pe_center = np.average(np.array(pts),0)
+
+    self.epi_center, self.pe_center
+    
+def _set_axial_plane(self):
+    norm_vec = self.epi_center - self.pe_center
+    point = self.pe_center
+    plane = get_perp_plane(norm_vec, point)
+    self.axial_plane = plane
+
+def set_axial_plane(self):
+    self._set_pe_center()
+    self._set_axial_plane()
+
+def init_complex_axial_plane_util(self):
+    self._set_axial_plane = MethodType(_set_axial_plane, self)
+    self._set_pe_center = MethodType(_set_pe_center, self)
+
+    self.set_axial_plane = MethodType(set_axial_plane, self)
+
+
+#set antigen and antibody centers utility
+def set_atg_atb_center(self):
+    """antigen and antibody center"""
+    pts = [a.xyz for r in self.atg.residues for a in r.atom]
+    self.atg_center = np.average(np.array(pts),0)
+    
+    pts = [a.xyz for r in self.atb.residues for a in r.atom]
+    self.atb_center = np.average(np.array(pts),0)
+    
+    for r in self.atg.residues:
+        r.set_axial_plane(self.atg_center)
+    for r in self.atb.residues:
+        r.set_axial_plane(self.atb_center)
+
+def init_atg_atb_axial_plane_util(self):
+    self.set_atg_atb_center = MethodType(set_atg_atb_center, self)

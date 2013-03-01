@@ -48,13 +48,12 @@ class ComplexDual(ComplexDual80):
 def single_test(complex_id):            
     data_dir = os.path.join(data237_complex_root,complex_id)
 
-
     antigen = load_pdb_struct(os.path.join(data_dir,"antigen.pdb"),residue_cls = Residue80)
     antibody = load_pdb_struct(os.path.join(data_dir,"antibody.pdb"),residue_cls = Residue80)
 
-    c = ComplexDual(complex_id, antigen, antibody)
+    c = ComplexSingle(complex_id, antigen, antibody)
     
-    c.gen_fp_to_file(complex_id, )
+    c.gen_fp_to_file(complex_id, fp_type="single")
     
 if __name__ == "__main__":
     ids = ["1SLG_D", "1N4X_L", "1JV5_A", "1STS_B"]
