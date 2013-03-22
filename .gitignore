@@ -1,5 +1,6 @@
 *.py[co]
 *.py[~]
+*.sh~
 
 # Packages
 *.egg

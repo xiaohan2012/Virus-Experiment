@@ -29,6 +29,7 @@ chain_list_path = os.path.join(epi166_root ,"chains.txt")
 dist_mat_path = os.path.join(epi166_root, "dist_mat_csv/dist_mat.csv")
 
 data237_root = os.path.join(data_root,"data237")
+data237_raw_complex = os.path.join(data237_root, "cp_pdb")
 data237_complex_root = os.path.join(data237_root,"splitted_complex")
 data237_fp_root = os.path.join(data237_root,"fp")
 data237_fp105_root = os.path.join(data237_root,"fp_105")

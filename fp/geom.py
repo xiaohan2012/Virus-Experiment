@@ -83,8 +83,12 @@ class Plane(Array):
         A,B,C,D = self.A, self.B, self.C, self.D
         abc = np.array([A,B,C])
         x,y,z = ext_point
-        k = (np.sum(abc**2)) / (np.sum(abc * ext_point) - D)
-        return Point([x - A/k, y - B/k, z - C/k])
+        den = (np.sum(abc * ext_point) - D)
+        if den == 0.: #the point is on the plane already!
+            return Point(ext_point)
+        else:
+            k = (np.sum(abc**2)) / den
+            return Point([x - A/k, y - B/k, z - C/k])
 
     def __repr__(self):
         return "%.2fx + %.2fy + %.2fz = %.2f" %(self.A, self.B, self.C, self.D)

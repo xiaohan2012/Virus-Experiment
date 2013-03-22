@@ -29,7 +29,6 @@ def split_cylinder_method(self, name="",bases=[],targets=[]):
 
     self.get_idx = MethodType(get_idx, self)
 
-#    fps = FP0112(targets)
     fps = BaseComplexFingerprint()
 
     print "processing %s"  %(name)
@@ -74,7 +73,8 @@ def init_split_cylinder_util(self,cylinder_radius = 10,
                 
         self.get_fp_generic = MethodType(split_cylinder_method, self)
 
-
+class ParatopeNotFoundError(Exception):pass
+class EpitopeNotFoundError(Exception):pass
 
 from pickle import load, dump
 def _find_paratope(self):
@@ -91,6 +91,9 @@ def _find_paratope(self):
             if dist <=self.paratope_threshold:
                 self.paratope.append(b_r)
                 break
+    if not self.paratope:
+        raise ParatopeNotFoundError
+        
     self.save_cache(attr_name)
 
 def _find_epitope(self):
@@ -106,6 +109,9 @@ def _find_epitope(self):
             if g_r.dist2residue(b_r) <= self.paratope_threshold:
                 self.epitope.append(g_r)
                 break
+    if not self.epitope:
+        raise EpitopeNotFoundError
+
     self.save_cache(attr_name)
 
 

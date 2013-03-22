@@ -15,7 +15,7 @@ import numpy as np
 
 from itertools import chain
 from collections import defaultdict
-from glob import glob
+
 from customcollections import OrderedDefaultDict
 
 from types import MethodType
@@ -27,7 +27,7 @@ from complex import TriangleComplex
 from residue_util import init_resdist_util,init_neighbour_util
 from complex_util import init_split_cylinder_util, init_complex_axial_plane_util
 
-from ve.util.load_pdb import load_pdb_struct
+from ve.util.load_pdb import load_pdb_struct, complex_ids
 from ve.util.file import fpstr2file
 from ve.util.residue import BaseResidue
 from ve.util.complex import BaseComplex
@@ -103,8 +103,7 @@ class Complex(TriangleComplex):
 
 ### this time, we mean it ###
 def data237_fp_gen(refresh=False):
-    for path in glob(os.path.join(data237_complex_root ,"*")):
-        complex_id = os.path.basename(path)
+    for complex_id in complex_ids(path = data237_complex_root):
 
         output_path = os.path.join(data237_fp6_root,complex_id)
         if not refresh and os.path.exists(output_path):
