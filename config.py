@@ -37,5 +37,4 @@ data237_epitope_root = os.path.join(data237_root,"epitope")
 
 data237_fps808015_root = os.path.join(data237_root,"fp_s_808015")
 
-
 logger = logging.getLogger()

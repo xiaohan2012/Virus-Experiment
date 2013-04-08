@@ -1,11 +1,11 @@
-
 from collections import defaultdict
 
-from geom import get_perp_plane
-from fp import BaseResidueFingerprint
+from ve.fp.geom import get_perp_plane
+from ve.fp.fp import BaseResidueFingerprint
 
 from types import MethodType
 
+"""find neighbour utility"""
 def find_neighbours(self,others,dist=4):
     """find neighbours"""
     for other in others:
@@ -16,6 +16,7 @@ def find_neighbours(self,others,dist=4):
 def get_neighbours(self):
     return self.nbs
 
+"""residue pair-wise distance"""
 def dist2residue(self,other):
     return self.distcache.get(self,other)
 

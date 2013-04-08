@@ -1,39 +1,37 @@
+"""
+A bunch of Complex class variants
+"""
 from ve.util.complex import BaseComplex
-from ve.util.dist import ResDistCache
 
-from complex_util import init_find_epiparatope_util, init_triangle_util
-
-
-
+from ve.fp.complex_util.paraepi import init_find_epiparatope_util
+from ve.fp.complex_util.triangle import init_triangle_util
+from ve.fp.complex_util.propagate_distcache import init_propagate_distcache_util
 
 class TriangleComplex(BaseComplex):
+    """
+    Complex with triangle structure detection functionality
+    """
+    
     def __init__(self,complex_id, antigen, antibody):
         BaseComplex.__init__(self,complex_id, antigen,antibody)
+        
+        #the distance matrix cache needs to be propagated
+        init_propagate_distcache_util(self)
 
-        self.distcache = ResDistCache()
-
+        #register find epitope and paratope util
         init_find_epiparatope_util(self)
+        
+        #register find triangle util
         init_triangle_util(self)
 
         self.neighbour_threshold = 4
 
-        self.paratope,self.epitope = [],[]
+        #find paratope and epitope
         print "finding paratope"
-        self._find_paratope()
+        self.find_paratope()
         print "finding epitope"
-        self._find_epitope()
+        self.find_epitope()
         print len(self.paratope),len(self.epitope)
-
-        self._find_triangles()
-
-    def __setattr__(self,name,value):
-        self.__dict__[name] = value
-        if name == "distcache":
-            self._set_dist_cache()
-
-    def _set_dist_cache(self):
-        for r in self.atg.residues:
-            r.distcache = self.distcache
-        for r in self.atb.residues:
-            r.distcache = self.distcache
-
+        
+        #find triangle
+        self.find_triangles()

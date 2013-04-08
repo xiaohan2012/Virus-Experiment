@@ -6,39 +6,30 @@ class Array(object):
         self.d = np.array(data)
         
     def __add__(self,other):
-        if isinstance(other,Array):
-            return self.d + other.d
-        elif isinstance(other,ndarray):
-            return self.d + other
-        else:
-            raise TypeError("`other` is not a Array instance")
-
+        return self.__class__(self.d + other.d)
+    
     def __sub__(self,other):
-        if isinstance(other,Array):
-            return self.d - other.d
-        elif isinstance(other,np.ndarray):
-            return self.d - other
-        else:
-            raise TypeError("`other` is not a Array instance")
-
+        return self.__class__(self.d - other.d)
+    
     def __mul__(self,other):            
-        if isinstance(other,Array):
-            return self.d * other.d
-        elif isinstance(other,np.ndarray):
-            return self.d * other
+        if isinstance(other, float) or isinstance(other, int):
+            return self.__class__(self.d * other)
+        elif isinstance(other, np.ndarray):
+            return self.__class__(self.d * other)
         else:
-            raise TypeError("`other` is not a Array instance")
+            return self.__class__(self.d * other.d)
 
     def __pow__(self,other): 
-        return Array(self.d ** other)
-    
+        return self.__class__(self.d ** other)
+
     def __len__(self):
         return len(self.d)
 
     def __getitem__(self,k):
         return self.d[k]
 
-
+    def __eq__(self, other):
+        return self.d == other.d
 
 
 
@@ -50,16 +41,27 @@ class Point(Array):
         return np.sqrt(np.sum((self - point) ** 2))
 
     def __repr__(self):
-        string = ",".join( "%.2f" %d for d in self)
+        string = ",".join( "%.7f" %d for d in self)
         return "%dD Point (%s)" %(len(self), string)
 
 class Line(Array):
-    """currently 3D only"""
+    """
+    Line class in the 3D space
+    """
     def __init__(self,start_p,end_p):
+        """
+        (Point, Point) => Line
+        
+        given the start point and end point, construct a line
+        """
         self.sp = start_p
         self.ep = end_p
 
     def dist2point(self,point):
+        """
+        (Point) => float
+        the distance between a point and itself
+        """
         return np.linalg.norm(np.cross(point - self.sp, point - self.ep)) /\
                np.linalg.norm(self.sp - self.ep)
 
@@ -67,19 +69,32 @@ class Vector(Array):
     pass
 
 class Plane(Array):
-    """currently 3D plane only"""
+    """
+    Plane representation in the 3D space
+    """
+
     def __init__(self,data):
+        """
+        ([float, float, float, float]) => Plane
+        given the a b c d parameter of a plane and construct a plane
+        """
         if len(data) != 4:
             raise ValueError("length `4` required")
         Array.__init__(self,data)
         self.A, self.B, self.C, self.D = self
 
     def dist2point(self,point):
+        """(Point) => float
+        distance between a Point and the plane"""
         return (sum(point * self[:3]) - self[3]) /\
                 np.sqrt(np.sum(self[:3] ** 2))
 
     def get_perp_point(self,ext_point):
-        """get perpendicular point of a external point"""
+        """
+        (Point) => Point
+        
+        given a point, get perpendicular point of it
+        """
         A,B,C,D = self.A, self.B, self.C, self.D
         abc = np.array([A,B,C])
         x,y,z = ext_point
@@ -94,6 +109,11 @@ class Plane(Array):
         return "%.2fx + %.2fy + %.2fz = %.2f" %(self.A, self.B, self.C, self.D)
 
 def get_perp_plane(norm_vec,point): 
+    """
+    (Vector, Point) => Plane
+    calculate the plane is perpendicular to norm_vec as its normal vector and also passes through `point`
+    """
+
     A,B,C = norm_vec
     D = np.sum(point * norm_vec)
     return Plane([A,B,C,D])
@@ -125,11 +145,12 @@ if __name__ == "__main__":
     
     print plane
 
-    plane = Plane([1,-2,3,5])
+    plane = Plane([1,-2,3,100])
     point = Point([2,3,1])
     print plane
     print "point to plane distance"
     print plane.dist2point(point)
+    
 
     print "plane perpendicular point"
     perp_point = plane.get_perp_point(point)

@@ -16,8 +16,6 @@ from ve.util.residue import BaseResidue
 from ve.config import *
 
 
-
-
 class Residue(object):
     def __init__(self , res , comp):
         self.hydro_dict = {'A':0.61,'C':1.07,'D':0.46,'E':0.47,'F':2.02,'G':0.07,'H':0.61,'I':2.22,'K':1.15,'L':1.53,'M':1.18,'N':0.06,'P':1.95,'Q':0.0,'R':0.6,'S':0.05,'T':0.05,'V':1.32,'W':2.65,'Y':1.88}
@@ -150,7 +148,6 @@ class Complex(object):
         self.residues = []
         for res in self.st.residue:
             self.residues.append(Residue(res,self))
-
 
     def get_fp(self):
         self.res_list = []
