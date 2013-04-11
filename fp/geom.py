@@ -18,12 +18,16 @@ class Array(object):
             return self.__class__(self.d * other)
         else:
             return self.__class__(self.d * other.d)
+        
+    def __getattr__(self, name):
+        if hasattr(self.d, name):
+            return getattr(self.d, name)
 
     def __pow__(self,other): 
         return self.__class__(self.d ** other)
 
     def __len__(self):
-        return len(self.d)
+        return self.d
 
     def __getitem__(self,k):
         return self.d[k]
@@ -42,7 +46,7 @@ class Point(Array):
 
     def __repr__(self):
         string = ",".join( "%.7f" %d for d in self)
-        return "%dD Point (%s)" %(len(self), string)
+        return "Point (%s)" %(string)
 
 class Line(Array):
     """

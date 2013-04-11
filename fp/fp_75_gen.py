@@ -21,6 +21,7 @@ from Queue import Queue
 
 from fp_gen import distance_tree , distance_data , sift_gen , sift
 
+
 class GroupingWorker(Thread):
     def __init__(self,q):
         Thread.__init__(self)
@@ -397,7 +398,6 @@ def get_15bits(receptor, binder):
     
     rec_tree.set_resnum_limit()
 
-    print "15 bits calculating" 
     rec_tree.find_close_residues(binder , 10.0)
 
     lig_name = rec_tree.fingerprints.sifts.keys()[0]

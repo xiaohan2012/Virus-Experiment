@@ -37,7 +37,7 @@ def init_axial_plane_util(self):
     self.set_axial_plane = MethodType(set_axial_plane,self)
 
 
-#electric finger print calculation
+#physical-chemical finger print
 
 def gen_electric_fp(self,others):
     bitlength=30

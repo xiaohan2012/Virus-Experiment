@@ -20,21 +20,15 @@ class ParaEpiAxialPlaneTest(NumericTestCase):
     def setUp(self):
         init_complex_axial_plane_trait(self)
 
-        init_find_epiparatope_trait(self)
-
         self.atg = load_pdb_struct(os.path.join(test_data_dir, "antigen.pdb"), TestResidue)
         self.atb = load_pdb_struct(os.path.join(test_data_dir, "antibody.pdb"), TestResidue)
         self.c_id = "1SLG_D"
         
-        self.find_epitope()
-        self.find_paratope()
-        
-        self.set_axial_plane()
 
     def test_general_case(self):
-        self.assertArrayAlmostEqual(self.pe_center.tolist(), [ 19.0855, 1.95487879, 16.1439697 ])
-        self.assertArrayAlmostEqual(self.epi_center.tolist(), [ 19.49365263,   6.60098947,  12.54066316])
-        self.assertArrayAlmostEqual(self.paraepi_center.tolist(), [ 19.38842578,   5.40316406,  13.46964063])
+        self.assertArrayAlmostEqual(self.get_para_center().tolist(), [ 19.0855, 1.95487879, 16.1439697 ])
+        self.assertArrayAlmostEqual(self.get_epi_center().tolist(), [ 19.49365263,   6.60098947,  12.54066316])
+        self.assertArrayAlmostEqual(self.get_paraepi_center().tolist(), [ 19.38842578,   5.40316406,  13.46964063])
     
 
 

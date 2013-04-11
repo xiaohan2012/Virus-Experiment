@@ -34,7 +34,10 @@ data237_complex_root = os.path.join(data237_root,"splitted_complex")
 data237_fp_root = os.path.join(data237_root,"fp")
 data237_fp105_root = os.path.join(data237_root,"fp_105")
 data237_epitope_root = os.path.join(data237_root,"epitope")
+data237_paraepi_root = os.path.join(data237_root,"paraepi")
 
 data237_fps808015_root = os.path.join(data237_root,"fp_s_808015")
+
+data237_paraepi_cache = os.path.join(data237_fp_root, ".cache")
 
 logger = logging.getLogger()
