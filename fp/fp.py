@@ -96,6 +96,11 @@ class BaseResidueFingerprint(OrderedDefaultDict):
         #be functional!
         return fp
 
+    def tofile(self,fp):
+        f = open(fp,"w")
+        f.write(self.fp_str())
+        f.close()
+
 #complex fingerprint
 class BaseComplexFingerprint(OrderedDict):
     def __init__(self,bitlength=None, residue_fp_cls = BaseResidueFingerprint):
