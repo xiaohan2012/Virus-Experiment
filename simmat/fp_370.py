@@ -5,7 +5,7 @@ Pairwise finger print calculator for 370-bits finger print data set
 from ve.util.calculator import complex_pairwise_calc
 from ve.util.load_pdb import complex_ids
 
-from io import fp370_atg_dataloader, fp370_atb_dataloader
+from common import fp370_atg_dataloader, fp370_atb_dataloader
 from sim_metric import corr_coef
 
 

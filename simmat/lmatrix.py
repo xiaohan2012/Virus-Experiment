@@ -9,16 +9,37 @@ np.set_printoptions(precision=3, suppress=True)
 class lmatrix(ndarray):
     """Labeled Matrix class"""
 
-    def __new__(cls, labels=[]):
-        """labels: list of str"""
-        obj = ndarray.__new__(cls, (len(labels), len(labels)))
-
+    def __new__(cls, labels= [], data = None):
+        """labels: list of str
+        matrix: None by default,
+        if presented, be `np.array` like object
+        """
+        #if matrix is presented, pass it to the new function
+        if data is not None:
+            rn,cn = data.shape
+            
+            #the row count and col count should equal
+            if rn != cn:
+                raise ValueError("not square matrix")
+            elif rn != len(labels):
+                raise ValueError("label size and matrix dimension not match")
+            obj = np.asarray(data).view(cls)
+        else:
+            #else, only init the labels
+            obj = ndarray.__new__(cls, (len(labels), len(labels)))
+            
         obj.labels = labels
         
         #label to index mapping
         obj.label2index_mapping = dict((l,i) for i,l in enumerate(obj.labels))
         
+        #label to index mapping
+        obj.index2label_mapping = dict((i,l) for i,l in enumerate(obj.labels))
+
         return obj
+    
+    def get_label(self, idx):
+        return self.index2label_mapping.get(idx, "unkown")
 
     def __array_finalize__(self, obj):    
         if obj is None: return

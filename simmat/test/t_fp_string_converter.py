@@ -3,7 +3,7 @@ import unittest
 import os
 import numpy as np
 
-from ve.simmat.io import single_line_headless_converter, make_dataloader
+from ve.simmat.common import single_line_headless_converter, make_dataloader
 
 class FPStringConverterTestCase(unittest.TestCase):
     
