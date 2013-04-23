@@ -25,7 +25,9 @@ def corr_coef(vec1, vec2):
     -1.0
     >>> corr_coef([1,2,3], [1,2,3])
     1.0
-    """ 
+    >>> corr_coef([1,2,3], [1,2,3])
+    1.0
+    """
     return np.corrcoef(vec1, vec2)[0,1]
 
 def test():

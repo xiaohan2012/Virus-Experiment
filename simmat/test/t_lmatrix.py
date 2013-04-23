@@ -1,6 +1,5 @@
 import unittest
 
-import os
 import numpy as np
 
 from ve.simmat.lmatrix import lmatrix
@@ -58,7 +57,7 @@ class LoadSimmatTestCase(unittest.TestCase):
 
     def setUp(self):
         """load the matrix"""
-        from ve.simmat.io import load_simmat
+        from ve.simmat.source import load_simmat
         self.m = load_simmat("fp_370_atg.txt")
 
     def test_content_matching_1(self):

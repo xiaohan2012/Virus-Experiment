@@ -8,8 +8,21 @@ def make_fp_str_loader(directory):
 
     return load_fp_string
 
-def single_line_headless_converter(string):
-    return np.array(map(float, string.strip().split(",")))
+def make_single_line_converter(slice_obj):
+    """
+    (slice) => (str => np.array)
+
+    make a single line fp string converter specified by the slice object
+    
+    """
+    def converter(string):
+        """(str) => np.array
+        
+        given a fp string, return the np.array
+        """
+        return np.array(map(float, string.strip().split(",")))[slice_obj]
+
+    return converter
 
 def make_dataloader(directory, converter):
     """
@@ -31,11 +44,16 @@ def make_dataloader(directory, converter):
 
 from ve.config import data237_root
 
-fp370_atg_dataloader = make_dataloader(os.path.join(data237_root, "fp_370_atg"), single_line_headless_converter)
-fp370_atb_dataloader = make_dataloader(os.path.join(data237_root, "fp_370_atb"), single_line_headless_converter)
+fp370_atg_dataloader = make_dataloader(os.path.join(data237_root, "fp_370_atg"), make_single_line_converter(slice(0, 370)))
+fp370_atb_dataloader = make_dataloader(os.path.join(data237_root, "fp_370_atb"), make_single_line_converter(slice(0, 370)))
 
+first_110_atg_dataloader = make_dataloader(os.path.join(data237_root, "fp_370_atg"), make_single_line_converter(slice(0, 110)))
+second_110_atg_dataloader = make_dataloader(os.path.join(data237_root, "fp_370_atg"), make_single_line_converter(slice(110, 220)))
+last_150_atg_dataloader = make_dataloader(os.path.join(data237_root, "fp_370_atg"), make_single_line_converter(slice(220, 370)))
 
-
+first_110_atb_dataloader = make_dataloader(os.path.join(data237_root, "fp_370_atb"), make_single_line_converter(slice(0, 110)))
+second_110_atb_dataloader = make_dataloader(os.path.join(data237_root, "fp_370_atb"), make_single_line_converter(slice(110, 220)))
+last_150_atb_dataloader = make_dataloader(os.path.join(data237_root, "fp_370_atb"), make_single_line_converter(slice(220, 370)))
 
 def load_simmat(path):
     """(str) => lmatrix

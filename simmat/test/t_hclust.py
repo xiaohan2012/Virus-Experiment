@@ -1,8 +1,6 @@
 import unittest
 
-import numpy as np
-
-from ve.simmat.io import load_simmat
+from ve.simmat.source import load_simmat
 from ve.simmat.hclust import sim_to_dist
 
 class SimToDistTestCase(unittest.TestCase):

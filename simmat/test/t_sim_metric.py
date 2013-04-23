@@ -1,6 +1,5 @@
 import unittest
 
-import os
 import numpy as np
 
 from ve.simmat.sim_metric import make_single_line_fp_similatirty_calculator, corr_coef

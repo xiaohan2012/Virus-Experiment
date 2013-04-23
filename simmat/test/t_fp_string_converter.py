@@ -3,7 +3,9 @@ import unittest
 import os
 import numpy as np
 
-from ve.simmat.io import single_line_headless_converter, make_dataloader
+from ve.simmat.source import make_dataloader, make_single_line_converter
+
+single_line_headless_converter = make_single_line_converter(slice(0,370))
 
 class FPStringConverterTestCase(unittest.TestCase):
     
@@ -20,7 +22,7 @@ class DataloadTestCase(unittest.TestCase):
         """ test on the single line headess 370-bits finger print data loader"""
         from ve.config import data237_root
 
-        fp_dir = os.path.join(data237_root, "fp_370")
+        fp_dir = os.path.join(data237_root, "fp_370_atg")
         dataloader = make_dataloader(fp_dir, single_line_headless_converter)
         
         actual = dataloader("4DKF_A")

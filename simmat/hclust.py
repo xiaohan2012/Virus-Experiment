@@ -1,7 +1,7 @@
 """
 Perform hierarchical clustering on similarity matrix
 """
-from io import load_simmat
+from source import load_simmat
 
 def sim_to_dist(mat):
     """
