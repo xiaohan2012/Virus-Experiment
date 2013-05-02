@@ -13,13 +13,30 @@ class lmatrix(ndarray):
         """labels: list of str"""
         obj = ndarray.__new__(cls, (len(labels), len(labels)))
 
-        obj.labels = labels
+        obj.labels = sorted(labels)
         
         #label to index mapping
         obj.label2index_mapping = dict((l,i) for i,l in enumerate(obj.labels))
         
         return obj
 
+    def to_csv_str(self):
+        """
+        (lmatrix) -> str
+
+        return the csv representation of the matrix
+        """
+        string = "%s,%s\n" %("", ",".join(self.labels))
+        rows = []
+        for row_name in self.labels:
+            row = [self[row_name, col_name] for col_name in self.labels]
+            row = map(lambda d: "%f" %d, row)
+            rows.append("%s,%s" %(row_name, ",".join(row)))
+        string += "\n".join(rows)
+        return string
+        #return "%s\n%s" %(header_str, "\n".join(["%s,%s" %(col_name, ",".join(map(lambda d: "%.2f" %d, self[col_name,:]))) for col_name in self.labels for col_name in self.labels]))
+
+        
     def __array_finalize__(self, obj):    
         if obj is None: return
         

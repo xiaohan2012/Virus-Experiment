@@ -52,13 +52,22 @@ class LMatrixTestCase(unittest.TestCase):
         expected = np.array([9,6,3])
         self.assertTrue( (actual == expected).all())
 
+    def test_to_table(self):
+        """test for table formulation"""
+        actual = self.m.to_csv_str()
+        expected = """,a,b,c
+a,1.000000,2.000000,3.000000
+b,4.000000,5.000000,6.000000
+c,7.000000,8.000000,9.000000"""
+        self.assertEqual(actual, expected)
+        
 class LoadSimmatTestCase(unittest.TestCase):
     """similarity matrix loading test case"""
 
     def setUp(self):
         """load the matrix"""
         from ve.simmat.source import load_simmat
-        self.m = load_simmat("fp_370_atg.txt")
+        self.m = load_simmat("data/fp_370_atg.txt")
 
     def test_content_matching_1(self):
         c1 = '2NLJ_C'
