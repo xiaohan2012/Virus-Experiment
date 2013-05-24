@@ -38,6 +38,11 @@ data237_paraepi_root = os.path.join(data237_root,"paraepi")
 
 data237_fps808015_root = os.path.join(data237_root,"fp_s_808015")
 
+data237_cache = os.path.join(data237_fp_root, ".cache")
 data237_paraepi_cache = os.path.join(data237_fp_root, ".cache")
+data237_triangle_cache = os.path.join(data237_fp_root, ".cache", "triangle")
+
+data480_root = os.path.join(data_root,"data480")
+data480_complex_root = os.path.join(data480_root,"splitted_complex")
 
 logger = logging.getLogger()

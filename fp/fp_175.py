@@ -32,7 +32,7 @@ ComplexSingle = type("ComplexSingle",
                       "gen_fp_to_file":gen_fp_to_file,})
 
 ComplexDual = type("ComplexDual", 
-                     (ComplexDual80,),
+                   (ComplexDual80,),
                      {"gen_15_bits":gen_15_bits,
                       "gen_fp_to_file":gen_fp_to_file,})
         

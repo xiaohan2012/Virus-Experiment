@@ -5,7 +5,7 @@ class mystructure(object):
         self.st = structure
 
     def __getattr__(self,name):
-       if hasattr(self.st, name):
+        if hasattr(self.st, name):
             return getattr(self.st,name)
-       else:
+        else:
             raise AttributeError("\"%s\" method not found." %name)

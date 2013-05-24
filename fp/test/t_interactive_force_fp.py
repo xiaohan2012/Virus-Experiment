@@ -1,39 +1,30 @@
-from ve.fp.complex_util.interactive_force_fp import *
+from ve.fp.complex_util.interactive_force_fp import InteractiveForceTrait
+from ve.fp.residue_util.geom import GeometryTrait
 
 from common import *
 
-class IFResidue(TestResidue):
-    """Residue class for interactive force fingerprint"""
-    
-    def __init__(self, residue):
-        TestResidue.__init__(self, residue)
-        from ve.fp.residue_util.res_geom import init_geom_trait
-        init_geom_trait(self)
-
+#Residue class for interactive force fingerprint
+IFResidue = make_residue_class(GeometryTrait)
+        
+from common import make_complex_class
+ComplexClass = make_complex_class(InteractiveForceTrait, residue_class = IFResidue)
 
 class ResidueInteractiveForceTestCase(NumericTestCase):
     """Interactive Force Fingerprint test of the residue fp"""
 
     def setUp(self):
-        #load atg and atb
-        self.atg = load_pdb_struct(os.path.join(test_data_dir, "antigen.pdb"), IFResidue)
-        self.atb = load_pdb_struct(os.path.join(test_data_dir, "antibody.pdb"), IFResidue)
-
-        self.c_id = "1SLG_D"
-
-        #init the trait
-        init_interative_force_fp_trait(self)
+        self.c = ComplexClass()
         
     def test_atg_based_fp(self):
         """residue-scope antigen as receptor"""
-        fp = self.gen_if_residue_fp_atg()
+        fp = self.c.gen_if_residue_fp_atg()
 
         #the length including the residue number should be 16
         self.assertEqual(len(fp.fp_str(int).split("\n")[0].split(",")), 16)
 
     def test_atb_based_fp(self):
         """residue-scope antibody as receptor"""
-        fp = self.gen_if_residue_fp_atb()
+        fp = self.c.gen_if_residue_fp_atb()
 
         #the length including the residue number should be 16
         self.assertEqual(len(fp.fp_str(int).split("\n")[0].split(",")), 16)
@@ -42,18 +33,11 @@ class ResidueInteractiveForceTestCase(NumericTestCase):
 class ComplexInteractiveForceTestCase(NumericTestCase):
     """Interactive Force Fingerprint test of the complex fp"""
     def setUp(self):
-        #load atg and atb
-        self.atg = load_pdb_struct(os.path.join(test_data_dir, "antigen.pdb"), IFResidue)
-        self.atb = load_pdb_struct(os.path.join(test_data_dir, "antibody.pdb"), IFResidue)
-
-        self.c_id = "1SLG_D"
-
-        #init the trait
-        init_interative_force_fp_trait(self)
+        self.c = ComplexClass()
         
     def test_atg_based_complex_fp(self):
         """complex-scope antigen as receptor"""
-        fp = self.gen_if_complex_fp_atg()
+        fp = self.c.gen_if_complex_fp_atg()
         
         #fp length should be 150
         self.assertEqual(len(fp.fp_array().tolist()), 150)
@@ -61,7 +45,7 @@ class ComplexInteractiveForceTestCase(NumericTestCase):
 
     def test_atb_based_complex_fp(self):
         """complex-scope antibody as receptor"""
-        fp = self.gen_if_complex_fp_atb()
+        fp = self.c.gen_if_complex_fp_atb()
         
         #fp length should be 150
         self.assertEqual(len(fp.fp_array().tolist()), 150)

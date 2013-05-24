@@ -43,11 +43,14 @@ class Point(Array):
         
     def dist2point(self,point):
         return np.sqrt(np.sum((self - point) ** 2))
-
-    def __repr__(self):
+        
+    def __str__(self):
         string = ",".join( "%.7f" %d for d in self)
         return "Point (%s)" %(string)
 
+    def __repr__(self):
+        return str(self)
+        
 class Line(Array):
     """
     Line class in the 3D space
@@ -108,9 +111,12 @@ class Plane(Array):
         else:
             k = (np.sum(abc**2)) / den
             return Point([x - A/k, y - B/k, z - C/k])
-
-    def __repr__(self):
+            
+    def __str__(self):
         return "%.2fx + %.2fy + %.2fz = %.2f" %(self.A, self.B, self.C, self.D)
+        
+    def __repr__(self):
+        return str(self)
 
 def get_perp_plane(norm_vec,point): 
     """

@@ -1,92 +1,71 @@
-import numpy as np
-
 from ve.util.residue import BaseResidue
 from ve.util.load_pdb import load_pdb_struct
-from ve.util.dist import ResDistCache,FP105DistCache
+#from ve.util.dist import FP105DistCache
 
-from residue_util import init_resdist_util, init_neighbour_util, init_axial_plane_util, init_electric_fp_util
-from complex_util import init_split_cylinder_util,init_triangle_util, init_complex_axial_plane_util, init_atg_atb_axial_plane_util
+from ve.fp.residue_util.neighbour import FindNeighbourTrait
+from ve.fp.residue_util.axial_plane import AtgAtbBasedAxialPlaneTrait
+from ve.fp.residue_util.physi_chemi import PhysiChemiTrait
+from ve.fp.residue_util.geom import GeometryTrait
+
+
 from complex import TriangleComplex
 from res_triangle import ResTriangle
 
 from ve.config import *
 
-class Residue(BaseResidue):
-    def __init__(self,*args,**kw):
-        BaseResidue.__init__(self,*args,**kw)
-        self.center =np.average(np.array([a.xyz for a in self.atom]),0)
-        
-        #adding the required methods
-        init_resdist_util(self)
-        init_neighbour_util(self)
-        
-        init_axial_plane_util(self)        
-
-        init_electric_fp_util(self)
-        
+class Residue(BaseResidue, FindNeighbourTrait,#triangle requires it, a little bit akward
+              PhysiChemiTrait, #the last 30 bits fp
+              AtgAtbBasedAxialPlaneTrait,#the first 50 requires it
+              GeometryTrait
+):
     def gen_last30_fp(self, others):
         first = others[0]
         if isinstance(first, ResTriangle):
-            return self.gen_last30_fp_triangle(others)
+            return self.gen_electric_fp_triangle(others)
         elif isinstance(first, Residue):
-            return self.gen_last30_fp_residue(others)
+            return self.gen_electric_fp(others)
         else:
             raise TypeError("Only ResTriangle and Residue is ok.")
-       
-            
-    def gen_last30_fp_triangle(self,others):
-        self.gen_electric_fp_triangle(others)
-        return self.fp
 
-    def gen_last30_fp_residue(self,others):
-        self.gen_electric_fp(others)
-        return self.fp
+from ve.fp.complex_util.split_cylinder import SplitCylinderTrait
 
 class GenericComplex(TriangleComplex):
     def __init__(self,complex_id, antigen, antibody):
-        TriangleComplex.__init__(self,complex_id, antigen,antibody)
+        super(GenericComplex,self).__init__(complex_id, antigen, antibody)
         
-        init_split_cylinder_util(self)
-
-        self.atg_param_50 = dict(name="antigen",
-                                 bases=self.atg.residues,
-                                 targets=[(0,self.triangles)])
-        self.atg_param_30 = self.triangles
-
-        self.atb_param_50 = dict(name="antibody",
-                                 bases=self.atb.residues,
-                                 targets=[(0,self.atb.residues)])
-        self.atb_param_30 = self.atb.residues
-
-        self.distcache = FP105DistCache()
+        #self.distcache = FP105DistCache()
 
     def gen_antigen_fp(self):
-        fp = self.get_fp_generic(** self.atg_param_50)
+        """
+        antigen side residue finger print
+        """
+        fp = self.get_fp_generic(bases=self.atg.residues,
+                                 targets=[(0,self.triangles)]) #from split_cylinder trait
         for r in fp.residues():
-            fp[r].append(r.gen_last30_fp(self.atg_param_30))
+            fp[r].append(r.gen_last30_fp(self.get_triangles()))
         return fp
         
     def gen_antibody_fp(self):
-        fp = self.get_fp_generic(** self.atb_param_50)
+        """
+        antibody side residue finger print
+        """
+        fp = self.get_fp_generic(name="antibody",
+                                 bases=self.atb.residues,
+                                 targets=[(0,self.atb.residues)])
         for r in fp.residues():
-            fp[r].append(r.gen_last30_fp(self.atb_param_30))
+            fp[r].append(r.gen_last30_fp(self.atb.residues))
         return fp
 
-class ComplexSingle(GenericComplex):
-    def __init__(self,*args):
-        GenericComplex.__init__(self,*args)
+from ve.fp.complex_util.split_cylinder import SplitCylinderViaComplexPlaneTrait
 
-        init_atg_atb_axial_plane_util(self)
-        self.set_atg_atb_center()#this is necessary
+class ComplexUsingComplexPlane(GenericComplex, SplitCylinderViaComplexPlaneTrait):
+    pass
 
+from ve.fp.complex_util.split_cylinder import SplitCylinderViaResiduePlaneTrait
 
+class ComplexUsingAtgAtbPlane(GenericComplex, SplitCylinderViaResiduePlaneTrait):
+    pass
 
-class ComplexDual(GenericComplex):
-    def __init__(self,*args):
-        GenericComplex.__init__(self,*args)
-
-        init_complex_axial_plane_util(self)
-        self.set_axial_plane()
 
 def single_test(complex_id):            
     data_dir = os.path.join(data237_complex_root,complex_id)

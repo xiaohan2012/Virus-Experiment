@@ -4,13 +4,17 @@ from itertools import izip
 
 import numpy as np
 
+from collections import namedtuple
+
+ResidueFingerPrintPickable = namedtuple("ResidueFingerPrintPickable", "res_id bitlength mapping")
+
 class BaseResidueFingerprint(OrderedDefaultDict):
-    """Fingerprint class for Residue/Triangle
+    """
+    Fingerprint class for Residue/Triangle
     """
     
-    def __init__(self,res,bitlength, values = None):
+    def __init__(self,res, bitlength, values = None):
         """(Residue, int, dict or list) => BaseResidueFingerprint"""
-
         OrderedDefaultDict.__init__(self,float)
         self.bitlength = bitlength
         self.min_idx = 0
@@ -33,7 +37,7 @@ class BaseResidueFingerprint(OrderedDefaultDict):
         specify the numeric display type(float or int)
         return the finger print body
         """
-        mapping = {int: "%2d",float: "%.2f"}
+        mapping = {int: "%d",float: "%.2f"}
 
         return ",".join([mapping[number_type] %self[i] for i in xrange(self.min_idx,self.max_idx)])
     
@@ -69,11 +73,13 @@ class BaseResidueFingerprint(OrderedDefaultDict):
             self[k] = v
             
     def __add__(self, other):
-        if isinstance(self, BaseResidueFingerprint):
-            fp_list = (self.fp_array() + other.fp_array()).tolist()
-            return self.__class__(len(fp_list), values=fp_list)
+        """essentially, vector addition"""
+        
+        fp_list = (self.fp_array() + other.fp_array()).tolist()
+        if isinstance(self, HeadlessFingerprint):
+            return HeadlessFingerprint(len(fp_list), values=fp_list)
         else:
-            raise ValueError("invalid type, should be BaseResidueFingerprint")
+            return self.__class__(self.res, len(fp_list), values=fp_list)
         
     def __copy__(self):
         """maunally copying"""
@@ -101,9 +107,31 @@ class BaseResidueFingerprint(OrderedDefaultDict):
         f.write(self.fp_str())
         f.close()
 
+        
+    def to_pickable(self):
+        """
+        (BaseResidueFingerprint) -> ResidueFingerPrintPickable
+        """
+        d = OrderedDefaultDict(float)
+        for k,v in self.items():
+            d[k] = v
+            
+        return ResidueFingerPrintPickable(self.res.res_id, self.bitlength, d)
+
+    @classmethod
+    def from_pickable(cls, p, c):
+        """(BaseResidueFingerprint) -> (p: Pickable, c: Complex)"""
+        res = c.get_res_from_resid(p.res_id)
+        res.c = c#set the host complex
+        
+        return cls(res, p.bitlength, p.mapping)
+
+ComplexFinperPrintPickable = namedtuple("ComplexFinperPrintPickable", "mapping")
+
 #complex fingerprint
 class BaseComplexFingerprint(OrderedDict):
-    def __init__(self,bitlength=None, residue_fp_cls = BaseResidueFingerprint):
+    
+    def __init__(self, residue_fp_cls = BaseResidueFingerprint):
         OrderedDict.__init__(self)
         self.residue_fp_cls = residue_fp_cls
 
@@ -127,9 +155,45 @@ class BaseComplexFingerprint(OrderedDict):
     
     def get_bitlength(self):
         return self.values()[0].bitlength
-    
 
+    #(dict(res_id: str, ResidueFingerPrint.Pickable))
 
+    def get_mapping(self):
+        return OrderedDict(map(lambda (r,fp): (r.res_id, fp.to_pickable()),
+                               self.items()))
+
+    def to_pickable(self):
+        """(BaseComplexFingerprint) -> ComplexFinperPrintPickable"""
+        return ComplexFinperPrintPickable(self.get_mapping())
+
+    @classmethod
+    def make_instance_from_pickable(cls, p, res_fp_cls):
+        return cls(res_fp_cls)
+        
+    @classmethod
+    def from_pickable(cls, p, c, res_fp_cls = BaseResidueFingerprint):
+        """
+        (type , ComplexFinperPrintPickable, Complex, type) -> BaseComplexFingerprint
+        """
+        #construct the complex finger print
+        fp = cls.make_instance_from_pickable(p, res_fp_cls)
+
+        #set the residue finger print
+        for res_id, res_p in p.mapping.items():
+            res_fp = res_fp_cls.from_pickable(res_p, c)
+            fp[res_fp.res] = res_fp
+
+        return fp    
+
+    def __eq__(self, other):
+        for (res1,fp1),(res2, fp2) in zip(self.items(),other.items()):
+            if res1 != res2 or fp1 != fp2:
+                return False
+        return True
+
+    def __repr__(self):
+        return str(self)
+        
 class HeadlessFingerprint(BaseResidueFingerprint):
     """Geometric-center-based complex finger print"""
     def __init__(self, bitlength, values = None):

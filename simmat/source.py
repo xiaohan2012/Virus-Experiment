@@ -86,7 +86,7 @@ def load_simmat(path):
     return m
 
 def main1():
-    mat = load_simmat("data/fp_370_atb.txt")
+    mat = load_simmat("data/last_150.atb.txt")
     #print mat[:10,:10]
     print mat.to_csv_str()
 

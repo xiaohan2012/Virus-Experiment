@@ -3,8 +3,9 @@ from glob import glob
 
 from schrodinger.structure import StructureReader
 from structure import mystructure
+from ve.util.residue import BaseResidue
 
-def load_pdb_struct(path,residue_cls  = None):
+def load_pdb_struct(path,residue_cls  = BaseResidue):
     st = StructureReader(path).next()
     st = mystructure(st)
     if residue_cls is not None:
@@ -28,7 +29,26 @@ def complex_ids(path=complex_dir):
     return map(lambda s: s.split(".")[0],
                map(os.path.basename, 
                    glob(os.path.join(path ,"*"))))
-        
+
+from ve.util.complex import BaseComplex
+
+
+def load_complexes(complex_ids, directory = complex_dir, complex_cls=BaseComplex, residue_cls=BaseResidue):
+    """
+    load complexes in a row
+
+    >>> ids = complex_ids()
+    >>> cs = load_complexes(ids)
+    >>> len(list(cs))
+    237
+    """
+    for cid in complex_ids:
+        atg = load_pdb_struct(os.path.join(directory, cid, "antigen.pdb"), residue_cls)
+        atb = load_pdb_struct(os.path.join(directory, cid, "antibody.pdb"), residue_cls)
+        c = complex_cls(complex_id = cid, antigen = atg, antibody = atb)
+        yield c
+
+    
 def test():
     import doctest
     doctest.testmod()

@@ -1,7 +1,6 @@
 from ve.util.residue import BaseResidue
-from ve.fp.residue_util import init_resdist_util
+from ve.fp.residue_util.dist import ResDistTrait
 
-class TestResidue(BaseResidue):
-    def __init__(self, residue):
-        BaseResidue.__init__(self, residue)
-        init_resdist_util(self)
+class TestResidue(BaseResidue, ResDistTrait):
+    def __init__(self, residue, **kwargs):
+        super(TestResidue, self).__init__(residue, **kwargs)
