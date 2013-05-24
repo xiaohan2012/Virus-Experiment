@@ -7,6 +7,7 @@ from ve.simmat.source import make_dataloader, make_single_line_converter
 
 single_line_headless_converter = make_single_line_converter(slice(0,370))
 
+
 class FPStringConverterTestCase(unittest.TestCase):
     
     def test_single_line_headless_converter(self):
