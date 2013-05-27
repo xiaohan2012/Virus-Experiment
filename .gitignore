@@ -30,3 +30,4 @@ pip-log.txt
 data/*
 !data/pdb_files
 log/*
+simmat/data/*

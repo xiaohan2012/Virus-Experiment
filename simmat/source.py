@@ -85,49 +85,13 @@ def load_simmat(path):
 
     return m
 
-def main1():
-    mat = load_simmat("data/last_150.atb.txt")
+def print_simmat_in_csv(path):
+    mat = load_simmat(path)
     #print mat[:10,:10]
     print mat.to_csv_str()
 
-from ve.config import data237_root
-
-fp370_atg_dataloader = make_dataloader(os.path.join(data237_root, "fp_370_atg"), make_single_line_converter(slice(0, 370)))
-fp370_atb_dataloader = make_dataloader(os.path.join(data237_root, "fp_370_atb"), make_single_line_converter(slice(0, 370)))
-
-first_110_atg_dataloader = make_dataloader(os.path.join(data237_root, "fp_370_atg"), make_single_line_converter(slice(0, 110)))
-second_110_atg_dataloader = make_dataloader(os.path.join(data237_root, "fp_370_atg"), make_single_line_converter(slice(110, 220)))
-last_150_atg_dataloader = make_dataloader(os.path.join(data237_root, "fp_370_atg"), make_single_line_converter(slice(220, 370)))
-
-first_110_atb_dataloader = make_dataloader(os.path.join(data237_root, "fp_370_atb"), make_single_line_converter(slice(0, 110)))
-second_110_atb_dataloader = make_dataloader(os.path.join(data237_root, "fp_370_atb"), make_single_line_converter(slice(110, 220)))
-last_150_atb_dataloader = make_dataloader(os.path.join(data237_root, "fp_370_atb"), make_single_line_converter(slice(220, 370)))
-
-first_110_atg_datasaver = make_fp_str_saver(os.path.join(data237_root, "fp_370_atg_first_110"))
-second_110_atg_datasaver = make_fp_str_saver(os.path.join(data237_root, "fp_370_atg_second_110"))
-last_150_atg_datasaver = make_fp_str_saver(os.path.join(data237_root, "fp_370_atg_last_150"))
-
-first_110_atb_datasaver = make_fp_str_saver(os.path.join(data237_root, "fp_370_atb_first_110"))
-second_110_atb_datasaver = make_fp_str_saver(os.path.join(data237_root, "fp_370_atb_second_110"))
-last_150_atb_datasaver = make_fp_str_saver(os.path.join(data237_root, "fp_370_atb_last_150"))
-
-def main2():
-    """
-    split 360 bits into parts
-    """
-    delimiter = " "
-    cids = load_cids("data/fp_370_atb.txt")
-    print("cid, first 110, second 110, last 150")
-    for cid in sorted(cids):
-        print("%s,%s,%s,%s" %(cid,
-                              delimiter.join(map(lambda d: "%.2f" %d, first_110_atg_dataloader(cid))),
-                              delimiter.join(map(lambda d: "%.2f" %d, second_110_atg_dataloader(cid))),
-                              delimiter.join(map(lambda d: "%.2f" %d, last_150_atg_dataloader(cid))),
-                          ))
-        
-        
-        
-
+            
+            
         
 def test():
     import doctest
@@ -135,4 +99,5 @@ def test():
 
 if __name__ == "__main__":
 #    test()
-    main1()
+    print_simmat_in_csv("data/fp_370_480_atg.txt")
+

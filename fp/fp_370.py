@@ -122,23 +122,37 @@ def main1():
         print cid
         gen_fp_for_complex(cid)
 
+def test_count():
+    import os
+    from ve.util.load_pdb import complex_ids, load_complexes
+    from ve.config import data480_root, data480_complex_root
+    
+    ids = complex_ids(data480_complex_root)
+    fp_dir = os.path.join(data480_root, "fp_370_atg" )
+
+    for cid in ids:
+        fp_path = os.path.join(fp_dir, "%s.fp" %cid)
+        if os.path.exists(fp_path):
+            print cid, "exists"
+        else:
+            print cid
+            
 def main2(which_as_rec):
     import os
     from ve.util.load_pdb import complex_ids, load_complexes
-    from ve.config import data480_root, data480_complex_root, data237_complex_root, data237_root
-    ids = ["3DVN_XY"]
-    #complex_ids(data480_complex_root)
-    cs = load_complexes(ids, directory = data480_complex_root,complex_cls = MyComplex, residue_cls = MyResidue)
+    from ve.config import data480_root, data480_complex_root
+    ids = complex_ids(data480_complex_root)
     
-    preexisted_fp_dir = os.path.join(data237_root, "fp_370_%s" %which_as_rec)
+    cs = load_complexes(ids, directory = data480_complex_root,complex_cls = MyComplex, residue_cls = MyResidue)
+
     fp_dir = os.path.join(data480_root, "fp_370_%s" %which_as_rec)
 
     for c in cs:
-        print c.c_id
         fp_path = os.path.join(fp_dir, "%s.fp" %c.c_id)
-        if os.path.exists(os.path.join(preexisted_fp_dir, "%s.fp" %c.c_id)) or os.path.exists(fp_path):
-            print "%s preexists" %c.c_id
+        if os.path.exists(fp_path):
+            print "%s preexists\n" %c.c_id
         else:
+            print "processing", c.c_id
 
             try:
                 fp = c.get_fp(which_as_rec)
@@ -146,11 +160,11 @@ def main2(which_as_rec):
             except Exception as e:
                 from ve.util.error import get_error_info
                 print c.c_id, get_error_info(e)
-
+            print c.c_id, "processed\n"
 
 def usage():
     return """
-python fp_370.py test | atg | atb
+python fp_370.py test | atg | atb | test_count
     """
     
 if __name__ == "__main__":
@@ -158,13 +172,11 @@ if __name__ == "__main__":
     if len(sys.argv) == 2 and sys.argv[1] == "test":
         test()
     elif len(sys.argv) == 2 and sys.argv[1] == "atg":
-        """
-        3B2U_E
-        1A2Y_C
-        3DVN_XY
-        """
+        """318 currently"""
         main2("atg")
     elif len(sys.argv) == 2 and sys.argv[1] == "atb":
         main2("atb")
+    elif len(sys.argv) == 2 and sys.argv[1] == "test_count":
+        test_count()
     else:
         print usage()

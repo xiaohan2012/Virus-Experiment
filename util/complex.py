@@ -43,4 +43,9 @@ class BaseComplex(object):
         
         from itertools import chain
         return filter(lambda r: r.res_id == res_id, self)[0]
-        
+
+    def __str__(self):
+        return "%s: %s" %(self.__class__, self.c_id)
+
+    def __repr__(self):
+        return str(self)

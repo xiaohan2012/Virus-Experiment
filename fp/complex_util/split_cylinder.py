@@ -187,10 +187,8 @@ class GBCSplitCylinderTrait(SplitCylinderUtility, HasAxialPlaneTrait, FindParaEp
 
         cylinder = self.make_cylinder(self.get_cylinder_center(), self.get_axial_plane())
 
-        print "up?"
-        
         for other in targets:
-            print other
+
             idx = cylinder.in_which(other.get_center())
             
             #it's within the cylinder

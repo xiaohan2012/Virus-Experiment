@@ -116,7 +116,7 @@ class FindParaEpiTrait(DistanceCachePropagationTrait):
                 #if there exists one residue in the antibody side that is close enough to `g_r`, 
                 #then `g_r` should belong to the epitope set
                 for b_r in self.atb.residues:
-                    if g_r.dist_to(b_r) <= self.paratope_threshold:
+                    if g_r.dist_to(b_r) <= self.epitope_threshold:
                         self.epitope.append(g_r)
                         break
             if not self.epitope:
