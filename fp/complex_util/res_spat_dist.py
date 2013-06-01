@@ -9,7 +9,7 @@ class CylinderWithResPos(Cylinder):
         get the residue spatial distribution
         """
 
-        return ResiduePositionDistribution([self.in_which(r.get_center()) for r in residues if self.in_which(r.get_center())])
+        return ResiduePositionDistribution(self.ring_count, [self.in_which(r.get_center()) for r in residues if self.in_which(r.get_center())])
         
     def get_residue_distribution(self, residues):
         """
@@ -30,22 +30,38 @@ class ResiduePositionDistribution(Counter):
     """
     A list recording the maximum residue number in each cylinder segment
 
-    >>> t = ResiduePositionDistribution([2,3])
+    >>> t = ResiduePositionDistribution(4, [2,3])
     >>> t[3]
     1
-    >>> t += ResiduePositionDistribution([1,2,2,2])
+    >>> t += ResiduePositionDistribution(4, [1,2,2,2])
+    >>> t.ring_count
+    4
     >>> t[1]
     1
     >>> t[2]
     3
+    >>> len(t)
+    5
+    >>> print t
+    idx:  0, 1, 2, 3
+    cnt:  0, 1, 3, 1
     """
+    def __init__(self, ring_count, *args, **kws):
+        self.ring_count = ring_count
+        super(ResiduePositionDistribution,self).__init__(*args, **kws)
+
+    def __getitem__(self, idx):
+        if idx >= self.ring_count:
+            raise IndexError("%d exceeds %d" %(idx, self.ring_count))
+        return super(ResiduePositionDistribution,self).__getitem__(idx)
+            
     def __add__(self, other):
         """
         merge two position distributions
         
         (ResiduePositionDistribution, ResiduePositionDistribution) -> ResiduePositionDistribution
         """
-        d = self.__class__(self)
+        d = self.__class__(self.ring_count, self)
         for pos, val in other.items():
             if self[pos] < val:
                 d[pos] = val
@@ -53,6 +69,17 @@ class ResiduePositionDistribution(Counter):
                 d[pos] = self[pos]
         return d
         
+    def __str__(self):
+        row_head = ",".join(map(lambda x: "%2d" %x,xrange(self.ring_count)))
+        row_content = ",".join(map(lambda x: "%2d" %x, (self[i] for i in xrange(self.ring_count))))
+        return "idx: %s\ncnt: %s" %(row_head, row_content)
+
+    def __repr__(self):
+        return str(self)
+        
+    def __len__(self):
+        return sum((self[i] for i in xrange(self.ring_count)))
+
 from ve.fp.complex_util.geom import GeometryTrait
 from ve.fp.geom import Line, get_perp_plane
 
@@ -64,7 +91,7 @@ class ResidueSpatialDistributionTrait(SplitCylinderUtility, HasAxialPlaneTrait, 
     """
     Distribution on residue spatial position with respect to the splitted cylinder
     """
-
+    
     def make_cylinder(self, center, plane):
         return CylinderWithResPos(center, plane, self.radius, self.radius_step, self.height, self.height_step)
 

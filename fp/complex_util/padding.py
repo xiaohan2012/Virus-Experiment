@@ -3,7 +3,7 @@ from ve.fp.complex_util.res_spat_dist import ResiduePositionDistribution
 
 import os
 from ve.config import data237_cache as cache_dir
-dist_cahce_path = os.path.join(cache_dir, "overall_residue_distribution")
+dist_cache_path = os.path.join(cache_dir, "overall_residue_distribution")
 
 from cPickle import dump, load
 
@@ -13,51 +13,52 @@ class OverallSpatialDistribution(object):
     """
         
     @classmethod
-    def overall_dist(cls, complexes, to_cache=True, path = dist_cahce_path):
+    def overall_dist(cls, complexes, to_cache=True, path = dist_cache_path):
         """
         (OverallSpatialDistribution, list of Complex) -> ResiduePositionDistribution, ResiduePositionDistribution
 
         return the Counter recording the maximum residue count in each ring of the splitted cylinder
         """
-        atg_dist, atb_dist = ResiduePositionDistribution(), ResiduePositionDistribution()
-        
+        complexes = list(complexes)
+        ring_count = complexes[0].ring_count
+        atg_dist, atb_dist = ResiduePositionDistribution(ring_count, []), ResiduePositionDistribution(ring_count, [])
         for c in complexes:
             atg_dist += c.get_atg_res_spat_dist()[0]
             atb_dist += c.get_atb_res_spat_dist()[0]
-            
+       
         #to cache
         if to_cache:
-            dump((atg_dist, atb_dist), open(path, "w"))
-            
+            dump((ring_count, atg_dist, atb_dist), open(path, "w"))
+
         return atg_dist, atb_dist
         
     @classmethod    
-    def from_cache(cls,  path = dist_cahce_path):
-        return load(open(path, "r"))
+    def from_cache(cls,  path = dist_cache_path):
+        #eggache and mysterious part
+        ring_count, atg_dist, atb_dist = load(open(path, "r"))
+        
+        for k,v in atg_dist.ring_count.items():
+            atg_dist[k] = v
+        atg_dist.ring_count = ring_count
+        
+        for k,v in atb_dist.ring_count.items():
+            atb_dist[k] = v
+        atb_dist.ring_count = ring_count
+
+        return atg_dist, atb_dist
     
 from ve.fp.fp import BaseComplexFingerprint, BaseResidueFingerprint
 
 from collections import namedtuple
-ComplexPaddedFinperPrintPickable = namedtuple("ComplexPaddedFinperPrintPickable", "ring_count mapping")
+ComplexPaddedFinperPrintPickable = namedtuple("ComplexPaddedFinperPrintPickable", "mapping")
 
 class PaddedComplexFingerPrint(BaseComplexFingerprint):
     """
     Padded version of complex fingerprint based on fingerprint template
     """
-    def __init__(self, ring_count = 0, residue_fp_cls = BaseResidueFingerprint):
-        """
-        (PaddedComplexFingerPrint, int, int, type) -> NoneType
-        """
-        self.ring_count = ring_count
-        super(PaddedComplexFingerPrint,self).__init__(residue_fp_cls = residue_fp_cls)
-
-    @classmethod
-    def make_instance_from_pickable(cls, p, res_fp_cls):
-        return cls(p.ring_count, res_fp_cls)
-        
     def to_pickable(self):
         """(BaseComplexFingerprint) -> ComplexFinperPrintPickable"""
-        return ComplexPaddedFinperPrintPickable(self.ring_count, self.get_mapping())
+        return ComplexPaddedFinperPrintPickable(self.get_mapping())
         
     def fake_fp_str(self, length, value='0',separator=','):
         """
@@ -82,7 +83,7 @@ class PaddedComplexFingerPrint(BaseComplexFingerprint):
         fp_strs = []
         res_fp_len = self.get_res_fp_length()
         #for the ith ring
-        for i in xrange(self.ring_count):
+        for i in xrange(cnt_dist.ring_count):
             #there is `cnt` residues in this ring
             cnt = cnt_dist[i]
             #for each residue position
@@ -95,13 +96,9 @@ class PaddedComplexFingerPrint(BaseComplexFingerprint):
                     fp_strs.append(self.fake_fp_str(res_fp_len))
                     
         return ",".join(fp_strs)
-        
+
     def __eq__(self, other):
-        return super(PaddedComplexFingerPrint, self).__eq__(other) and self.ring_count == other.ring_count
-
-    def __str__(self):
-        return "Padded Complex Fingerprint with %d rings" %self.ring_count
-
+        return super(PaddedComplexFingerPrint, self).__eq__(other)
         
 from ve.fp.complex_util.res_spat_dist import ResidueSpatialDistributionTrait
 from ve.util.complex import BaseComplex

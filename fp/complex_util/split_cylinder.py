@@ -27,6 +27,8 @@ class Cylinder(object):#the cylinder concept can be factored out
         self.layer_size = self.cylinder_radius / self.cylinder_radius_step
         self.layer_count = self.cylinder_height / self.cylinder_height_step
 
+        self.ring_count = self.layer_size * self.layer_count
+        
     def in_which(self, pt):
         """
         (Cylinder, Point) => int

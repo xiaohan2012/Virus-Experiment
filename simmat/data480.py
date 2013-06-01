@@ -20,9 +20,9 @@ def print_splitted_fp_in_csv(use_atg = True):
     """
     split 360 bits into parts
     """
-    delimiter = " "
-    cids = load_cids("data/fp_370_atb.txt")
-    print("cid, first 110, second 110, last 150")
+    delimiter = ","
+    cids = load_cids("data/fp_370_480_atb.txt")
+    print("cid, %s" %",".join(map(str, range(1,371))))
     for cid in sorted(cids):
         if use_atg:
             print("%s,%s,%s,%s" %(cid,

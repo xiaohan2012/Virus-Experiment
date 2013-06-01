@@ -23,7 +23,7 @@ class CacheTrait(object):
         raise NotImplementedError
 
     @classmethod
-    def load(cls, c_id, c):
+    def load(cls, c_id, c, **kwargs):
         """
         (class, str, Complex) -> obj
         
@@ -33,7 +33,7 @@ class CacheTrait(object):
         if cls.cache_type is None:
             raise ValueError("Please specify cache type")
         
-        return cls.assemble(cls.load_pickle(c_id), c)
+        return cls.assemble(cls.load_pickle(c_id), c, **kwargs)
         
     @classmethod    
     def dump(cls, c_id, obj):
@@ -95,6 +95,8 @@ class TriangleCache(CacheTrait):
         from ve.fp.residue_util.res_triangle import ResTriangle
         return [ResTriangle(c.get_res_from_resids(resids)) for resids in resids_lst]
 
+from ve.fp.fp import BaseComplexFingerprint, BaseResidueFingerprint
+
 class ComplexFingerPrintCache(CacheTrait):
     """Cache for complex finger print"""
     cache_type = None #please specify
@@ -108,10 +110,10 @@ class ComplexFingerPrintCache(CacheTrait):
         return fp.to_pickable()
         
     @classmethod
-    def assemble(cls, p, c):
+    def assemble(cls, p, c, complex_fp_cls = BaseComplexFingerprint, res_fp_cls = BaseResidueFingerprint):
         """
         (ComplexFingerPrintCache, ComplexFingerPrintPickable, Complex) -> BaseComplexFingerPrint
         """
         from ve.fp.fp import BaseComplexFingerprint
-        return BaseComplexFingerprint.from_pickable(p, c)
+        return complex_fp_cls.from_pickable(p, c, res_fp_cls)
     

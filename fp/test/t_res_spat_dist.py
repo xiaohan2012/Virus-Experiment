@@ -11,7 +11,7 @@ class ResidueDistributionTestCase(NumericTestCase):
     """Test case for residue spatial distribution within the cylinder"""
     
     def setUp(self):
-        self.c = Complex()
+        self.c = Complex(radius = 20, radius_step = 2, height = 40, height_step = 5)
 
     def test_atg_side_count(self):
         """Residue count distribution on the antigen side"""
