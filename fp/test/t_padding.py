@@ -79,6 +79,9 @@ class PaddingTestCase(unittest.TestCase):
 
 from ve.fp.complex_util.padding import PaddedComplexFingerPrint
 class PaddedFingerPrintTest(unittest.TestCase):
+    """
+    pickle related method of PaddedFingerPrint
+    """
     def setUp(self):
         self.c = ComplexClass()
 
@@ -86,16 +89,24 @@ class PaddedFingerPrintTest(unittest.TestCase):
                                                   targets=[(0,self.c.atb.residues)], 
                                                   fps = PaddedComplexFingerPrint())
     def test_to_pickle_mapping_len(self):
-        """mapping length of to_pickle"""
+        """
+        mapping length of to_pickle
+        """
         p = self.fps.to_pickable()
         self.assertEqual(len(p.mapping), 7)
 
     def test_from_pickable(self):
+        """
+        test whether padded fingerprint loaded from cache works
+        """
         p = self.fps.to_pickable()
         fps = PaddedComplexFingerPrint.from_pickable(p, self.c)
         
         self.assertEqual(self.fps, fps)
 
+class FromCachePaddedFingerPrintTest(unittest.TestCase):
+    pass
+    
 if __name__ == '__main__':
     unittest.main()
         

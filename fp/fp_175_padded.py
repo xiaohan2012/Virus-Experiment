@@ -1,7 +1,7 @@
 from __future__ import division
 
 """
-Padded version of 175-bit finger print
+Padded version of 175-bit finger print(80 + 80 + 15)
 """
 
 from ve.fp.fp_75_gen import get_15bits
@@ -16,36 +16,41 @@ overall_atg_dist,overall_atb_dist =  OverallSpatialDistribution.from_cache()
 class AxialPlaneBasedComplex(TriangleComplex, #triangle genenration
                              ResidueSpatialDistributionTrait):#padding
     def gen_fp_str(self, atg_as_receptor = True):
-        #gen fp
+        #gen fp, atg_tri
         fps1 = self.gen_fp_by_splitting_cylinder(bases=self.atg.residues,
                                      targets=[(0,self.get_triangles())],
-                                     fps = PaddedComplexFingerPrint(self.ring_count))
-        #padded fp str
+                                     fps = PaddedComplexFingerPrint())
+        #padded fp str, atg_res
         _, atg_res_dist = self.get_atg_res_spat_dist()
         str1 = fps1.fp_str(overall_atg_dist, atg_res_dist, number_type=int)
 
-        #gen fp
+        #gen fp, atb_resi
         fps2 = self.gen_fp_by_splitting_cylinder(bases=self.atb.residues,
                                                  targets=[(0,self.atb.residues)],
-                                                 fps = PaddedComplexFingerPrint(self.ring_count))
-
+                                                 fps = PaddedComplexFingerPrint())
+        
         #padded fp str
         _, atb_res_dist = self.get_atb_res_spat_dist()
         str2 = fps2.fp_str(overall_atb_dist, atb_res_dist, number_type=int)
-
+        
         #gen fp and padded fp str
         if atg_as_receptor:
-            fps3 = get_15bits(receptor = self.atg, binder = self.atb, fp = PaddedComplexFingerPrint(self.ring_count))
+            #atg as receptor
+            fps3 = get_15bits(receptor = self.atg, binder = self.atb,
+                              fp = PaddedComplexFingerPrint())
             str3 = fps3.fp_str(overall_atg_dist, atg_res_dist, number_type = int)
         else:
-            fps3 = get_15bits(binder = self.atg, receptor = self.atb, fp = PaddedComplexFingerPrint(self.ring_count))
+            #atb as receptor
+            fps3 = get_15bits(binder = self.atg, receptor = self.atb,
+                              fp = PaddedComplexFingerPrint())
             str3 = fps3.fp_str(overall_atb_dist, atg_res_dist, number_type = int)
-
+            
         return ",".join([str1, str2, str3])
 
 class ComplexPlaneBasedComplex(AxialPlaneBasedComplex, SplitCylinderViaComplexPlaneTrait):
-    pass
-
+    def gen_fp_from_cache(self, ):
+        pass
+    
 class ResiduePlaneBasedComplex(AxialPlaneBasedComplex, SplitCylinderViaResiduePlaneTrait):
     pass
     

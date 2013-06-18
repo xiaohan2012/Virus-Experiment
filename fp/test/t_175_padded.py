@@ -36,7 +36,7 @@ class ComplexPlaneBasedComplexTestCase(unittest.TestCase):
         expected = sum(overall_atg_dist.values()) * 80 + sum(overall_atb_dist.values()) * (80 + 15)
 
         self.assertEqual(actual, expected)
-        
+
 
 class ResiduePlaneBasedComplexTestCase(unittest.TestCase):
     

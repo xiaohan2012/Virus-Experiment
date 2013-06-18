@@ -74,6 +74,9 @@ class ComplexFingerPrintCacheTest(unittest.TestCase):
         new_fps = self.C.load(self.c.c_id, self.c)
 
         self.assertEqual(fps, new_fps)
+
+    def test_padded_complex_fp(self):
+        pass
         
     def tearDown(self):
         """don't forget the clean the caches'"""

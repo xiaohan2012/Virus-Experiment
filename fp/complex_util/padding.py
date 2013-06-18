@@ -60,7 +60,7 @@ class PaddedComplexFingerPrint(BaseComplexFingerprint):
         """(BaseComplexFingerprint) -> ComplexFinperPrintPickable"""
         return ComplexPaddedFinperPrintPickable(self.get_mapping())
         
-    def fake_fp_str(self, length, value='0',separator=','):
+    def fake_fp_str(self, length, value='0', separator=','):
         """
         a string of `length`  separated by `separator` with `value` in between `separator`
         """
