@@ -36,7 +36,8 @@ class TriangleCacheTest(unittest.TestCase):
         """don't forget the clean the caches'"""
         path = self.C.get_dir(self.c.c_id)
         os.remove(path)
-        
+
+from ve.fp.complex_util.padding import PaddedComplexFingerPrint
 
 class ComplexFingerPrintCacheTest(unittest.TestCase):
     """ Test case for complex fp cache"""
@@ -65,6 +66,9 @@ class ComplexFingerPrintCacheTest(unittest.TestCase):
         self.assertTrue(self.C.has_cache(self.c.c_id))
 
     def test_load(self):
+        """
+        test load fp as BaseComplexFingerprint
+        """
         #first dump it
         fps = self.c.gen_fp_by_splitting_cylinder(bases=self.c.atb.residues,
                                             targets=[(0,self.c.atb.residues)])
@@ -75,13 +79,12 @@ class ComplexFingerPrintCacheTest(unittest.TestCase):
 
         self.assertEqual(fps, new_fps)
 
-    def test_padded_complex_fp(self):
-        pass
         
     def tearDown(self):
         """don't forget the clean the caches'"""
         path = self.C.get_dir(self.c.c_id)
-        os.remove(path)
-        
+        if os.path.exists(path):
+            os.remove(path)
+            
 if __name__ == '__main__':
     unittest.main()

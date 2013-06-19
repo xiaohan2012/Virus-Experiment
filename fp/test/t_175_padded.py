@@ -23,7 +23,7 @@ class ComplexPlaneBasedComplexTestCase(unittest.TestCase):
         fp_str = self.c.gen_fp_str()
         actual = len(fp_str.split(","))
         expected = sum(overall_atg_dist.values()) * (80+15) + sum(overall_atb_dist.values()) * 80
-
+        
         self.assertEqual(actual, expected)
 
     def test_fp_length_atb_as_rec(self):

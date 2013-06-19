@@ -20,11 +20,12 @@ def make_complex_class(cls, residue_class = TestResidue):
     create new complex class that extends from `cls`
     """
     class ComplexClass(BaseComplex, cls):
-        def __init__(self,**kwargs):
+        def __init__(self,c_id = None, **kwargs):
             atg = load_pdb_struct(os.path.join(test_data_dir, "antigen.pdb"), residue_class)
             atb = load_pdb_struct(os.path.join(test_data_dir, "antibody.pdb"), residue_class)
-
-            c_id = "1SLG_D"
+            
+            if not c_id:#c_id not set
+                c_id = "1SLG_D"
 
             super(ComplexClass,self).__init__(complex_id = c_id, antigen = atg, antibody = atb, **kwargs)
 

@@ -190,9 +190,6 @@ class BaseComplexFingerprint(OrderedDict):
             if res1 != res2 or fp1 != fp2:
                 return False
         return True
-
-    def __repr__(self):
-        return str(self)
         
 class HeadlessFingerprint(BaseResidueFingerprint):
     """Geometric-center-based complex finger print"""
