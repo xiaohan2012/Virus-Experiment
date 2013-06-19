@@ -11,29 +11,49 @@ from ve.fp.complex_util.padding import PaddedComplexFingerPrint, OverallSpatialD
 from ve.fp.complex_util.split_cylinder import SplitCylinderViaComplexPlaneTrait, SplitCylinderViaResiduePlaneTrait
 from ve.fp.complex_util.res_spat_dist import ResidueSpatialDistributionTrait
 
+from ve.fp.complex_util.cache import ComplexFingerPrintCache as C
+
 overall_atg_dist,overall_atb_dist =  OverallSpatialDistribution.from_cache()
 
 class AxialPlaneBasedComplex(TriangleComplex, #triangle genenration
                              ResidueSpatialDistributionTrait):#padding
-    def gen_fp_str(self, atg_as_receptor = True):
-        #gen fp, atg_tri
-        fps1 = self.gen_fp_by_splitting_cylinder(bases=self.atg.residues,
-                                     targets=[(0,self.get_triangles())],
-                                     fps = PaddedComplexFingerPrint())
-        #padded fp str, atg_res
+    def gen_fp_str(self, use_tri = True, atg_as_receptor = True, use_cache = True):
+        #antigen side
+        if use_tri:
+            if use_cache:
+                C.set_signature("atg_tri_%s_plane" %self.plane_type)
+                fps1 = C.load(self.c_id, self,  complex_fp_cls =  PaddedComplexFingerPrint)
+            else:
+                fps1 = self.gen_fp_by_splitting_cylinder(bases=self.atg.residues,
+                                                         targets=[(0,self.get_triangles())],
+                                                         fps = PaddedComplexFingerPrint())
+        else:
+            if use_cache:
+                C.set_signature("atg_res_%s_plane" %self.plane_type)
+                fps1 = C.load(self.c_id, self,  complex_fp_cls =  PaddedComplexFingerPrint)
+            else:
+                fps1 = self.gen_fp_by_splitting_cylinder(bases=self.atg.residues,
+                                                     targets=[(0,self.atg.residues)], 
+                                                     fps = PaddedComplexFingerPrint())
+            
+        #padded fp str
         _, atg_res_dist = self.get_atg_res_spat_dist()
         str1 = fps1.fp_str(overall_atg_dist, atg_res_dist, number_type=int)
 
-        #gen fp, atb_resi
-        fps2 = self.gen_fp_by_splitting_cylinder(bases=self.atb.residues,
-                                                 targets=[(0,self.atb.residues)],
-                                                 fps = PaddedComplexFingerPrint())
+        #antibody side
+        if use_cache:
+            C.set_signature("atb_res_%s_plane" %self.plane_type)
+            fps2 = C.load(self.c_id, self,  complex_fp_cls =  PaddedComplexFingerPrint)
+        else:
+            fps2 = self.gen_fp_by_splitting_cylinder(bases=self.atb.residues,
+                                                     targets=[(0,self.atb.residues)],
+                                                     fps = PaddedComplexFingerPrint())
         
         #padded fp str
         _, atb_res_dist = self.get_atb_res_spat_dist()
         str2 = fps2.fp_str(overall_atb_dist, atb_res_dist, number_type=int)
         
-        #gen fp and padded fp str
+        #interactive force
         if atg_as_receptor:
             #atg as receptor
             fps3 = get_15bits(receptor = self.atg, binder = self.atb,
@@ -48,8 +68,7 @@ class AxialPlaneBasedComplex(TriangleComplex, #triangle genenration
         return ",".join([str1, str2, str3])
 
 class ComplexPlaneBasedComplex(AxialPlaneBasedComplex, SplitCylinderViaComplexPlaneTrait):
-    def gen_fp_from_cache(self, ):
-        pass
+    pass
     
 class ResiduePlaneBasedComplex(AxialPlaneBasedComplex, SplitCylinderViaResiduePlaneTrait):
     pass
