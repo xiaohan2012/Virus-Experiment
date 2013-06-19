@@ -420,6 +420,7 @@ def get_15bits(receptor, binder, fp = None):
         fp[res] = res_fp
 
     return fp
+    
 def gen_fp_to_file(receptor=None,binder=None,fp_path=''):
     rec_tree = distance_tree_15()
 

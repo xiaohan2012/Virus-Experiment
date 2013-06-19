@@ -1,6 +1,7 @@
 import os
 from common import *
 from ve.fp.complex_util.padding import PaddedComplexFingerPrint
+from ve.fp.fp_75_gen import get_15bits
 
 class ComplexPlanePaddedComplexFingerPrintCacheTest(unittest.TestCase):
     """ Test case for padded complex fp cache"""
@@ -55,12 +56,33 @@ class ComplexPlanePaddedComplexFingerPrintCacheTest(unittest.TestCase):
         self.C.set_signature("atb_res_complex_plane")
 
         expected_fp = self.c.gen_fp_by_splitting_cylinder(bases=self.c.atb.residues,
-                                                  targets=[(0,self.c.atb.residues)],
+                                                          targets=[(0,self.c.atb.residues)],
                                                   fps = PaddedComplexFingerPrint())
-
+        
                                                   
         actual_fp = self.C.load(self.c.c_id, self.c, complex_fp_cls =  PaddedComplexFingerPrint)
         self.assertEqual(expected_fp, actual_fp)
+        
+    def test_load_iforce_atg_as_rec(self):
+        """test interactive force whose receptor is set to antigen"""
+        expected_fp =  get_15bits(receptor = self.c.atg, binder = self.c.atb,
+                                  fp = PaddedComplexFingerPrint())
+        
+        self.C.set_signature("interactive_force_atG_as_rec")
+        
+        actual_fp = self.C.load(self.c.c_id, self.c, complex_fp_cls =  PaddedComplexFingerPrint)
+        self.assertEqual(expected_fp, actual_fp)
+        
+    def test_load_iforce_atb_as_rec(self):
+        """test interactive force whose receptor is set to antibody"""
+        expected_fp =  get_15bits(receptor = self.c.atb, binder = self.c.atg,
+                                  fp = PaddedComplexFingerPrint())
+        
+        self.C.set_signature("interactive_force_atB_as_rec")
+        
+        actual_fp = self.C.load(self.c.c_id, self.c, complex_fp_cls =  PaddedComplexFingerPrint)
+        self.assertEqual(expected_fp, actual_fp)
+        
 
 class ResiduePlanePaddedComplexFingerPrintCacheTest(unittest.TestCase):
     """ Test case for padded complex fp cache"""

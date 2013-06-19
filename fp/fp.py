@@ -125,7 +125,10 @@ class BaseResidueFingerprint(OrderedDefaultDict):
         res.c = c#set the host complex
         
         return cls(res, p.bitlength, p.mapping)
-
+        
+    def __eq__(self, other):
+        return sorted(self.items()) == sorted(other.items())
+        
 ComplexFinperPrintPickable = namedtuple("ComplexFinperPrintPickable", "mapping")
 
 #complex fingerprint
@@ -188,6 +191,8 @@ class BaseComplexFingerprint(OrderedDict):
     def __eq__(self, other):
         for (res1,fp1),(res2, fp2) in zip(self.items(),other.items()):
             if res1 != res2 or fp1 != fp2:
+                print res1,res2, res1 == res2
+                print fp1, fp2, fp1 == fp2
                 return False
         return True
         
@@ -215,7 +220,6 @@ class FP0112(BaseComplexFingerprint):
         else:
             step = targets[1][0] - targets[0][0]
             bitlength = step * len(targets)
-        print bitlength
         BaseComplexFingerprint.__init__(self,bitlength)
 
 if __name__ == "__main__":

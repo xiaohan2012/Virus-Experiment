@@ -96,9 +96,6 @@ class PaddedComplexFingerPrint(BaseComplexFingerprint):
                     fp_strs.append(self.fake_fp_str(res_fp_len))
                     
         return ",".join(fp_strs)
-
-    def __eq__(self, other):
-        return super(PaddedComplexFingerPrint, self).__eq__(other)
         
 from ve.fp.complex_util.res_spat_dist import ResidueSpatialDistributionTrait
 from ve.util.complex import BaseComplex
