@@ -88,9 +88,11 @@ class PaddedComplexFingerPrint(BaseComplexFingerprint):
             cnt = cnt_dist[i]
             #for each residue position
             for j in xrange(cnt):
+                res_dist_to_complex_func = lambda res: res.get_center().dist2point(res.c.get_geom_center())
+                sorted_res_list = sorted(res_dist[i], key = lambda res_fp: res_dist_to_complex_func(res_fp.res))
                 #haven't reach the end && fps has record for the residue
                 if j < len(res_dist[i]) and self.has_key(res_dist[i][j]):
-                    fp = self[res_dist[i][j]]
+                    fp = self[sorted_res_list[j]]
                     fp_strs.append(fp.fp_body(number_type))
                 else:
                     fp_strs.append(self.fake_fp_str(res_fp_len))
