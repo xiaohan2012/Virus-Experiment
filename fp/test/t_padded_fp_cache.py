@@ -44,7 +44,6 @@ class ComplexPlanePaddedComplexFingerPrintCacheTest(unittest.TestCase):
         expected_fp = self.c.gen_fp_by_splitting_cylinder(bases=self.c.atg.residues,
                                                   targets=[(0,self.c.atg.residues)],
                                                   fps = PaddedComplexFingerPrint())
-
                                                   
         actual_fp = self.C.load(self.c.c_id, self.c, complex_fp_cls =  PaddedComplexFingerPrint)
         self.assertEqual(expected_fp, actual_fp)
@@ -62,21 +61,34 @@ class ComplexPlanePaddedComplexFingerPrintCacheTest(unittest.TestCase):
                                                   
         actual_fp = self.C.load(self.c.c_id, self.c, complex_fp_cls =  PaddedComplexFingerPrint)
         self.assertEqual(expected_fp, actual_fp)
+
+class InteractiveForceTestCase(unittest.TestCase):
+
+    def setUp(self):
+        from ve.fp.complex_util.cache import ComplexFingerPrintCache as C
+        self.C = C
+
+        from ve.fp.complex_util.interactive_force_fp import InteractiveForceTrait
+        Complex = make_complex_class(InteractiveForceTrait)
         
+        self.c = Complex()
+    
     def test_load_iforce_atg_as_rec(self):
         """test interactive force whose receptor is set to antigen"""
-        expected_fp =  get_15bits(receptor = self.c.atg, binder = self.c.atb,
-                                  fp = PaddedComplexFingerPrint())
+        expected_fp =  self.c.gen_if_residue_fp_atg(fp = PaddedComplexFingerPrint())
         
         self.C.set_signature("interactive_force_atG_as_rec")
         
         actual_fp = self.C.load(self.c.c_id, self.c, complex_fp_cls =  PaddedComplexFingerPrint)
+        
+        print expected_fp.get_res_fp_by_resid("D-109 ")
+        print actual_fp.get_res_fp_by_resid("D-109 ")
+
         self.assertEqual(expected_fp, actual_fp)
         
     def test_load_iforce_atb_as_rec(self):
         """test interactive force whose receptor is set to antibody"""
-        expected_fp =  get_15bits(receptor = self.c.atb, binder = self.c.atg,
-                                  fp = PaddedComplexFingerPrint())
+        expected_fp =  self.c.gen_if_residue_fp_atb(fp = PaddedComplexFingerPrint())
         
         self.C.set_signature("interactive_force_atB_as_rec")
         
@@ -123,9 +135,8 @@ class ResiduePlanePaddedComplexFingerPrintCacheTest(unittest.TestCase):
         self.C.set_signature("atg_res_residue_plane")
 
         expected_fp = self.c.gen_fp_by_splitting_cylinder(bases=self.c.atg.residues,
-                                                  targets=[(0,self.c.atg.residues)],
-                                                  fps = PaddedComplexFingerPrint())
-
+                                                          targets=[(0,self.c.atg.residues)],
+                                                          fps = PaddedComplexFingerPrint())
                                                   
         actual_fp = self.C.load(self.c.c_id, self.c, complex_fp_cls =  PaddedComplexFingerPrint)
         self.assertEqual(expected_fp, actual_fp)
@@ -137,13 +148,11 @@ class ResiduePlanePaddedComplexFingerPrintCacheTest(unittest.TestCase):
         self.C.set_signature("atb_res_residue_plane")
 
         expected_fp = self.c.gen_fp_by_splitting_cylinder(bases=self.c.atb.residues,
-                                                  targets=[(0,self.c.atb.residues)],
-                                                  fps = PaddedComplexFingerPrint())
-
-                                                  
+                                                          targets=[(0,self.c.atb.residues)],
+                                                          fps = PaddedComplexFingerPrint())
+        
         actual_fp = self.C.load(self.c.c_id, self.c, complex_fp_cls =  PaddedComplexFingerPrint)
         self.assertEqual(expected_fp, actual_fp)
-
             
 if __name__ == '__main__':
     unittest.main()

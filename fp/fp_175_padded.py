@@ -10,13 +10,14 @@ from ve.fp.complex import TriangleComplex
 from ve.fp.complex_util.padding import PaddedComplexFingerPrint, OverallSpatialDistribution
 from ve.fp.complex_util.split_cylinder import SplitCylinderViaComplexPlaneTrait, SplitCylinderViaResiduePlaneTrait
 from ve.fp.complex_util.res_spat_dist import ResidueSpatialDistributionTrait
-
+from ve.fp.complex_util.geom import GeometryTrait
 from ve.fp.complex_util.cache import ComplexFingerPrintCache as C
 
 overall_atg_dist,overall_atb_dist =  OverallSpatialDistribution.from_cache()
 
 class AxialPlaneBasedComplex(TriangleComplex, #triangle genenration
-                             ResidueSpatialDistributionTrait):#padding
+                             ResidueSpatialDistributionTrait,#padding
+                             GeometryTrait):#for complex center calculation
     def gen_fp_str(self, use_tri = True, atg_as_receptor = True, use_cache = True):
         #antigen side
         if use_tri:
@@ -56,34 +57,87 @@ class AxialPlaneBasedComplex(TriangleComplex, #triangle genenration
         #interactive force
         if atg_as_receptor:
             #atg as receptor
-            fps3 = get_15bits(receptor = self.atg, binder = self.atb,
-                              fp = PaddedComplexFingerPrint())
+            if use_cache:
+                C.set_signature("interactive_force_atG_as_rec")
+                fps3 = C.load(self.c_id, self, complex_fp_cls =  PaddedComplexFingerPrint)
+            else:
+                fps3 = get_15bits(receptor = self.atg, binder = self.atb,
+                                  fp = PaddedComplexFingerPrint())
             str3 = fps3.fp_str(overall_atg_dist, atg_res_dist, number_type = int)
         else:
             #atb as receptor
-            fps3 = get_15bits(binder = self.atg, receptor = self.atb,
-                              fp = PaddedComplexFingerPrint())
+            if use_cache:
+                C.set_signature("interactive_force_atB_as_rec")
+                fps3 = C.load(self.c_id, self, complex_fp_cls =  PaddedComplexFingerPrint)
+            else:
+                fps3 = get_15bits(binder = self.atg, receptor = self.atb,
+                                  fp = PaddedComplexFingerPrint())
             str3 = fps3.fp_str(overall_atb_dist, atg_res_dist, number_type = int)
             
         return ",".join([str1, str2, str3])
 
 class ComplexPlaneBasedComplex(AxialPlaneBasedComplex, SplitCylinderViaComplexPlaneTrait):
-    pass
+    def __init__(self, *args, **kwargs):
+        self.plane_type = "complex"
+        super(ComplexPlaneBasedComplex,self).__init__(*args, **kwargs)
     
 class ResiduePlaneBasedComplex(AxialPlaneBasedComplex, SplitCylinderViaResiduePlaneTrait):
-    pass
+    def __init__(self, *args, **kwargs):
+        self.plane_type = "residue"
+        super(ResiduePlaneBasedComplex,self).__init__(*args, **kwargs)
     
-    
-def main():
+def main(use_complex_plane = True, atg_as_rec = True, use_tri = True, use_cache = True):
     from ve.fp.fp_80 import Residue
     from ve.util.load_pdb import complex_ids, load_complexes
 
-    cs = load_complexes(complex_ids(), complex_cls = ComplexPlaneBasedComplex, residue_cls = Residue)
+    complex_cls = ComplexPlaneBasedComplex if use_complex_plane else ResiduePlaneBasedComplex
+    
+    cs = load_complexes(complex_ids(), complex_cls = complex_cls, residue_cls = Residue)
     for c in cs:
+        print c.c_id
+        print "%s:%s" %(c.c_id, c.gen_fp_str(atg_as_receptor = atg_as_rec, use_cache = use_cache, use_tri = use_tri))
         try:
-            print "%s:%s" %(c.c_id, c.gen_fp_str())
+            pass
         except:
             print "%s encountered error" %c.c_id
+
+def usage():
+    print """
+Usage:
+    
+    python fp_175_padded.py  complex_plane|residue_plane atg|atb tri|res
+    """
     
 if __name__ == '__main__':
-    main()
+    import sys
+    try:
+        plane_type, rec_target, tri_or_res = sys.argv[1:]
+    except ValueError:
+        usage()
+        sys.exit(0)
+    
+    if plane_type == "complex":
+        use_complex_plane = True
+    elif plane_type == "residue":
+        use_complex_plane = False
+    else:
+        usage()
+        sys.exit(0)
+
+    if rec_target == "atg":
+        atg_as_rec = True
+    elif rec_target == "atb":
+        atg_as_rec = False
+    else:
+        usage()
+        sys.exit(0)
+
+    if tri_or_res == "tri":
+        use_tri = True
+    elif tri_or_res == "res":
+        use_tri = False
+    else:
+        usage()
+        sys.exit(0)        
+        
+    main(use_complex_plane = use_complex_plane, use_tri = use_tri, atg_as_rec = atg_as_rec, use_cache = True)

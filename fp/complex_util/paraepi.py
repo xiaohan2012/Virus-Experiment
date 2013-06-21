@@ -69,8 +69,9 @@ class FindParaEpiTrait(DistanceCachePropagationTrait):
         #then load it from cache
         if not refresh and self.cache_exists(attr_name):
             self.paratope = self.load_cache(attr_name)
-        #needs to be calculated
+            print "paratope", self.paratope
         else:
+            #needs to be calculated
             #consider each residue  `b_r` in the antibody side
             for b_r in self.atb.residues:
                 #if there exists one residue in the antigen side that is close enough to `b_r`, 
@@ -159,6 +160,8 @@ class FindParaEpiTrait(DistanceCachePropagationTrait):
         given a list of residue numbers, return the corresponding list of residue objects of the paratope side
 
         """
+        print self.atg.residues
+        print content
         return filter(lambda r: r.resnum in content, 
                       self.atb.residues)
 
@@ -194,7 +197,9 @@ class FindParaEpiTrait(DistanceCachePropagationTrait):
         cache_content = load(open(cache_path,"r"))
 
         #return the residue list
-        return self.cache_load_methods[cache_type](cache_content)
+        result =  self.cache_load_methods[cache_type](cache_content)
+        print cache_type, result, cache_content, self.cache_load_methods[cache_type]
+        return result
 
     def save_cache(self,cache_type):
         """

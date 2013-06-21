@@ -116,11 +116,11 @@ class InteractiveForceComplex(BaseComplex, InteractiveForceTrait):
     def fp_to_cache(self):
         """(Complex) -> NoneType"""
         fp1 = self.gen_if_residue_fp_atg()
+        
         fp2 = self.gen_if_residue_fp_atb()
 
         C.set_signature("interactive_force_atG_as_rec")
         C.dump(self.c_id, fp1)
-
         C.set_signature("interactive_force_atB_as_rec")
         C.dump(self.c_id, fp2)
 

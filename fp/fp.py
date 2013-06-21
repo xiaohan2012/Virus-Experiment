@@ -106,7 +106,6 @@ class BaseResidueFingerprint(OrderedDefaultDict):
         f = open(fp,"w")
         f.write(self.fp_str())
         f.close()
-
         
     def to_pickable(self):
         """
@@ -158,8 +157,9 @@ class BaseComplexFingerprint(OrderedDict):
     
     def get_bitlength(self):
         return self.values()[0].bitlength
-
-    #(dict(res_id: str, ResidueFingerPrint.Pickable))
+        
+    def get_complex(self):
+        return self.values()[0].res.c
 
     def get_mapping(self):
         return OrderedDict(map(lambda (r,fp): (r.res_id, fp.to_pickable()),
@@ -196,6 +196,21 @@ class BaseComplexFingerprint(OrderedDict):
                 return False
         return True
         
+    def get_res_fp_by_resid(self, res_id):
+        """
+        (ComplexFingerPrint, str) -> ResidueFingerPrint
+
+        Get residue fingerprint by residue id
+        """
+        sel = filter(lambda r: r.res_id ==res_id, self.keys())
+        if sel:
+            return self[sel[0]]
+
+    def __str__(self):
+        return "%s: %s with %d res fps" %(self.__class__, self.get_complex().c_id, len(self.values()))
+
+    def __repr__(self):
+        return str(self)
 class HeadlessFingerprint(BaseResidueFingerprint):
     """Geometric-center-based complex finger print"""
     def __init__(self, bitlength, values = None):

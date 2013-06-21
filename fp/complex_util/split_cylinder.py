@@ -36,8 +36,9 @@ class Cylinder(object):#the cylinder concept can be factored out
         calculate the point's distance to the axial plane and its distance to the axis, 
         return this point's position index within the cylinder
         """
-        dist2axis = self.plane.get_perp_point(pt).dist2point(self.center)
 
+        dist2axis = self.plane.get_perp_point(pt).dist2point(self.center)
+        
         dist2plane = self.plane.dist2point(pt)
         
         min_height,max_height = self.cylinder_height_range
@@ -91,9 +92,7 @@ def make_split_cylinder_method(get_cylinder_func):
                     #same as the base, ignore
                     if base == other:
                         continue
-                    
                     idx = cylinder.in_which(other.get_center())
-
                     #if within range
                     if idx:
                         if not fps.has_res(base):#not registered yet
@@ -116,7 +115,6 @@ from ve.fp.complex_util.axial_plane import HasAxialPlaneTrait
 class SplitCylinderViaComplexPlaneTrait(SplitCylinderTrait, HasAxialPlaneTrait):
     def __init__(self, *args, **kwargs):
         super(SplitCylinderViaComplexPlaneTrait,self).__init__(*args, **kwargs)
-
         self.gen_fp_by_splitting_cylinder = MethodType(make_split_cylinder_method(lambda self, base: self.make_cylinder(base.get_center(), self.get_axial_plane())), self)
 
 class SplitCylinderViaResiduePlaneTrait(SplitCylinderTrait, HasAxialPlaneTrait):

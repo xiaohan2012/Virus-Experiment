@@ -29,7 +29,6 @@ class HasAxialPlaneTrait(FindParaEpiTrait):
         """get the paratope center"""
         if hasattr(self, "para_center"):
             return self.para_center
-
         self.para_center = Point(np.average(np.array([a.xyz for r in self.find_paratope() for a in r.atom]),0))    
         return self.para_center
 

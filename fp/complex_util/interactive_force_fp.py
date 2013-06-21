@@ -22,21 +22,21 @@ class InteractiveForceTrait(GeometryTrait):
         self.group_count = self.boundary // self.step
 
 
-    def gen_if_residue_fp_atg(self):
+    def gen_if_residue_fp_atg(self, fp = None):
         """
         interactive force finger print, antigen as the receptor
         for each residue
         """
         logger.info("interactive force finger print, antigen as the receptor")
-        return get_15bits(receptor= self.atg, binder= self.atb)
+        return get_15bits(receptor= self.atg, binder= self.atb, fp = fp)
 
-    def gen_if_residue_fp_atb(self):
+    def gen_if_residue_fp_atb(self, fp = None):
         """
         interactive force finger print, antibody as the receptor
         for each residue
         """
         logger.info("interactive force finger print, antibody as the receptor")
-        return get_15bits(receptor= self.atb, binder= self.atg)
+        return get_15bits(receptor= self.atb, binder= self.atg, fp = fp)
 
     def gen_if_complex_fp(self, res_fps, residues):
         """

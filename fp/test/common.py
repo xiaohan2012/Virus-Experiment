@@ -26,9 +26,8 @@ def make_complex_class(cls, residue_class = TestResidue):
             
             if not c_id:#c_id not set
                 c_id = "1SLG_D"
-
+                
             super(ComplexClass,self).__init__(complex_id = c_id, antigen = atg, antibody = atb, **kwargs)
-
         
     return ComplexClass
 
