@@ -23,16 +23,10 @@ class ParaEpiGen(object):
         self.write_paratope()
     
 if __name__ == "__main__":
-    import logging
     import sys
-
-    logging.basicConfig( stream=sys.stderr )
-    logging.getLogger("Split Cylinder").setLevel( logging.DEBUG )
-    logger = logging.getLogger("Split Cylinder")
 
     from ve.config import data237_raw_complex as raw_complex_path, data237_complex_root as splitted_complex_path
 
-    
     from ve.fp.complex_util.paraepi import ParatopeNotFoundError, EpitopeNotFoundError
     #get the complex ids
     cids = complex_ids(raw_complex_path)

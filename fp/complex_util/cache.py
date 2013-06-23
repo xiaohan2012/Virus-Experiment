@@ -1,3 +1,4 @@
+import os
 from cPickle import load, dump
 from ve.config import data237_cache as cache_dir
 
@@ -7,7 +8,6 @@ class CacheTrait(object):
         cls.cache_type = t
         
         #make necessary directory creation
-        import os
         path = os.path.join(cache_dir, cls.cache_type)
         if not os.path.exists(path):
             os.makedirs(path)
@@ -21,7 +21,7 @@ class CacheTrait(object):
     def assemble(cls, obj):
         """(CacheTrait, Python built-in obj) -> VE related obj"""
         raise NotImplementedError
-
+        
     @classmethod
     def load(cls, c_id, c, **kwargs):
         """
@@ -54,12 +54,10 @@ class CacheTrait(object):
         
         if the cache exists
         """
-        import os
         return os.path.exists(cls.get_dir(c_id))
                  
     @classmethod
     def get_dir(cls, c_id):
-        import os
         return os.path.join(cache_dir, cls.cache_type, c_id)
 
     @classmethod    
@@ -116,4 +114,45 @@ class ComplexFingerPrintCache(CacheTrait):
         """
         from ve.fp.fp import BaseComplexFingerprint
         return complex_fp_cls.from_pickable(p, c, res_fp_cls)
+
+class ParaepiCache(CacheTrait):
+    """Cache for paraepi"""
+    cache_type = None
+
+    @classmethod
+    def extract(cls, residues):
+        """
+        (ParaepiCache, list of Residue) -> (list of str)
+        """
+        #extract the residue ids in the list of residues
+        return map(lambda r: r.res_id, residues)
+
+    @classmethod
+    def _assemble_helper(cls, res_ids, obj):
+        """(ParaepiCache, list of str, Complex.atg or Complex.atb) -> list of Residue"""
+        res_list =  filter(lambda r: r.res_id in res_ids, 
+                           obj.residues)
+        
+        #abnomal if empty list of returned
+        assert(len(res_list) > 0)
+        
+        return res_list
+
+class EpitopeCache(ParaepiCache):
+    """Cache for epitope"""
+    cache_type = "epitope"
+
+    @classmethod
+    def assemble(cls, res_ids, c):
+        return cls._assemble_helper(res_ids, c.atg)
+        
+class ParatopeCache(ParaepiCache):
+    """Cache for paratope"""
+    cache_type = "paratope"
+
+    @classmethod
+    def assemble(cls, res_ids, c):
+        return cls._assemble_helper(res_ids, c.atb)
     
+
+

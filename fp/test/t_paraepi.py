@@ -26,14 +26,20 @@ class FindParatopeTest(unittest.TestCase, FindParaEpiTrait):
 
     def test_paratope_general_case(self):
         paratope = self.c.find_paratope(True)
-        
         self.assertEqual(self.extract_res_ids(paratope), [1 ,3 ,4 ,5 ,6 ,7])
         
     def test_epitope_general_case(self):
         epitope = self.c.find_epitope(True)
-        self.assertGreater(len(epitope), 0)
         self.assertEqual(self.extract_res_ids(epitope), [23 ,25 ,27 ,43 ,45 ,46 ,47 ,54 ,79 ,86 ,88 ,89 ,90 ,92 ,108 ,110 ,112 ,124 ,128])
 
+    def test_paratope_cached_case(self):
+        paratope = self.c.find_paratope()
+        self.assertEqual(self.extract_res_ids(paratope), [1 ,3 ,4 ,5 ,6 ,7])
+
+    def test_epitope_cached_case(self):
+        epitope = self.c.find_epitope()
+        self.assertEqual(self.extract_res_ids(epitope), [23 ,25 ,27 ,43 ,45 ,46 ,47 ,54 ,79 ,86 ,88 ,89 ,90 ,92 ,108 ,110 ,112 ,124 ,128])
+        
 from ve.fp.complex_util.paraepi import IOTrait
 
 ComplexClass = make_complex_class(IOTrait)
