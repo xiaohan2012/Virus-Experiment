@@ -1,6 +1,7 @@
 import unittest
 from ve.util.logger import make_logger
 from ve.util.load_pdb import load_pdb_struct, load_complexes, complex_ids
+from ve.config import data237_complex_root
 
 class NumericTestCase(unittest.TestCase):
     def assertArrayEqual(self, first, second):
@@ -21,12 +22,13 @@ def make_complex_class(cls, residue_class = TestResidue):
     """
     class ComplexClass(BaseComplex, cls):
         def __init__(self,c_id = None, **kwargs):
-            atg = load_pdb_struct(os.path.join(test_data_dir, "antigen.pdb"), residue_class)
-            atb = load_pdb_struct(os.path.join(test_data_dir, "antibody.pdb"), residue_class)
             
             if not c_id:#c_id not set
                 c_id = "1SLG_D"
-                
+
+            atg = load_pdb_struct(os.path.join(data237_complex_root, c_id, "antigen.pdb"), residue_class)
+            atb = load_pdb_struct(os.path.join(data237_complex_root, c_id, "antibody.pdb"), residue_class)
+            
             super(ComplexClass,self).__init__(complex_id = c_id, antigen = atg, antibody = atb, **kwargs)
         
     return ComplexClass
