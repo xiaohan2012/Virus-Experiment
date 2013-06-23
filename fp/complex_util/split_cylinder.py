@@ -84,20 +84,24 @@ def make_split_cylinder_method(get_cylinder_func):
             fps = BaseComplexFingerprint()
         
         for base in bases:
+
             cylinder = get_cylinder_func(self, base)
             fp_length = cylinder.layer_size * cylinder.layer_count
+            
+            fps.add_res(base, fp_length)
 
             for index_base,iterables in targets:
                 for other in iterables:
                     #same as the base, ignore
                     if base == other:
                         continue
+                        
                     idx = cylinder.in_which(other.get_center())
+                    
                     #if within range
                     if idx:
-                        if not fps.has_res(base):#not registered yet
-                            fps.add_res(base, fp_length)
                         fps[base][index_base + idx] += 1
+                        
         return fps
         
     return gen_fp_by_splitting_cylinder

@@ -33,6 +33,7 @@ data237_raw_complex = os.path.join(data237_root, "cp_pdb")
 data237_complex_root = os.path.join(data237_root,"splitted_complex")
 data237_fp_root = os.path.join(data237_root,"fp")
 data237_fp105_root = os.path.join(data237_root,"fp_105")
+data237_fp175_padded_root = os.path.join(data237_root, "fp_175_padded")
 data237_epitope_root = os.path.join(data237_root,"epitope")
 data237_paraepi_root = os.path.join(data237_root,"paraepi")
 

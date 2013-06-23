@@ -34,13 +34,13 @@ class AxialPlaneBasedComplex(TriangleComplex, #triangle genenration
                 fps1 = C.load(self.c_id, self,  complex_fp_cls =  PaddedComplexFingerPrint)
             else:
                 fps1 = self.gen_fp_by_splitting_cylinder(bases=self.atg.residues,
-                                                     targets=[(0,self.atg.residues)], 
-                                                     fps = PaddedComplexFingerPrint())
-            
+                                                         targets=[(0,self.atg.residues)], 
+                                                         fps = PaddedComplexFingerPrint())
+        
         #padded fp str
         _, atg_res_dist = self.get_atg_res_spat_dist()
         str1 = fps1.fp_str(overall_atg_dist, atg_res_dist, number_type=int)
-
+        
         #antibody side
         if use_cache:
             C.set_signature("atb_res_%s_plane" %self.plane_type)
@@ -86,18 +86,20 @@ class ResiduePlaneBasedComplex(AxialPlaneBasedComplex, SplitCylinderViaResiduePl
         self.plane_type = "residue"
         super(ResiduePlaneBasedComplex,self).__init__(*args, **kwargs)
     
-def main(use_complex_plane = True, atg_as_rec = True, use_tri = True, use_cache = True):
+def main(fp_dir, use_complex_plane = True, atg_as_rec = True, use_tri = True, use_cache = True):
     from ve.fp.fp_80 import Residue
     from ve.util.load_pdb import complex_ids, load_complexes
-
-    complex_cls = ComplexPlaneBasedComplex if use_complex_plane else ResiduePlaneBasedComplex
+    from ve.config import data237_fp175_padded_root
     
+    complex_cls = ComplexPlaneBasedComplex if use_complex_plane else ResiduePlaneBasedComplex
+
     cs = load_complexes(complex_ids(), complex_cls = complex_cls, residue_cls = Residue)
     for c in cs:
-        print c.c_id
-        print "%s:%s" %(c.c_id, c.gen_fp_str(atg_as_receptor = atg_as_rec, use_cache = use_cache, use_tri = use_tri))
         try:
-            pass
+            fp_str = c.gen_fp_str(atg_as_receptor = atg_as_rec, use_cache = use_cache, use_tri = use_tri)
+            print c.c_id
+            with open(fp_dir + "/" + c.c_id, "w") as f:
+                f.write(fp_str)
         except:
             print "%s encountered error" %c.c_id
 
@@ -105,17 +107,23 @@ def usage():
     print """
 Usage:
     
-    python fp_175_padded.py  complex_plane|residue_plane atg|atb tri|res
+    python fp_175_padded.py  complex|residue atg|atb tri|res
     """
     
 if __name__ == '__main__':
-    import sys
+    import sys, os
+    from ve.config import data237_fp175_padded_root
+
     try:
         plane_type, rec_target, tri_or_res = sys.argv[1:]
     except ValueError:
         usage()
         sys.exit(0)
-    
+        
+    fp_dir = os.path.join(data237_fp175_padded_root, "%s-%s-%s" %(plane_type, rec_target, tri_or_res))
+    if not os.path.exists(fp_dir):
+        os.makedirs(fp_dir)
+        
     if plane_type == "complex":
         use_complex_plane = True
     elif plane_type == "residue":
@@ -140,4 +148,4 @@ if __name__ == '__main__':
         usage()
         sys.exit(0)        
         
-    main(use_complex_plane = use_complex_plane, use_tri = use_tri, atg_as_rec = atg_as_rec, use_cache = True)
+    main(fp_dir, use_complex_plane = use_complex_plane, use_tri = use_tri, atg_as_rec = atg_as_rec, use_cache = True)

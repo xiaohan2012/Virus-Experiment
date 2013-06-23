@@ -22,6 +22,9 @@ class BaseResidue(object):
 
     def __hash__(self):
         return hash(self.res_id)
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
         
     def __repr__(self):
         return str(self)

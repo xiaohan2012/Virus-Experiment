@@ -132,7 +132,7 @@ class ParaepiCache(CacheTrait):
         """(ParaepiCache, list of str, Complex.atg or Complex.atb) -> list of Residue"""
         res_list =  filter(lambda r: r.res_id in res_ids, 
                            obj.residues)
-        
+
         #abnomal if empty list of returned
         assert(len(res_list) > 0)
         
