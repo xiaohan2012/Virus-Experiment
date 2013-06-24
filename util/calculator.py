@@ -1,4 +1,7 @@
-def complex_pairwise_calc(complex_id_list, dataloader, calc_func, callback = None, exception_callback=None, symmetry=True):
+def default_exception_callback(c1,c2):
+    print "exception:", c1, c2
+    
+def complex_pairwise_calc(complex_id_list, dataloader, calc_func, callback = None, exception_callback= None, symmetry=True):
     """
     (list of str, (str)=> compelx, (complex, complex) => double, (str, str, double) => ???) => ???
 
@@ -20,10 +23,14 @@ def complex_pairwise_calc(complex_id_list, dataloader, calc_func, callback = Non
     pairs_with_results = []
     exception_pairs = []
     for c1, c2 in pairs:
-        try:
+        print c1,c2
+        if exception_callback: #if exception_callback is given
+            try:
+                pairs_with_results.append((c1, c2, calc_func(dataloader(c1),dataloader(c2))))
+            except:
+                exception_pairs.append((c1,c2))
+        else:
             pairs_with_results.append((c1, c2, calc_func(dataloader(c1),dataloader(c2))))
-        except:
-            exception_pairs.append((c1,c2))
 
     #if there is a callback, apply it to the results
     if callback:

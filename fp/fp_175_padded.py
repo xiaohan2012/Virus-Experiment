@@ -92,14 +92,17 @@ def main(fp_dir, use_complex_plane = True, atg_as_rec = True, use_tri = True, us
     from ve.config import data237_fp175_padded_root
     
     complex_cls = ComplexPlaneBasedComplex if use_complex_plane else ResiduePlaneBasedComplex
-
-    cs = load_complexes(complex_ids(), complex_cls = complex_cls, residue_cls = Residue)
+    cids = ["1FJ1_F"]
+    #cids = complex_ids()
+    cs = load_complexes(cids, complex_cls = complex_cls, residue_cls = Residue)
     for c in cs:
+        fp_str = c.gen_fp_str(atg_as_receptor = atg_as_rec, use_cache = use_cache, use_tri = use_tri)
+        print c.c_id
+        with open(fp_dir + "/" + c.c_id, "w") as f:
+            f.write(fp_str)
+            
         try:
-            fp_str = c.gen_fp_str(atg_as_receptor = atg_as_rec, use_cache = use_cache, use_tri = use_tri)
-            print c.c_id
-            with open(fp_dir + "/" + c.c_id, "w") as f:
-                f.write(fp_str)
+            pass
         except:
             print "%s encountered error" %c.c_id
 

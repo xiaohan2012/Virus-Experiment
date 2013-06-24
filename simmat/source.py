@@ -18,7 +18,7 @@ def make_fp_str_saver(directory):
 
     return save_fp_string
 
-def make_single_line_converter(slice_obj):
+def make_single_line_converter(slice_obj = None):
     """
     (slice) => (str => np.array)
 
@@ -30,8 +30,11 @@ def make_single_line_converter(slice_obj):
         
         given a fp string, return the np.array
         """
-        return np.array(map(float, string.strip().split(",")))[slice_obj]
-
+        if slice_obj is None:
+            return np.array(map(float, string.strip().split(",")))
+        else:
+            return np.array(map(float, string.strip().split(",")))[slice_obj]
+            
     return converter
 
 def make_dataloader(directory, converter):
