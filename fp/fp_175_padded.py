@@ -41,6 +41,9 @@ class AxialPlaneBasedComplex(TriangleComplex, #triangle genenration
         _, atg_res_dist = self.get_atg_res_spat_dist()
         str1 = fps1.fp_str(overall_atg_dist, atg_res_dist, number_type=int)
         
+        print "str1", len(str1.split(","))
+        print overall_atg_dist, atg_res_dist
+        
         #antibody side
         if use_cache:
             C.set_signature("atb_res_%s_plane" %self.plane_type)
@@ -53,6 +56,9 @@ class AxialPlaneBasedComplex(TriangleComplex, #triangle genenration
         #padded fp str
         _, atb_res_dist = self.get_atb_res_spat_dist()
         str2 = fps2.fp_str(overall_atb_dist, atb_res_dist, number_type=int)
+
+        print "str2", len(str2.split(","))
+        print overall_atb_dist, atb_res_dist
         
         #interactive force
         if atg_as_receptor:
@@ -72,7 +78,9 @@ class AxialPlaneBasedComplex(TriangleComplex, #triangle genenration
             else:
                 fps3 = get_15bits(binder = self.atg, receptor = self.atb,
                                   fp = PaddedComplexFingerPrint())
-            str3 = fps3.fp_str(overall_atb_dist, atg_res_dist, number_type = int)
+            str3 = fps3.fp_str(overall_atb_dist, atb_res_dist, number_type = int)
+            
+        print "str3", len(str3.split(","))
             
         return ",".join([str1, str2, str3])
 
@@ -112,6 +120,17 @@ Usage:
     
     python fp_175_padded.py  complex|residue atg|atb tri|res
     """
+
+def bug_list(plane_type, rec_target, tri_or_res):
+    tpl = (plane_type, rec_target, tri_or_res)
+    if tpl == [("complex", "atg", "res"), ("complex", "atb", "res")]:
+        return ["1SLG_D", "2XTJ_A", "1FJ1_E"]
+    elif "tri" in tpl:
+        """if tri is involved, then the fp lengths are very diversified, so it may needs separate investigation"""
+        return None
+    elif tpl in [("residue", "atg", "res"), ("residue", "atb", "res")]:
+        return ["1SLG_D"]
+        
     
 if __name__ == '__main__':
     import sys, os

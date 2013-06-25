@@ -186,5 +186,28 @@ class ResiduePlaneBasedComplexTestCase(unittest.TestCase):
         self.assertEqual(actual, expected)
         self.assertEqual(actual_using_cache, expected)
 
+class FPLengthUniformityTestCase(unittest.TestCase):
+    def setUp(self):
+        from ve.fp.fp_80 import Residue
+        
+        c1_id = "2NLJ_C"
+        self.c1 = ResiduePlaneBasedComplex(complex_id = c1_id,
+                                           antigen = load_pdb_struct(os.path.join(data237_complex_root, c1_id, "antigen.pdb"), Residue),
+                                           antibody = load_pdb_struct(os.path.join(data237_complex_root, c1_id, "antibody.pdb"), Residue))
+        c2_id = "1SLG_D"
+        self.c2 = ResiduePlaneBasedComplex(complex_id = c2_id,
+                                           antigen = load_pdb_struct(os.path.join(data237_complex_root, c2_id, "antigen.pdb"), Residue),
+                                           antibody = load_pdb_struct(os.path.join(data237_complex_root, c2_id, "antibody.pdb"), Residue))
+
+    def test_iter_through_res(self):
+        """Test case for fp generation that iterates its residues"""
+        fp_str1 = self.c1.gen_fp_str(use_tri = False, atg_as_receptor = True, use_cache = True)
+        len1 = len(fp_str1.split(","))
+
+        fp_str2 = self.c2.gen_fp_str(use_tri = False, atg_as_receptor = True, use_cache = True)
+        len2 = len(fp_str2.split(","))
+
+        self.assertEqual(len1, len2)
+        
 if __name__ == '__main__':
     unittest.main()
