@@ -7,6 +7,8 @@ from ve.fp.complex_util.padding import OverallSpatialDistribution
 
 from ve.config import data237_complex_root
 
+overall_atg_dist,overall_atb_dist =  OverallSpatialDistribution.from_cache()
+
 class ComplexPlaneBasedComplexTestCase(unittest.TestCase):
     """using cache and without cache cases altogether"""
     def setUp(self):
@@ -26,7 +28,6 @@ class ComplexPlaneBasedComplexTestCase(unittest.TestCase):
         1, antigen is set as the receptor
         2, iterate through antigen residue triangles
         """
-        overall_atg_dist,overall_atb_dist =  OverallSpatialDistribution.from_cache()
         fp_str = self.c.gen_fp_str(use_tri = True, atg_as_receptor = True, use_cache = False)
         actual = len(fp_str.split(","))
 
@@ -123,7 +124,7 @@ class ResiduePlaneBasedComplexTestCase(unittest.TestCase):
         fp_str_using_cache = self.c.gen_fp_str(use_tri = True, atg_as_receptor = True, use_cache = True)
         actual_using_cache = len(fp_str.split(","))
 
-        expected = sum(overall_atg_dist.values()) * (80+15) + sum(overall_atb_dist.values()) * 80
+        expected = sum(overall_atg_dist.values()) * (50+15) + sum(overall_atb_dist.values()) * 50
         
         self.assertEqual(actual, expected)
         self.assertEqual(actual_using_cache, expected)
@@ -142,7 +143,7 @@ class ResiduePlaneBasedComplexTestCase(unittest.TestCase):
         fp_str_using_cache = self.c.gen_fp_str(use_tri = False, atg_as_receptor = True, use_cache = True)
         actual_using_cache = len(fp_str.split(","))
         
-        expected = sum(overall_atg_dist.values()) * (80+15) + sum(overall_atb_dist.values()) * 80
+        expected = sum(overall_atg_dist.values()) * (50+15) + sum(overall_atb_dist.values()) * 50
         
         self.assertEqual(actual, expected)
         self.assertEqual(actual_using_cache, expected)
@@ -161,7 +162,7 @@ class ResiduePlaneBasedComplexTestCase(unittest.TestCase):
         fp_str_using_cache = self.c.gen_fp_str(use_tri = False, atg_as_receptor = False, use_cache = True)
         actual_using_cache = len(fp_str.split(","))
 
-        expected = sum(overall_atg_dist.values()) * 80 + sum(overall_atb_dist.values()) * (80 + 15)
+        expected = sum(overall_atg_dist.values()) * 50 + sum(overall_atb_dist.values()) * (50 + 15)
 
         self.assertEqual(actual, expected)
         self.assertEqual(actual_using_cache, expected)
@@ -181,33 +182,46 @@ class ResiduePlaneBasedComplexTestCase(unittest.TestCase):
         fp_str_using_cache = self.c.gen_fp_str(use_tri = True, atg_as_receptor = False, use_cache = True)
         actual_using_cache = len(fp_str.split(","))
 
-        expected = sum(overall_atg_dist.values()) * 80 + sum(overall_atb_dist.values()) * (80 + 15)
+        expected = sum(overall_atg_dist.values()) * 50 + sum(overall_atb_dist.values()) * (50 + 15)
 
         self.assertEqual(actual, expected)
         self.assertEqual(actual_using_cache, expected)
 
-class FPLengthUniformityTestCase(unittest.TestCase):
+class ComplexPlaneFPLengthUniformityTestCase(unittest.TestCase):
     def setUp(self):
+        from ve.util.load_pdb import load_complexes, complex_ids
         from ve.fp.fp_80 import Residue
-        
-        c1_id = "2NLJ_C"
-        self.c1 = ResiduePlaneBasedComplex(complex_id = c1_id,
-                                           antigen = load_pdb_struct(os.path.join(data237_complex_root, c1_id, "antigen.pdb"), Residue),
-                                           antibody = load_pdb_struct(os.path.join(data237_complex_root, c1_id, "antibody.pdb"), Residue))
-        c2_id = "1SLG_D"
-        self.c2 = ResiduePlaneBasedComplex(complex_id = c2_id,
-                                           antigen = load_pdb_struct(os.path.join(data237_complex_root, c2_id, "antigen.pdb"), Residue),
-                                           antibody = load_pdb_struct(os.path.join(data237_complex_root, c2_id, "antibody.pdb"), Residue))
 
+        from random import sample
+
+        sample_count = 5
+        sampled_ids = sample(complex_ids(), sample_count)
+
+        sampled_ids += ["2XTJ_A", "1SLG_D", "1FJ1_E"]
+        
+        self.complexes = load_complexes(sampled_ids, complex_cls = ComplexPlaneBasedComplex, residue_cls = Residue)
+        
     def test_iter_through_res(self):
         """Test case for fp generation that iterates its residues"""
-        fp_str1 = self.c1.gen_fp_str(use_tri = False, atg_as_receptor = True, use_cache = True)
-        len1 = len(fp_str1.split(","))
+        expected = sum(overall_atg_dist.values()) * (50+15) + sum(overall_atb_dist.values()) * 50
 
-        fp_str2 = self.c2.gen_fp_str(use_tri = False, atg_as_receptor = True, use_cache = True)
-        len2 = len(fp_str2.split(","))
+        for c in self.complexes:
+            fp_str = c.gen_fp_str(use_tri = False, atg_as_receptor = True, use_cache = True)
+            length = len(fp_str.split(","))
+            print c.c_id, length
+            
+            self.assertEqual(length, expected)
 
-        self.assertEqual(len1, len2)
+    def test_iter_through_tri(self):
+        """Test case for fp generation that iterates its residue triangles"""
+        expected = sum(overall_atg_dist.values()) * (50+15) + sum(overall_atb_dist.values()) * 50
         
+        for c in self.complexes:
+            fp_str = c.gen_fp_str(use_tri = True, atg_as_receptor = True, use_cache = True)
+            length = len(fp_str.split(","))
+            print c.c_id, length
+
+            self.assertEqual(length, expected)
+
 if __name__ == '__main__':
     unittest.main()

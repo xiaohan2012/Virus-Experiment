@@ -128,18 +128,19 @@ from ve.fp.fp_80 import Residue
 
 def main(complex_cls, residue_cls = Residue):
     from ve.util.load_pdb import complex_ids, load_complexes
-    #complex_ids()
+    ids = complex_ids()
     #ids = ["1FJ1_E", "1FJ1_F", "0HEZ_E", "1GC1_G", "3B2U_I", "3L5W_I", "1G9M_G"]
-    ids = ["1SLG_D"]
+    #ids = ["1SLG_D"]
     cs = load_complexes(ids, complex_cls = complex_cls, residue_cls = residue_cls)
+    
     for c in cs:
-        c.fp_to_cache()
-        """
+        #c.fp_to_cache()
         try:
             c.fp_to_cache()
         except:
             print "error! %s" %c.c_id
-        """
+
+        
 def usage():
     print """
 possible args: res_plane | comp_plane | if 

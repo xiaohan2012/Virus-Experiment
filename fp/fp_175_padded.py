@@ -42,8 +42,7 @@ class AxialPlaneBasedComplex(TriangleComplex, #triangle genenration
         str1 = fps1.fp_str(overall_atg_dist, atg_res_dist, number_type=int)
         
         print "str1", len(str1.split(","))
-        print overall_atg_dist, atg_res_dist
-        
+                
         #antibody side
         if use_cache:
             C.set_signature("atb_res_%s_plane" %self.plane_type)
@@ -52,14 +51,12 @@ class AxialPlaneBasedComplex(TriangleComplex, #triangle genenration
             fps2 = self.gen_fp_by_splitting_cylinder(bases=self.atb.residues,
                                                      targets=[(0,self.atb.residues)],
                                                      fps = PaddedComplexFingerPrint())
-        
         #padded fp str
         _, atb_res_dist = self.get_atb_res_spat_dist()
         str2 = fps2.fp_str(overall_atb_dist, atb_res_dist, number_type=int)
 
         print "str2", len(str2.split(","))
-        print overall_atb_dist, atb_res_dist
-        
+
         #interactive force
         if atg_as_receptor:
             #atg as receptor

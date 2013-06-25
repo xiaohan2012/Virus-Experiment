@@ -7,10 +7,10 @@ from ve.fp.fp import BaseComplexFingerprint
 
 from common import *
 
-RADIUS = 20
+RADIUS = 10
 RADIUS_STEP = 2
-HEIGHT = 40
-HEIGHT_STEP = 5
+HEIGHT = 20
+HEIGHT_STEP = 2
 
 logger = make_logger("Split Cylinder]")
 
