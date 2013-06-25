@@ -128,10 +128,11 @@ from ve.fp.fp_80 import Residue
 
 def main(complex_cls, residue_cls = Residue):
     from ve.util.load_pdb import complex_ids, load_complexes
-    ids = complex_ids()
-    #ids = ["1FJ1_E", "1FJ1_F", "0HEZ_E", "1GC1_G", "3B2U_I", "3L5W_I", "1G9M_G"]
+    from ve.config import data480_complex_root
+    ids = complex_ids(data480_complex_root)
     #ids = ["1SLG_D"]
-    cs = load_complexes(ids, complex_cls = complex_cls, residue_cls = residue_cls)
+    
+    cs = load_complexes(ids, directory = data480_complex_root, complex_cls = complex_cls, residue_cls = residue_cls)
     
     for c in cs:
         #c.fp_to_cache()
