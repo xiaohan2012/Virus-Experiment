@@ -84,7 +84,6 @@ class PaddedComplexFingerPrint(BaseComplexFingerprint):
         """
         fp_strs = []
         res_fp_len = self.get_res_fp_length()
-        print self
         #for the ith ring
         for i in xrange(cnt_dist.ring_count):
             #there is `cnt` residues in this ring
@@ -119,4 +118,4 @@ def get_overall_residue_distribution():
 
 
 if __name__ == '__main__':
-    get_overall_residue_distribution()
+    overall_dist = get_overall_residue_distribution()

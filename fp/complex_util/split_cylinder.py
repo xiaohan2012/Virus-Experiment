@@ -7,6 +7,11 @@ from ve.fp.fp import BaseComplexFingerprint
 
 from common import *
 
+RADIUS = 20
+RADIUS_STEP = 2
+HEIGHT = 40
+HEIGHT_STEP = 5
+
 logger = make_logger("Split Cylinder]")
 
 class Cylinder(object):#the cylinder concept can be factored out
@@ -14,7 +19,7 @@ class Cylinder(object):#the cylinder concept can be factored out
     Splitted Cylinder used in the split cylinder functionality
     """
     
-    def __init__(self, center, plane, radius = 10, radius_step = 2, height = 20, height_step = 2):
+    def __init__(self, center, plane, radius = RADIUS, radius_step = RADIUS_STEP, height = HEIGHT, height_step = HEIGHT_STEP):
         self.center = center
         self.plane = plane
         
@@ -60,7 +65,7 @@ class SplitCylinderUtility(object):
     Generic trait class for cylinder splitting method
     """
     
-    def __init__(self,  radius = 10, radius_step = 2, height = 20, height_step = 2):
+    def __init__(self,  radius = RADIUS, radius_step = RADIUS_STEP, height = HEIGHT, height_step = HEIGHT_STEP):
         self.radius = radius
         self.radius_step = radius_step
         self.height = height
@@ -107,7 +112,7 @@ def make_split_cylinder_method(get_cylinder_func):
     return gen_fp_by_splitting_cylinder
 
 class SplitCylinderTrait(SplitCylinderUtility):
-    def __init__(self,  radius = 20, radius_step = 2, height = 40, height_step = 5, **kwargs):
+    def __init__(self,  radius = RADIUS, radius_step = RADIUS_STEP, height = HEIGHT, height_step = HEIGHT_STEP, **kwargs):
         super(SplitCylinderTrait,self).__init__(radius = radius, radius_step = radius_step, height = height, height_step = height_step, **kwargs)
 
     def gen_fp_by_splitting_cylinder(self, bases=[],targets=[]):
