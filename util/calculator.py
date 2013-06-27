@@ -23,7 +23,6 @@ def complex_pairwise_calc(complex_id_list, dataloader, calc_func, callback = Non
     pairs_with_results = []
     exception_pairs = []
     for c1, c2 in pairs:
-        print c1,c2
         if exception_callback: #if exception_callback is given
             try:
                 pairs_with_results.append((c1, c2, calc_func(dataloader(c1),dataloader(c2))))

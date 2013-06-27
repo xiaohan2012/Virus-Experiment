@@ -194,12 +194,10 @@ class ComplexPlaneFPLengthUniformityTestCase(unittest.TestCase):
 
         from random import sample
 
-        sample_count = 5
+        sample_count = 10
         sampled_ids = sample(complex_ids(), sample_count)
 
-        sampled_ids += ["2XTJ_A", "1SLG_D", "1FJ1_E"]
-        
-        self.complexes = load_complexes(sampled_ids, complex_cls = ComplexPlaneBasedComplex, residue_cls = Residue)
+        self.complexes = load_complexes(sampled_ids, complex_cls = ResiduePlaneBasedComplex, residue_cls = Residue)
         
     def test_iter_through_res(self):
         """Test case for fp generation that iterates its residues"""

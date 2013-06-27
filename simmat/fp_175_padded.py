@@ -24,7 +24,7 @@ def usage():
     print """
 Usage:
     
-    python fp_175_padded.py  complex|residue atg|atb tri|res
+    python fp_175_padded.py complex|residue atg|atb tri|res
     """
     
 if __name__ == '__main__':

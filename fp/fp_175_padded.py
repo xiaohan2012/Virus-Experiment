@@ -41,8 +41,6 @@ class AxialPlaneBasedComplex(TriangleComplex, #triangle genenration
         _, atg_res_dist = self.get_atg_res_spat_dist()
         str1 = fps1.fp_str(overall_atg_dist, atg_res_dist, number_type=int)
         
-        print "str1", len(str1.split(","))
-                
         #antibody side
         if use_cache:
             C.set_signature("atb_res_%s_plane" %self.plane_type)
@@ -54,8 +52,6 @@ class AxialPlaneBasedComplex(TriangleComplex, #triangle genenration
         #padded fp str
         _, atb_res_dist = self.get_atb_res_spat_dist()
         str2 = fps2.fp_str(overall_atb_dist, atb_res_dist, number_type=int)
-
-        print "str2", len(str2.split(","))
 
         #interactive force
         if atg_as_receptor:
@@ -77,8 +73,6 @@ class AxialPlaneBasedComplex(TriangleComplex, #triangle genenration
                                   fp = PaddedComplexFingerPrint())
             str3 = fps3.fp_str(overall_atb_dist, atb_res_dist, number_type = int)
             
-        print "str3", len(str3.split(","))
-            
         return ",".join([str1, str2, str3])
 
 class ComplexPlaneBasedComplex(AxialPlaneBasedComplex, SplitCylinderViaComplexPlaneTrait):
@@ -94,20 +88,19 @@ class ResiduePlaneBasedComplex(AxialPlaneBasedComplex, SplitCylinderViaResiduePl
 def main(fp_dir, use_complex_plane = True, atg_as_rec = True, use_tri = True, use_cache = True):
     from ve.fp.fp_80 import Residue
     from ve.util.load_pdb import complex_ids, load_complexes
-    from ve.config import data237_fp175_padded_root
+    from ve.config import data237_fp175_padded_root, data480_complex_root
     
     complex_cls = ComplexPlaneBasedComplex if use_complex_plane else ResiduePlaneBasedComplex
-    cids = ["1FJ1_F"]
-    #cids = complex_ids()
+
+    cids = complex_ids()
+    
     cs = load_complexes(cids, complex_cls = complex_cls, residue_cls = Residue)
     for c in cs:
-        fp_str = c.gen_fp_str(atg_as_receptor = atg_as_rec, use_cache = use_cache, use_tri = use_tri)
-        print c.c_id
-        with open(fp_dir + "/" + c.c_id, "w") as f:
-            f.write(fp_str)
-            
         try:
-            pass
+            fp_str = c.gen_fp_str(atg_as_receptor = atg_as_rec, use_cache = use_cache, use_tri = use_tri)
+            print c.c_id
+            with open(fp_dir + "/" + c.c_id + ".fp", "w") as f:
+                f.write(fp_str)
         except:
             print "%s encountered error" %c.c_id
 

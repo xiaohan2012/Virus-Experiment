@@ -129,8 +129,10 @@ from ve.fp.fp_80 import Residue
 def main(complex_cls, residue_cls = Residue):
     from ve.util.load_pdb import complex_ids, load_complexes
     from ve.config import data480_complex_root
-    ids = complex_ids(data480_complex_root)
-    #ids = ["1SLG_D"]
+    from ve.fp.complex_util.paraepi  import ParatopeNotFoundError, EpitopeNotFoundError
+    
+    #ids = complex_ids(data480_complex_root)
+    ids = ["3B2U_E","3DVN_XY","2ARJ_R","3RKD_A","3RKD_B","3L5W_J","1BZQ_D","3NFP_I","3DVN_UV","3HI1_J","3B9K_AB","3IU3_K","3HI1_G","3B2U_A","3BN9_A","1BZQ_A","4ETQ_X","3U4E_J","3B2U_B","2ARJ_Q","1BZQ_B","3NFP_K","3IU3_I"]
     
     cs = load_complexes(ids, directory = data480_complex_root, complex_cls = complex_cls, residue_cls = residue_cls)
     
@@ -138,8 +140,12 @@ def main(complex_cls, residue_cls = Residue):
         #c.fp_to_cache()
         try:
             c.fp_to_cache()
+        except EpitopeNotFoundError:
+            print "EpitopeNotFoundError %s" %c.c_id
+        except ParatopeNotFoundError:
+            print "ParatopeNotFoundError %s" %c.c_id
         except:
-            print "error! %s" %c.c_id
+            print "other error %s" %c.c_id
 
         
 def usage():

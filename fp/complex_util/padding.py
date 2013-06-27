@@ -84,7 +84,6 @@ class PaddedComplexFingerPrint(BaseComplexFingerprint):
         """
         fp_strs = []
         res_fp_len = self.get_res_fp_length()
-        print res_fp_len
         
         #for the ith ring
         for i in xrange(cnt_dist.ring_count):
