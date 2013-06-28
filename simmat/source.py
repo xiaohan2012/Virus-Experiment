@@ -93,8 +93,6 @@ def print_simmat_in_csv(path):
     #print mat[:10,:10]
     print mat.to_csv_str()
 
-            
-            
         
 def test():
     import doctest
@@ -102,5 +100,7 @@ def test():
 
 if __name__ == "__main__":
 #    test()
-    print_simmat_in_csv("data/fp_370_480_atg.txt")
+    import sys
+    path = sys.argv[1]
+    print_simmat_in_csv(path)
 

@@ -28,7 +28,13 @@ def corr_coef(vec1, vec2):
     >>> corr_coef([1,2,3], [1,2,3])
     1.0
     """
-    return np.corrcoef(vec1, vec2)[0,1]
+    import numpy as np
+    if np.all(vec1 == 0) and np.all(vec2 == 0):
+        return 1.0
+    elif np.all(vec1 == 0) or np.all(vec2 == 0):
+        return 0.0
+    else:
+        return np.corrcoef(vec1, vec2)[0,1]
 
 def test():
     import doctest

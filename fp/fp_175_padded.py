@@ -49,10 +49,11 @@ class AxialPlaneBasedComplex(TriangleComplex, #triangle genenration
             fps2 = self.gen_fp_by_splitting_cylinder(bases=self.atb.residues,
                                                      targets=[(0,self.atb.residues)],
                                                      fps = PaddedComplexFingerPrint())
+            
         #padded fp str
         _, atb_res_dist = self.get_atb_res_spat_dist()
         str2 = fps2.fp_str(overall_atb_dist, atb_res_dist, number_type=int)
-
+        
         #interactive force
         if atg_as_receptor:
             #atg as receptor
@@ -98,7 +99,7 @@ def main(fp_dir, use_complex_plane = True, atg_as_rec = True, use_tri = True, us
     for c in cs:
         try:
             fp_str = c.gen_fp_str(atg_as_receptor = atg_as_rec, use_cache = use_cache, use_tri = use_tri)
-            print c.c_id
+            #print c.c_id
             with open(fp_dir + "/" + c.c_id + ".fp", "w") as f:
                 f.write(fp_str)
         except:

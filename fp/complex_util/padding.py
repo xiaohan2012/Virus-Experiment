@@ -96,6 +96,7 @@ class PaddedComplexFingerPrint(BaseComplexFingerprint):
                 #haven't reach the end && fps has record for the residue
                 if j < len(sorted_res_list) and self.has_key(sorted_res_list[j]):
                     fp = self[sorted_res_list[j]]
+
                     fp_strs.append(fp.fp_body(number_type))
                 else:
                     fp_strs.append(self.fake_fp_str(res_fp_len))
