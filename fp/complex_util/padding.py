@@ -121,3 +121,6 @@ def get_overall_residue_distribution():
 
 if __name__ == '__main__':
     overall_dist = get_overall_residue_distribution()
+    #overall_dist = OverallSpatialDistribution.from_cache()
+    #print overall_dist[0]#atg
+    #print overall_dist[1]#atb

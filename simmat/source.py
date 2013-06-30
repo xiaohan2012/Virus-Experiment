@@ -55,8 +55,6 @@ def make_dataloader(directory, converter):
 
     return dataloader
 
-
-
 def load_cids(path):
     """() => set of str
     

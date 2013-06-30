@@ -5,8 +5,7 @@ hbond = {'A': 0, 'C': 0, 'E': 1, 'D': 1, 'G': 0, 'F': 0, 'I': 0, 'H': 1, 'K': 2,
 electro = {'A': -0.01, 'C': 0.12, 'E': 0.07, 'D': 0.15, 'G': 0, 'F': 0.03, 'I': -0.01, 'H': 0.08, 'K': 0, 'M': 0.04, 'L': -0.01, 'N': 0.06, 'Q': 0.05, 'P': 0, 'S': 0.11, 'R': 0.04, 'T': 0.04, 'W': 0, 'V': 0.01, 'Y': 0.03}
 
 class AAIndexTrait(object):
-    def get_aaindex_fp(self, iterables):
-        fps = BaseComplexFingerprint()
+    def get_aaindex_fp(self, iterables, fps):
         fp_len = 3
         
         for r in iterables:
@@ -23,8 +22,8 @@ class AAIndexTrait(object):
             fps[r][2] = e_val
         return fps
 
-    def get_atg_aaindex_fp(self):
-        return self.get_aaindex_fp(self.atg.residues)
+    def get_atg_aaindex_fp(self, fps = BaseComplexFingerprint()):
+        return self.get_aaindex_fp(self.atg.residues, fps)
         
-    def get_atb_aaindex_fp(self):
-        return self.get_aaindex_fp(self.atb.residues)
+    def get_atb_aaindex_fp(self, fps = BaseComplexFingerprint()):
+        return self.get_aaindex_fp(self.atb.residues, fps)
