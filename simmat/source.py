@@ -63,7 +63,7 @@ def load_cids(path):
     >>> len(load_cids("fp_370_atg.txt"))
     236
     """
-    return set([c for l in open(path).readlines() for c in l.split()[:2]])
+    return sorted(list(set([c for l in open(path).readlines() for c in l.split()[:2]])))
     
 
 def load_simmat(path):
