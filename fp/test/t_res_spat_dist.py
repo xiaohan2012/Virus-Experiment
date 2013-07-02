@@ -41,6 +41,17 @@ class ResidueDistributionTestCase(NumericTestCase):
         expected = 1
         self.assertEqual(actual, expected)
 
+    def test_tri_count(self):
+        dist, _ = self.c.get_tri_spat_dist()
+        actual = dist[33]
+        expected = 9
+        self.assertEqual(actual, expected)
+
+    def test_tri_residue_count(self):
+        _, dist = self.c.get_tri_spat_dist()
+        actual = len(dist[33])
+        expected = 9
+        self.assertEqual(actual, expected)
         
 if __name__ == "__main__":
     unittest.main()

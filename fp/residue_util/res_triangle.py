@@ -2,17 +2,22 @@ from itertools import combinations
 import numpy as np
 
 class ResTriangle(object):
-    def __init__(self,reslist):
+    def __init__(self,reslist, c):
         if len(reslist) != 3:
             raise ValueError("The residue number should be 3, however %s" %(repr(reslist)))
         self.pts = reslist
         self.res_ids = sorted([res.res_id for res in reslist])
         self.fingerprint = "+".join(self.res_ids)
+        self.c = c
 
     def get_center(self):
+        from ve.fp.geom import Point
         if not hasattr(self, "center"):
-            self.center = np.average(np.array([a.xyz for res in self.pts for a in res.atom]), 0)
+            self.center = Point(np.average(np.array([a.xyz for res in self.pts for a in res.atom]), 0))
         return self.center
+
+    def get_residues(self):
+        return self.pts
         
     def __eq__(self,other):
         return  self.fingerprint  == other.fingerprint if isinstance(other, self.__class__) else False

@@ -86,8 +86,9 @@ from ve.fp.geom import Line, get_perp_plane
 from ve.fp.complex_util.axial_plane import HasAxialPlaneTrait
 from ve.fp.complex_util.split_cylinder import SplitCylinderUtility
 from ve.fp.complex_util.geom import GeometryTrait
+from ve.fp.complex_util.triangle import ResidueTriangleTrait
 
-class ResidueSpatialDistributionTrait(SplitCylinderUtility, HasAxialPlaneTrait, GeometryTrait):
+class ResidueSpatialDistributionTrait(SplitCylinderUtility, HasAxialPlaneTrait, GeometryTrait, ResidueTriangleTrait):
     """
     Distribution on residue spatial position with respect to the splitted cylinder
     """
@@ -115,6 +116,21 @@ class ResidueSpatialDistributionTrait(SplitCylinderUtility, HasAxialPlaneTrait, 
             
         return self.atg_res_cnt_spat_dist, self.atg_res_spat_dist
 
+    def get_tri_spat_dist(self):
+        """
+        (CylinderSpatialDistritbution) -> Counter
+
+        return the count of antigen residue triangle that fall in the respective rings in the cylinder
+        """
+        if not hasattr(self, "tri_spat_dist"):
+            plane = get_perp_plane(self.get_atg_center() - self.get_epitope_center(), self.get_epitope_center())
+            cylinder = self.make_cylinder(self.get_epitope_center(), plane)
+            self.tri_cnt_spat_dist = cylinder.get_count_distribution(self.get_triangles())
+            self.tri_spat_dist = cylinder.get_residue_distribution(self.get_triangles())
+            
+        return self.tri_cnt_spat_dist, self.tri_spat_dist
+
+        
     def get_atb_res_spat_dist(self):
         """
         (CylinderSpatialDistritbution) -> Counter

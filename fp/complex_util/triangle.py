@@ -23,6 +23,7 @@ class ResidueTriangleTrait(FindParaEpiTrait):
         #cached in local file already
         if not refresh and cache.has_cache(self.c_id):
             self.triangles = cache.load(self.c_id, self)
+            assert(len(self.triangles) != 0)
             return self.triangles
             
         #stores residue tuples that are possible to form triangle with external residue
@@ -31,7 +32,7 @@ class ResidueTriangleTrait(FindParaEpiTrait):
         from itertools import combinations
 
         #residue triple that are within triangle formation range with each other
-        initial_triangles = [ResTriangle([r1,r2,r3]) for r1,r2,r3 in combinations(self.find_epitope(), 3)
+        initial_triangles = [ResTriangle([r1,r2,r3], self) for r1,r2,r3 in combinations(self.find_epitope(), 3)
                      if r1.may_form_triangle_with(r2) and r2.may_form_triangle_with(r3) and r1.may_form_triangle_with(r3)]
 
         #determine if a residue pair are potential to form a triangle with an non-epitope residue
@@ -45,7 +46,7 @@ class ResidueTriangleTrait(FindParaEpiTrait):
         marginal_residues = set(self.atg.residues)-set(self.epitope)
 
         #find residues that may form triangles with the still_possible pairs
-        newly_detected_triangles = [ResTriangle([r1,r2,r3]) for r1,r2 in still_possible_pairs for r3 in (marginal_residues - {r1,r2})
+        newly_detected_triangles = [ResTriangle([r1,r2,r3], self) for r1,r2 in still_possible_pairs for r3 in (marginal_residues - {r1,r2})
                                     if r1.may_form_triangle_with(r3) and r2.may_form_triangle_with(r3)]
 
         self.triangles = initial_triangles + newly_detected_triangles

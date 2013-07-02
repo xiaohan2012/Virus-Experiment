@@ -21,21 +21,22 @@ class OverallSpatialDistribution(object):
         """
         complexes = list(complexes)
         ring_count = complexes[0].ring_count
-        atg_dist, atb_dist = ResiduePositionDistribution(ring_count, []), ResiduePositionDistribution(ring_count, [])
+        atg_dist, atb_dist, tri_dist = ResiduePositionDistribution(ring_count, []), ResiduePositionDistribution(ring_count, []), ResiduePositionDistribution(ring_count, [])
         for c in complexes:
             atg_dist += c.get_atg_res_spat_dist()[0]
             atb_dist += c.get_atb_res_spat_dist()[0]
-       
+            tri_dist += c.get_tri_spat_dist()[0]
+
         #to cache
         if to_cache:
-            dump((ring_count, atg_dist, atb_dist), open(path, "w"))
+            dump((ring_count, atg_dist, atb_dist, tri_dist), open(path, "w"))
 
-        return atg_dist, atb_dist
+        return atg_dist, atb_dist, tri_dist
         
     @classmethod    
     def from_cache(cls,  path = dist_cache_path):
         #eggache and mysterious part
-        ring_count, atg_dist, atb_dist = load(open(path, "r"))
+        ring_count, atg_dist, atb_dist, tri_dist = load(open(path, "r"))
         
         for k,v in atg_dist.ring_count.items():
             atg_dist[k] = v
@@ -45,7 +46,11 @@ class OverallSpatialDistribution(object):
             atb_dist[k] = v
         atb_dist.ring_count = ring_count
 
-        return atg_dist, atb_dist
+        for k,v in tri_dist.ring_count.items():
+            tri_dist[k] = v
+        tri_dist.ring_count = ring_count
+        
+        return atg_dist, atb_dist, tri_dist
     
 from ve.fp.fp import BaseComplexFingerprint, BaseResidueFingerprint
 
@@ -114,13 +119,16 @@ def get_overall_residue_distribution():
     from ve.fp.test.common import GeometryResidue
     
     cs = load_complexes(complex_ids(), complex_cls = ComplexWithResidueSpatialDistribution, residue_cls = GeometryResidue)
-    overall_atg_dist, overall_atb_dist = OverallSpatialDistribution.overall_dist(cs)
+    overall_atg_dist, overall_atb_dist, overall_tri_dist = OverallSpatialDistribution.overall_dist(cs)
     
-    return overall_atg_dist, overall_atb_dist
+    return overall_atg_dist, overall_atb_dist, overall_tri_dist
 
 
 if __name__ == '__main__':
-    #overall_dist = get_overall_residue_distribution()
+    overall_dist = get_overall_residue_distribution()
+    """
     overall_dist = OverallSpatialDistribution.from_cache()
     print overall_dist[0]#atg
     print overall_dist[1]#atb
+    print overall_dist[2]#tri
+    """

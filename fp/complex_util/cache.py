@@ -91,7 +91,7 @@ class TriangleCache(CacheTrait):
         -> list of ResTriangle
         """
         from ve.fp.residue_util.res_triangle import ResTriangle
-        return [ResTriangle(c.get_res_from_resids(resids)) for resids in resids_lst]
+        return [ResTriangle(c.get_res_from_resids(resids), c) for resids in resids_lst]
 
 from ve.fp.fp import BaseComplexFingerprint, BaseResidueFingerprint
 

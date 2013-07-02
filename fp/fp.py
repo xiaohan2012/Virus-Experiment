@@ -49,10 +49,10 @@ class BaseResidueFingerprint(OrderedDefaultDict):
         () => str
         return the finger print header
         """
-        from res_triangle import ResTriangle
+        from ve.fp.residue_util.res_triangle import ResTriangle
         
         #the header string(residue id or triangle id)
-        return  isinstance(self.res, ResTriangle) and self.res.fingerprint or str(self.res.resnum)
+        return  self.res.fingerprint if isinstance(self.res, ResTriangle)  else str(self.res.resnum)
 
     def fp_str(self, number_type=float):
         """(type) => str
@@ -211,6 +211,7 @@ class BaseComplexFingerprint(OrderedDict):
 
     def __repr__(self):
         return str(self)
+        
 class HeadlessFingerprint(BaseResidueFingerprint):
     """Geometric-center-based complex finger print"""
     def __init__(self, bitlength, values = None):
