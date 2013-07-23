@@ -24,6 +24,7 @@ rmsd_row_path = os.path.join(rmsd_root,"rows.txt")
 rmsd_matrix_path = os.path.join(rmsd_root,"matrix.txt")
 
 epi166_root = os.path.join(data_root, "epi_166")
+epi166_fp = os.path.join(epi166_root ,"fp")
 pdb_166_src = os.path.join(epi166_root ,"pdb_file/*")
 chain_list_path = os.path.join(epi166_root ,"chains.txt")
 dist_mat_path = os.path.join(epi166_root, "dist_mat_csv/dist_mat.csv")

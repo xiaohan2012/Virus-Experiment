@@ -63,8 +63,8 @@ class residue_fp_list(UserDict):
         self.comp = comp
         self.data = OrderedDict()
         with open(fp_path,'r') as f:
-            for line in f.readlines()[2:]:
-                s_line = re.split(r"[ ,]",line)
+            for line in f.readlines():
+                s_line = re.split(r"[ ,\t]",line)
 
                 residue_id = int(s_line[0])
                 fp = map(float, s_line[1:])
