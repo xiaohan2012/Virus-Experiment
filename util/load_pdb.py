@@ -28,9 +28,9 @@ def complex_ids(path=complex_dir):
     >>> len(ids)
     236
     """
-    return map(lambda s: s.split(".")[0],
+    return sorted(map(lambda s: s.split(".")[0],
                map(os.path.basename, 
-                   glob(os.path.join(path ,"*"))))
+                   glob(os.path.join(path ,"*")))))
     
 from ve.util.complex import BaseComplex
 

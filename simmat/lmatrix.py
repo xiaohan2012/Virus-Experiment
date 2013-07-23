@@ -103,6 +103,17 @@ class lmatrix(ndarray):
 #    def __str__(self):
 #        return "   %s\n%s" %('  '.join(self.labels), super(lmatrix, self).__str__())
 
+    @classmethod
+    def from_db(cls, col, complex_ids):
+        mat = lmatrix(complex_ids)
+
+        for c1 in complex_ids:
+            for c2 in complex_ids:
+                row = col.find_one({"complex1":c1,"complex2":c2}) or col.find_one({"complex1":c2,"complex2":c1})
+                mat[c1,c2] = row["val1"] + row["val2"] + row["val3"]
+                
+        return mat
+        
 def main():
     labels = ["l1", "l2", "l3"]
     m = lmatrix(labels)
@@ -117,5 +128,21 @@ def main():
     print m["l1",:]
     print m[:,'l2']
     print m
+
+def simmat_from_db():
+    from ve.util.load_pdb import complex_ids
+    from ve.config import epi166_fp
+    from ve.dbconfig import db
+    
+    cids = complex_ids(epi166_fp)
+    
+    mat = lmatrix.from_db(db["epi_166"], cids)
+    
+    
+    mat = lmatrix(cids, data = mat / np.matrix(mat.diagonal()).T)
+
+    print mat.to_csv_str()
+
 if __name__ == "__main__":
-    main()
+    #main()
+    simmat_from_db()
