@@ -8,7 +8,9 @@ data = {
     "HIV_transmembrane_glycoprotein": ['3MA9_A', '3MAC_A', '2CMR_A', '2XRA_A']
 }
 
-
+data1 = {
+    "lysozyme": ['1MLC_F', '1YQV_Y', '1P2C_C', '1JHL_A', '1OP9_B', '1FBI_X', '1J1O_Y', '3D9A_C', '1DZB_X', '2ZNX_Y', '1G7J_C', '1FDL_Y', '1A2Y_C', '1BVK_C', '1SQ2_L', '2I25_M', '1RI8_B', '1RJC_B', '1JTP_L']
+}
 def categorize(mat, categories):
     """(labeled matrix, dict(str -> list)) => list of labeled matrix
 
