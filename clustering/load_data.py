@@ -14,8 +14,6 @@ def load_mat(path):
     
     return LMatrix(labels, data = data)
 
-
-
 if __name__ == '__main__':
     import doctest
     doctest.testmod()

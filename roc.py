@@ -72,17 +72,21 @@ def draw_roc(x_arr  , y_arr ):
     plt.show()        
     
 if __name__ == "__main__":
-    groups = get_manual_groups()
+    groups = get_manual_groups("166")
     group_rel = PdbGroupRelation(groups)
 
+    print group_rel
     pdbs = [pdb for g in groups for pdb in g]
+    
+    #inv_code_map = get_inv_codes_from_file(pdb_src)
+    #mat  = DistanceMatrix(mat_id  = "ARGP820101_dist_mat" , code_map = inv_code_map)
 
-    inv_code_map = get_inv_codes_from_file(pdb_src)
-    mat  = DistanceMatrix(mat_id  = "ARGP820101_dist_mat" , code_map = inv_code_map)
+    #roc_data = perform_roc_test(group_rel, mat,roc_step_count = 21)
+    
+    #print roc_data
+    
+    #for cutoff,stat in roc_data:
+    #print "cutoff:%f\tsensitivity:%f\tspecificity:%f" %(cutoff,stat["sensitivity"],stat["specificity"])
 
-    roc_data = perform_roc_test(group_rel, mat,roc_step_count = 21)
-    print roc_data
-    for cutoff,stat in roc_data:
-        print "cutoff:%f\tsensitivity:%f\tspecificity:%f" %(cutoff,stat["sensitivity"],stat["specificity"])
-
-    generate_yard_file(pdbs, group_rel , mat)
+    #generate_yard_file(pdbs, group_rel , mat)
+    

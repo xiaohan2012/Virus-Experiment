@@ -1,0 +1,10 @@
+methods=(CEpiMatch MATT Multiprot SPa SPb SPe TMa TMb TMc)
+
+for method in "${methods[@]}"
+do
+    m_path="clustering/data/$method.csv"
+    
+    echo "AUC for $method"
+    python yard_gen.py $m_path > "roc/$method.yard"
+    yard-auc "roc/$method.yard"
+done
