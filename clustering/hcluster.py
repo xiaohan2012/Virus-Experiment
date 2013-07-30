@@ -9,7 +9,7 @@ from categories import categorize, data
 
 def main():
 
-    paths = ['CEpiMatch.csv', 'Multiprot.csv', 'spa.csv', 'spb.csv', 'spe.csv', 'tma.csv', 'tmb.csv', 'tmc.csv', 'matt.csv']
+    paths = ['CEpiMatch.csv', 'Multiprot.csv', 'SPa.csv', 'SPb.csv', 'SPe.csv', 'TMa.csv', 'TMb.csv', 'TMc.csv', 'MATT.csv']
 
     for path in paths:
         mats = categorize(load_mat("data/%s" %path), data)
@@ -21,11 +21,13 @@ def main():
 
             plt.figure()
             
-            dendrogram(Z, labels=mat.rlabels, orientation="left")
+            dendrogram(Z, labels=mat.rlabels, orientation="right")
 
             type_name = path.split(".")[0]
-            
-            plt.savefig("img1/%s/%s.png" %( name, type_name))
+
+            plt.title("%s  %s" %(name, type_name))
+            plt.ylabel("PDB ID")
+            plt.savefig("img/%s/%s.png" %( name, type_name))
 
 
 if __name__ == '__main__':
