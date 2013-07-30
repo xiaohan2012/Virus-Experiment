@@ -2,35 +2,35 @@ from itertools import combinations
 import numpy as np
 
 class ResTriangle(object):
-    def __init__(self,reslist):
+    def __init__(self,reslist, c):
         if len(reslist) != 3:
-            raise ValueError("The residue number should be 3")
+            raise ValueError("The residue number should be 3, however %s" %(repr(reslist)))
         self.pts = reslist
-        self.resnums = sorted([res.resnum for res in reslist])
-        self.fingerprint = "-".join(map(str,self.resnums))
+        self.res_ids = sorted([res.res_id for res in reslist])
+        self.fingerprint = "+".join(self.res_ids)
+        self.c = c
 
-    def cal_center(self):
-        a = np.array([a.xyz for res in self.pts for a in res.atom])
-        self.center = np.average(a,0)
+    def get_center(self):
+        from ve.fp.geom import Point
+        if not hasattr(self, "center"):
+            self.center = Point(np.average(np.array([a.xyz for res in self.pts for a in res.atom]), 0))
+        return self.center
 
+    def get_residues(self):
+        return self.pts
+        
     def __eq__(self,other):
-        if isinstance(other,ResTriangle):
-            return self.fingerprint  == other.fingerprint
-        return False
+        return  self.fingerprint  == other.fingerprint if isinstance(other, self.__class__) else False
 
     def __hash__(self):
         return hash(self.fingerprint)
     
     def __repr__(self):
-        #sides_str = ",".join(map(lambda n: "%.2f" %n, (r1.dist2residue(r2) for (r1,r2) in combinations(self.pts,2))))
         return "triangle-%s" %(self.fingerprint)
     
     def __iter__(self):
         return iter(self.pts)
 
-
-def make_triangles(residues):
-    pass
 
 if __name__ == "__main__":
     from ve.util.load_pdb import load_pdb_struct

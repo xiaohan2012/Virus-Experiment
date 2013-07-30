@@ -1,8 +1,7 @@
 """
 Perform hierarchical clustering on similarity matrix
 """
-import numpy as np
-from common import load_simmat
+from source import load_simmat
 
 def sim_to_dist(mat):
     """

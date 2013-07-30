@@ -390,7 +390,7 @@ class sift_gen_15(sift_gen):
                     strength = "strong" if len(atoms) >= self.stren_threshold['CHARGED'] else "exists"
                     cur_sift.turn_sift_bit_on(self.bit_pos['CHARGED'],  rec_atom.resnum, strength)
                     
-def get_15bits(receptor, binder):
+def get_15bits(receptor, binder, fp = None):
     rec_tree = distance_tree_15()
 
     rec_tree.set_receptor_structure(receptor)
@@ -406,7 +406,8 @@ def get_15bits(receptor, binder):
 
     from fp import BaseComplexFingerprint,BaseResidueFingerprint
 
-    fp = BaseComplexFingerprint()
+    if fp is None:
+        fp = BaseComplexFingerprint()
 
     for res in receptor.residues:
         #reconstruct
@@ -419,6 +420,7 @@ def get_15bits(receptor, binder):
         fp[res] = res_fp
 
     return fp
+    
 def gen_fp_to_file(receptor=None,binder=None,fp_path=''):
     rec_tree = distance_tree_15()
 

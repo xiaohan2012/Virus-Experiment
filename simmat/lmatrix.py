@@ -41,6 +41,23 @@ class lmatrix(ndarray):
     def get_label(self, idx):
         return self.index2label_mapping.get(idx, "unkown")
 
+    def to_csv_str(self):
+        """
+        (lmatrix) -> str
+
+        return the csv representation of the matrix
+        """
+        string = "%s,%s\n" %("", ",".join(self.labels))
+        rows = []
+        for row_name in self.labels:
+            row = [self[row_name, col_name] for col_name in self.labels]
+            row = map(lambda d: "%f" %d, row)
+            rows.append("%s,%s" %(row_name, ",".join(row)))
+        string += "\n".join(rows)
+        return string
+        #return "%s\n%s" %(header_str, "\n".join(["%s,%s" %(col_name, ",".join(map(lambda d: "%.2f" %d, self[col_name,:]))) for col_name in self.labels for col_name in self.labels]))
+
+        
     def __array_finalize__(self, obj):    
         if obj is None: return
         
@@ -86,6 +103,17 @@ class lmatrix(ndarray):
 #    def __str__(self):
 #        return "   %s\n%s" %('  '.join(self.labels), super(lmatrix, self).__str__())
 
+    @classmethod
+    def from_db(cls, col, complex_ids):
+        mat = lmatrix(complex_ids)
+
+        for c1 in complex_ids:
+            for c2 in complex_ids:
+                row = col.find_one({"complex1":c1,"complex2":c2}) or col.find_one({"complex1":c2,"complex2":c1})
+                mat[c1,c2] = row["val1"] + row["val2"] + row["val3"]
+                
+        return mat
+        
 def main():
     labels = ["l1", "l2", "l3"]
     m = lmatrix(labels)
@@ -100,5 +128,21 @@ def main():
     print m["l1",:]
     print m[:,'l2']
     print m
+
+def simmat_from_db():
+    from ve.util.load_pdb import complex_ids
+    from ve.config import epi166_fp
+    from ve.dbconfig import db
+    
+    cids = complex_ids(epi166_fp)
+    
+    mat = lmatrix.from_db(db["epi_166"], cids)
+    
+    
+    mat = lmatrix(cids, data = mat / np.matrix(mat.diagonal()).T)
+
+    print mat.to_csv_str()
+
 if __name__ == "__main__":
-    main()
+    #main()
+    simmat_from_db()

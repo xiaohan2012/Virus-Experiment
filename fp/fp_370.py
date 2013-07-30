@@ -1,58 +1,52 @@
 from ve.util.residue import BaseResidue
 
-import sys
-import logging
+from ve.util.logger import make_logger
+logger = make_logger("FP 370")
 
-logging.basicConfig( stream=sys.stderr )
-logging.getLogger("FP370").setLevel( logging.DEBUG )
-logger = logging.getLogger("FP370")
+from ve.fp.residue_util.geom import GeometryTrait
+from ve.fp.residue_util.dist import ResDistTrait
 
-class MyResidue(BaseResidue):
-    def __init__(self, res):
-        BaseResidue.__init__(self, res)
+class MyResidue(BaseResidue, GeometryTrait, ResDistTrait):
+    def __init__(self, res, **kwargs):
+        super(MyResidue,self).__init__(res, **kwargs)
         
-        from ve.fp.residue_util.res_geom import init_geom_trait
-        init_geom_trait(self)
         
 from ve.util.complex import BaseComplex        
+from ve.fp.complex_util.split_cylinder import GBCSplitCylinderTrait
+from ve.fp.complex_util.physi_chemi import PhysiChemiTrait
+from ve.fp.complex_util.interactive_force_fp import InteractiveForceTrait
 
-class MyComplex(BaseComplex):
-    def __init__(self,c_id, atg, atb):
-        self.c_id = c_id
-        self.atg = atg
-        self.atb = atb
+class MyComplex(BaseComplex, GBCSplitCylinderTrait, PhysiChemiTrait, InteractiveForceTrait):
+    def __init__(self, **kwargs):
+        super(MyComplex,self).__init__(radius = 20, radius_step = 2, height = 40, height_step = 5, **kwargs)
         
-        #Split cylinde part finger print
-        from ve.fp.complex_util.split_cylinder import init_gcb_split_cylinder_trait
-        init_gcb_split_cylinder_trait(self)
-        
-        #physical chemical finger print
-        from ve.fp.complex_util.physi_chemi import init_physi_chemi_fp_trait
-        init_physi_chemi_fp_trait(self)
-        
-        #interactive force finger print
-        from ve.fp.complex_util.interactive_force_fp import init_interative_force_fp_trait
-        init_interative_force_fp_trait(self)
-        
-        
-    def get_fp(self):
+    def get_fp(self, which_as_rec):
         logger.info("gen fp for %s", self.c_id)
 
+        print "antigen side split cylinder fingerprint"
         #antigen side split cylinder fingerprint
         fp1 = self.get_atg_fp_by_split_cylinder()
 
+        print "antigen side physical chemical fingerprint"
         #antigen side physical chemical fingerprint
         fp2 = self.get_physi_chemi_atg_fp()
 
+        print "antibody side split cylinder fingerprint"
         #antibody side split cylinder fingerprint
         fp3 = self.get_atb_fp_by_split_cylinder()
 
+        print "antigen side physical chemical fingerprint"
         #antigen side physical chemical fingerprint
         fp4 = self.get_physi_chemi_atb_fp()
-        
+
+        print "interactive force finger print "
         #interactive force finger print 
         #antigen as the receptor
-        fp5 = self.gen_if_complex_fp_atg()
+        if which_as_rec == "atg":
+            fp5 = self.gen_if_complex_fp_atg()
+        elif which_as_rec == "atb":
+            fp5 = self.gen_if_complex_fp_atb()
+                        
         
         return fp1.append(fp2).append(fp3).append(fp4).append(fp5)
 
@@ -114,7 +108,7 @@ def gen_fp_for_complex(cid):
     #output to file
     fp.tofile(fp_path)
         
-def main():
+def main1():
     """
     main function
     generate the 370-bit finger prints for all complexes in 237 dataset
@@ -128,9 +122,61 @@ def main():
         print cid
         gen_fp_for_complex(cid)
 
+def test_count():
+    import os
+    from ve.util.load_pdb import complex_ids, load_complexes
+    from ve.config import data480_root, data480_complex_root
+    
+    ids = complex_ids(data480_complex_root)
+    fp_dir = os.path.join(data480_root, "fp_370_atg" )
+
+    for cid in ids:
+        fp_path = os.path.join(fp_dir, "%s.fp" %cid)
+        if os.path.exists(fp_path):
+            print cid, "exists"
+        else:
+            print cid
+            
+def main2(which_as_rec):
+    import os
+    from ve.util.load_pdb import complex_ids, load_complexes
+    from ve.config import data480_root, data480_complex_root
+    ids = complex_ids(data480_complex_root)
+    
+    cs = load_complexes(ids, directory = data480_complex_root,complex_cls = MyComplex, residue_cls = MyResidue)
+
+    fp_dir = os.path.join(data480_root, "fp_370_%s" %which_as_rec)
+
+    for c in cs:
+        fp_path = os.path.join(fp_dir, "%s.fp" %c.c_id)
+        if os.path.exists(fp_path):
+            print "%s preexists\n" %c.c_id
+        else:
+            print "processing", c.c_id
+
+            try:
+                fp = c.get_fp(which_as_rec)
+                fp.tofile(fp_path)
+            except Exception as e:
+                from ve.util.error import get_error_info
+                print c.c_id, get_error_info(e)
+            print c.c_id, "processed\n"
+
+def usage():
+    return """
+python fp_370.py test | atg | atb | test_count
+    """
+    
 if __name__ == "__main__":
     import sys
     if len(sys.argv) == 2 and sys.argv[1] == "test":
         test()
+    elif len(sys.argv) == 2 and sys.argv[1] == "atg":
+        """318 currently"""
+        main2("atg")
+    elif len(sys.argv) == 2 and sys.argv[1] == "atb":
+        main2("atb")
+    elif len(sys.argv) == 2 and sys.argv[1] == "test_count":
+        test_count()
     else:
-        main()
+        print usage()

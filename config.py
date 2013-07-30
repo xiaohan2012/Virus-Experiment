@@ -24,6 +24,7 @@ rmsd_row_path = os.path.join(rmsd_root,"rows.txt")
 rmsd_matrix_path = os.path.join(rmsd_root,"matrix.txt")
 
 epi166_root = os.path.join(data_root, "epi_166")
+epi166_fp = os.path.join(epi166_root ,"fp")
 pdb_166_src = os.path.join(epi166_root ,"pdb_file/*")
 chain_list_path = os.path.join(epi166_root ,"chains.txt")
 dist_mat_path = os.path.join(epi166_root, "dist_mat_csv/dist_mat.csv")
@@ -33,11 +34,17 @@ data237_raw_complex = os.path.join(data237_root, "cp_pdb")
 data237_complex_root = os.path.join(data237_root,"splitted_complex")
 data237_fp_root = os.path.join(data237_root,"fp")
 data237_fp105_root = os.path.join(data237_root,"fp_105")
+data237_fp175_padded_root = os.path.join(data237_root, "fp_175_padded")
 data237_epitope_root = os.path.join(data237_root,"epitope")
 data237_paraepi_root = os.path.join(data237_root,"paraepi")
 
 data237_fps808015_root = os.path.join(data237_root,"fp_s_808015")
 
+data237_cache = os.path.join(data237_fp_root, ".cache")
 data237_paraepi_cache = os.path.join(data237_fp_root, ".cache")
+data237_triangle_cache = os.path.join(data237_fp_root, ".cache", "triangle")
+
+data480_root = os.path.join(data_root,"data480")
+data480_complex_root = os.path.join(data480_root,"splitted_complex")
 
 logger = logging.getLogger()

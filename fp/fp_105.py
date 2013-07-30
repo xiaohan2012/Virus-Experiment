@@ -250,9 +250,7 @@ def epi_gen_test(complex_id):
         os.makedirs(output_path)
     complex.write_epitope(path,output_path)
     complex.write_paratope(path,output_path)
-
     
-
 if __name__ == "__main__":
     #data237_fp_gen(refresh = False)
     data237_fp_gen(False)

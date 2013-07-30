@@ -1,6 +1,5 @@
 import unittest
 
-import os
 import numpy as np
 
 from ve.simmat.lmatrix import lmatrix
@@ -56,6 +55,17 @@ class LMatrixTestCase1(unittest.TestCase):
         expected = np.array([9,6,3])
         self.assertTrue( (actual == expected).all())
 
+
+    def test_to_table(self):
+        """test for table formulation"""
+        actual = self.m.to_csv_str()
+        expected = """,a,b,c
+a,1.000000,2.000000,3.000000
+b,4.000000,5.000000,6.000000
+c,7.000000,8.000000,9.000000"""
+        self.assertEqual(actual, expected)
+        
+
 class LMatrixTestCase2(unittest.TestCase):
     """Testcase for labeled matrx
     in this case, the matrix data is set
@@ -102,8 +112,8 @@ class LoadSimmatTestCase(unittest.TestCase):
 
     def setUp(self):
         """load the matrix"""
-        from ve.simmat.common import load_simmat
-        self.m = load_simmat("fp_370_atg.txt")
+        from ve.simmat.source import load_simmat
+        self.m = load_simmat("data/fp_370_atg.txt")
 
     def test_content_matching_1(self):
         c1 = '2NLJ_C'
@@ -112,6 +122,21 @@ class LoadSimmatTestCase(unittest.TestCase):
         expected = 0.888093103028
         self.assertEqual(actual, expected)
     
+
+class FromDBTest(unittest.TestCase):
+    def test_dimension_and_val(self):
+        from ve.util.load_pdb import complex_ids
+        from ve.config import epi166_fp
+        from ve.dbconfig import db
+        
+        cids = complex_ids(epi166_fp)
+
+        mat = lmatrix.from_db(db["epi_166"], cids)
+
+        self.assertEqual((166, 166), mat.shape)
+        
+        self.assertAlmostEqual(mat["2VYR_A", "2VYR_A"], 26 + 260 +139)
+
 
 if __name__ == "__main__":
     unittest.main()

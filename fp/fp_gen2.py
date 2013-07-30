@@ -172,13 +172,13 @@ if __name__ == "__main__":
     #c.get_fp()
     #c.write_fp_to_file("/home/xiaohan/Desktop/temp.dat")
     
-    #output_dir = "/home/rxzhu/code/ve/parallel/fp_result"
-    for fname in glob.glob(pdb_src):
+    for fname in glob.glob(pdb_166_src):
+        print fname
         complex_id = os.path.basename(fname).split('.')[0] 
 
         c = Complex(fname)
         c.get_fp()
 
-        #fp_path = os.path.join(output_dir,complex_id + ".fp" )
-        #c.write_fp_to_file(fp_path)
+        fp_path = os.path.join(epi166_fp,complex_id + ".fp" )
+        c.write_fp_to_file(fp_path)
 
