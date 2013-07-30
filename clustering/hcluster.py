@@ -2,21 +2,31 @@
 using hierarchical clustering to classify protein complexes into clusters
 """
 from scipy.cluster.hierarchy import linkage,fcluster,dendrogram,fclusterdata
-from pickle import load
-from numpy import array,min,ceil
-import matplotlib.pyplot as pp
+import matplotlib.pyplot as plt
 
-sim_mat = array(load(open("dist_mat_epi_166.dat")))
+from load_data import load_mat
+from categories import categorize, data
 
-sim_mat += ceil(min(sim_mat))#prevent negative
+def main():
 
-feature_vec= sim_mat / sim_mat.diagonal()
+    paths = ['CEpiMatch.csv', 'Multiprot.csv', 'spa.csv', 'spb.csv', 'spe.csv', 'tma.csv', 'tmb.csv', 'tmc.csv', 'matt.csv']
 
-feature_vec = 1 / feature_vec#comment this out to use the feature vector directly
+    for path in paths:
+        mats = categorize(load_mat("data/%s" %path), data)
+        
+        for name, mat in mats.items():
+            mat = 1 / mat
+            
+            Z = linkage(mat)
 
-Z = linkage(feature_vec)
+            plt.figure()
+            
+            dendrogram(Z, labels=mat.rlabels, orientation="left")
 
-dendrogram(Z)
+            type_name = path.split(".")[0]
+            
+            plt.savefig("img1/%s/%s.png" %( name, type_name))
 
-pp.show()
 
+if __name__ == '__main__':
+    main()
