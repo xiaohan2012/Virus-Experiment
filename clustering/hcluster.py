@@ -49,7 +49,6 @@ def main():
     plt.title("Hierarchical clustering result")
     plt.ylabel("PDB ID")
     plt.plot()
-    #plt.show()
     plt.savefig("img/166.png")
 
 def for_lysozyme():
@@ -62,6 +61,7 @@ def for_lysozyme():
     
     paths = ['CEpiMatch.csv', 'Multiprot.csv', 'SPa.csv', 'SPb.csv', 'SPe.csv', 'TMa.csv', 'TMb.csv', 'TMc.csv', 'MATT.csv', 'RMSD.csv']
 
+
     for path in paths:
         mats = categorize(load_mat("data/%s" %path), data)
         
@@ -69,7 +69,7 @@ def for_lysozyme():
 
         if path not in ("RMSD.csv", ):
             mat = 1 / mat
-        
+
         if method == "upper":
             mat = np.triu(mat)
         elif method == "lower":
@@ -90,5 +90,7 @@ def for_lysozyme():
 
 if __name__ == '__main__':
     #main()
+
     compare()
     #for_lysozyme()
+
