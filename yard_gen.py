@@ -1,4 +1,5 @@
 from ve.clustering.lmatrix import LMatrix
+from ve.clustering.load_data import load_mat
 
 def load_groups(path):
     """
@@ -37,25 +38,46 @@ def load_groups(path):
 
     
     
-def print_yard_file(gmat, mat):
-    print("output\tmethod1")
+def print_yard_file(gmat, mat, method):
+    print("output\t%s" %method)
 
     for pdb1 in gmat.rlabels:
         for pdb2 in gmat.clabels:
             print("%f\t%f" %(gmat[pdb1, pdb2] if pdb1 != pdb2 else 1.0 , mat[pdb1, pdb2]))
 
-def main():
+def print_overall_yards(gmat, mats, methods):
+    print("output\t%s" %"\t".join(methods))
+        
+    for pdb1 in gmat.rlabels:
+        for pdb2 in gmat.clabels:
+            print("%f\t%s" %(gmat[pdb1, pdb2] if pdb1 != pdb2 else 1.0,
+                                 "\t".join(map(lambda mat: "%f" %mat[pdb1,pdb2], mats))) )
+    
+def single_yard():
     import sys
-    from ve.clustering.load_data import load_mat
 
-    mat_path = sys.argv[1]
+    mat_path, method = sys.argv[1:]
 
     gmat = load_groups("data/manual_classification_result/166.tab")
     mat = load_mat(mat_path)
+
+    if "RMSD" in mat_path:
+        mat = 1 - mat / mat.max(1)
     
-    print_yard_file(gmat, mat)
+    print_yard_file(gmat, mat, method)
+
+def main():
+    gmat = load_groups("data/manual_classification_result/166.tab")
+
+    mat_ids = ["CEpiMatch", "MATT", "Multiprot", "SPa", "SPb", "SPe", "TMa", "TMb", "TMc", "RMSD"]
+    mats = map(lambda mat_id: load_mat("clustering/data/%s.csv" %mat_id), mat_ids)
+
+    mats[-1] = 1 - mats[-1] / mats[-1].max(1)
+    
+    print_overall_yards(gmat, mats, mat_ids)
     
 if __name__ == '__main__':
     #import doctest
     #doctest.testmod()
-    main()
+    #main()
+    single_yard()

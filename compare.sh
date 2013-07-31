@@ -1,4 +1,4 @@
-methods=(CEpiMatch MATT Multiprot SPa SPb SPe TMa TMb TMc)
+methods=(CEpiMatch MATT Multiprot SPa SPb SPe TMa TMb TMc RMSD)
 
 for method in "${methods[@]}"
 do
