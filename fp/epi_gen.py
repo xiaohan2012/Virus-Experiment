@@ -1,43 +1,31 @@
-from ve.fp.complex_util.paraepi import init_io_trait
+from ve.fp.complex_util.paraepi import ParaEpiIOTrait
+from ve.util.complex import BaseComplex
 from ve.util.load_pdb import *
 
 from ve.fp.test.fake_class import TestResidue
 
-class ParaEpiGen(object):
-    def __init__(self, complex_dir, c_id):
-        
-        init_io_trait(self)
-        
-        #load the antibody and antigen
-        self.atg = load_pdb_struct(os.path.join(complex_dir, c_id, "antigen.pdb"), TestResidue)
-        self.atb = load_pdb_struct(os.path.join(complex_dir, c_id, "antibody.pdb"), TestResidue)
-
-        self.c_id = c_id
-        
-        #find the paratope and epitope
+class ParaEpiGen(BaseComplex, ParaEpiIOTrait):
+    def gen_paraepi(self, complex_dir, paraepi_dir):
         self.find_paratope()
         self.find_epitope()
-        
-    def gen_paraepi(self):
-        self.write_epitope()
-        self.write_paratope()
+
+        self.write_epitope(complex_dir, paraepi_dir + "/epitope")
+        self.write_paratope(complex_dir, paraepi_dir + "/paratope")
     
 if __name__ == "__main__":
     import sys
+    from ve.util.load_pdb import complex_ids, load_complexes
+    from ve.fp.complex_util.paraepi  import ParatopeNotFoundError, EpitopeNotFoundError
 
-    from ve.config import data237_raw_complex as raw_complex_path, data237_complex_root as splitted_complex_path
+    var = "HIV"
 
-    from ve.fp.complex_util.paraepi import ParatopeNotFoundError, EpitopeNotFoundError
+    complex_dir = "../data/three-groups/split-complexes/%s" %var
+    
     #get the complex ids
-    cids = complex_ids(raw_complex_path)
-    print cids
+    ids = complex_ids(complex_dir)
+    print ids
+
+    cs = load_complexes(ids, directory =  complex_dir, complex_cls = ParaEpiGen)
     
-    path = splitted_complex_path
-    for c_id in cids:
-        try:
-            obj = ParaEpiGen(path, c_id)
-            logger.info("gen paraepi for %s" %c_id)
-            obj.gen_paraepi()
-        except ParatopeNotFoundError, EpitopeNotFoundError:
-            logger.error("Abnormal data %s" %c_id)
-    
+    for c in cs:
+        c.gen_paraepi(complex_dir, "../data/three-groups/paraepi/%s" %var)

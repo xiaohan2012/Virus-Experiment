@@ -120,13 +120,7 @@ class FindParaEpiTrait(DistanceCachePropagationTrait):
 #output the paratope and epitope into pdb format string
 from ve.config import data237_complex_root as complex_path, data237_paraepi_root as paraepi_path
 
-class IOTrait(FindParaEpiTrait):
-
-    def __init__(self,i_path = complex_path, o_path= paraepi_path, **kwargs):
-        self.complex_path = i_path
-        self.paraepi_path = o_path
-
-        super(IOTrait,self).__init__(**kwargs)
+class ParaEpiIOTrait(FindParaEpiTrait):
         
     def gen_str(self, source_fp, res_ids):
         #load the complex file 
@@ -140,18 +134,18 @@ class IOTrait(FindParaEpiTrait):
         #return the concatenated string
         return "".join(lines)
 
-    def epitope_str(self):
+    def epitope_str(self, complex_dir):
         #the antigen path
-        source_fp = os.path.join(self.complex_path, self.c_id, "antigen.pdb")
+        source_fp = os.path.join(complex_dir, self.c_id, "antigen.pdb")
 
         #get the epitope residue ids
         res_ids = map(lambda a:str(a.resnum),self.find_epitope())
 
         return self.gen_str(source_fp, res_ids)
 
-    def paratope_str(self):
+    def paratope_str(self, complex_dir):
         #the antibody path
-        source_fp = os.path.join(self.complex_path, self.c_id, "antibody.pdb")
+        source_fp = os.path.join(complex_dir, self.c_id, "antibody.pdb")
 
         #get the paratope residue ids
         res_ids = map(lambda a:str(a.resnum),self.find_paratope())
@@ -159,32 +153,32 @@ class IOTrait(FindParaEpiTrait):
         return self.gen_str(source_fp, res_ids)
 
 
-    def write_epitope(self):
+    def write_epitope(self, complex_dir, paraepi_dir):
         #get the epitope string
-        string = self.epitope_str()
+        string = self.epitope_str(complex_dir)
 
         #get the epitope path
-        output_fp = os.path.join(self.paraepi_path, self.c_id, "epitope.pdb")
+        output_fp = os.path.join(paraepi_dir, self.c_id, "epitope.pdb")
 
         #if path does not exist, create it
-        if not os.path.exists(os.path.join(self.paraepi_path, self.c_id)):
-            os.mkdir(os.path.join(self.paraepi_path, self.c_id))
+        if not os.path.exists(os.path.join(paraepi_dir, self.c_id)):
+            os.mkdir(os.path.join(paraepi_dir, self.c_id))
 
         #write it
         f = open(output_fp, "w")
         f.write(string)
         f.close()
 
-    def write_paratope(self):
+    def write_paratope(self, complex_dir, paraepi_dir):
         #get the paratope string
-        string = self.paratope_str()
+        string = self.paratope_str(complex_dir)
 
         #get the paratope path
-        output_fp = os.path.join(self.paraepi_path, self.c_id, "paratope.pdb")
+        output_fp = os.path.join(paraepi_dir, self.c_id, "paratope.pdb")
 
         #if path does not exist, create it
-        if not os.path.exists(os.path.join(self.paraepi_path, self.c_id)):
-            os.mkdir(os.path.join(self.paraepi_path, self.c_id))
+        if not os.path.exists(os.path.join(paraepi_dir, self.c_id)):
+            os.mkdir(os.path.join(paraepi_dir, self.c_id))
 
         #write it
         f = open(output_fp, "w")

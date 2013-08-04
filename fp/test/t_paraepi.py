@@ -40,9 +40,9 @@ class FindParatopeTest(unittest.TestCase, FindParaEpiTrait):
         epitope = self.c.find_epitope()
         self.assertEqual(self.extract_res_ids(epitope), [23 ,25 ,27 ,43 ,45 ,46 ,47 ,54 ,79 ,86 ,88 ,89 ,90 ,92 ,108 ,110 ,112 ,124 ,128])
         
-from ve.fp.complex_util.paraepi import IOTrait
+from ve.fp.complex_util.paraepi import ParaEpiIOTrait
 
-ComplexClass = make_complex_class(IOTrait)
+ComplexClass = make_complex_class(ParaEpiIOTrait)
 
 class IOTestCase(unittest.TestCase):
     def setUp(self):
@@ -51,16 +51,17 @@ class IOTestCase(unittest.TestCase):
         
     def test_epitope_str_no_empty(self):
         """ensure the epitope string is not empty"""
-        self.assertGreater(len(self.c.epitope_str()), 0)
+        self.assertGreater(len(self.c.epitope_str("data/")), 0)
         
     def test_paratope_str_no_empty(self):
         """ensure the paraitope string is not empty"""
-        self.assertGreater(len(self.c.paratope_str()), 0)
+        s = self.c.paratope_str("data/")
+        self.assertGreater(len(s), 0)
         
     def test_epitope_io(self):
         from ve.config import data237_paraepi_root as paraepi_path
         #write the epitope to file
-        self.c.write_epitope()
+        self.c.write_epitope("data/", paraepi_path)
         
         #target file path
         output_path = os.path.join(paraepi_path,self.c.c_id,"epitope.pdb")
@@ -76,7 +77,7 @@ class IOTestCase(unittest.TestCase):
     def test_paratope_io(self):
         from ve.config import data237_paraepi_root as paraepi_path
         #write the paratope to file
-        self.c.write_paratope()
+        self.c.write_paratope("data/", paraepi_path)
         
         #target file path
         output_path = os.path.join(paraepi_path,self.c.c_id,"paratope.pdb")
