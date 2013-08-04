@@ -72,7 +72,7 @@ def draw_roc(x_arr  , y_arr ):
     plt.show()        
     
 if __name__ == "__main__":
-    groups = get_manual_groups()
+    groups = get_manual_groups("166")
     group_rel = PdbGroupRelation(groups)
 
     pdbs = [pdb for g in groups for pdb in g]

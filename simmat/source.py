@@ -88,6 +88,8 @@ def load_simmat(path):
 
 def print_simmat_in_csv(path):
     mat = load_simmat(path)
+    #mat = mat / mat.diagonal()
+    #mat = mat 
     #print mat[:10,:10]
     print mat.to_csv_str()
 
