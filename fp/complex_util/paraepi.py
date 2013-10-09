@@ -127,8 +127,8 @@ class ParaEpiIOTrait(FindParaEpiTrait):
         #and filter out the unrelated lines
         lines = []
         for l in open(source_fp,"r").readlines():
-            resnum = ''.join(l[22:26]).strip()
             if resnum in res_ids:
+            resnum = ''.join(l[22:26]).strip()
                 lines.append(l)
 
         #return the concatenated string
@@ -162,7 +162,7 @@ class ParaEpiIOTrait(FindParaEpiTrait):
 
         #if path does not exist, create it
         if not os.path.exists(os.path.join(paraepi_dir, self.c_id)):
-            os.mkdir(os.path.join(paraepi_dir, self.c_id))
+            os.makedirs(os.path.join(paraepi_dir, self.c_id))
 
         #write it
         f = open(output_fp, "w")
@@ -178,9 +178,10 @@ class ParaEpiIOTrait(FindParaEpiTrait):
 
         #if path does not exist, create it
         if not os.path.exists(os.path.join(paraepi_dir, self.c_id)):
-            os.mkdir(os.path.join(paraepi_dir, self.c_id))
+            os.makedirs(os.path.join(paraepi_dir, self.c_id))
 
         #write it
+        print output_fp
         f = open(output_fp, "w")
         f.write(string)
         f.close()
