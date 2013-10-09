@@ -28,11 +28,7 @@ def get_manual_groups(group_id = "157" ):
         c_type = c_type.strip()
         if name and c_type and name in pdb_names:#not empty line
             class_d[c_type].append(name)
-    count = 0                    
-    for c,pdbs in class_d.items():
-        #print c,pdbs
-        count += len(pdbs)
-    #print count        
+            
     return class_d.values()
 
 class PdbGroupRelation(defaultdict):
