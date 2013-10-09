@@ -51,17 +51,17 @@ class IOTestCase(unittest.TestCase):
         
     def test_epitope_str_no_empty(self):
         """ensure the epitope string is not empty"""
-        self.assertGreater(len(self.c.epitope_str("data/")), 0)
+        self.assertGreater(len(self.c.epitope_str()), 0)
         
     def test_paratope_str_no_empty(self):
         """ensure the paraitope string is not empty"""
-        s = self.c.paratope_str("data/")
+        s = self.c.paratope_str()
         self.assertGreater(len(s), 0)
         
     def test_epitope_io(self):
         from ve.config import data237_paraepi_root as paraepi_path
         #write the epitope to file
-        self.c.write_epitope("data/", paraepi_path)
+        self.c.write_epitope( paraepi_path)
         
         #target file path
         output_path = os.path.join(paraepi_path,self.c.c_id,"epitope.pdb")
@@ -77,7 +77,7 @@ class IOTestCase(unittest.TestCase):
     def test_paratope_io(self):
         from ve.config import data237_paraepi_root as paraepi_path
         #write the paratope to file
-        self.c.write_paratope("data/", paraepi_path)
+        self.c.write_paratope( paraepi_path)
         
         #target file path
         output_path = os.path.join(paraepi_path,self.c.c_id,"paratope.pdb")

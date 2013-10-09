@@ -127,35 +127,28 @@ class ParaEpiIOTrait(FindParaEpiTrait):
         #and filter out the unrelated lines
         lines = []
         for l in open(source_fp,"r").readlines():
-            if resnum in res_ids:
             resnum = ''.join(l[22:26]).strip()
+            if resnum in res_ids:
                 lines.append(l)
 
         #return the concatenated string
         return "".join(lines)
 
-    def epitope_str(self, complex_dir):
-        #the antigen path
-        source_fp = os.path.join(complex_dir, self.c_id, "antigen.pdb")
-
+    def epitope_str(self):
         #get the epitope residue ids
         res_ids = map(lambda a:str(a.resnum),self.find_epitope())
 
-        return self.gen_str(source_fp, res_ids)
+        return self.gen_str(self.atg.src, res_ids)
 
-    def paratope_str(self, complex_dir):
-        #the antibody path
-        source_fp = os.path.join(complex_dir, self.c_id, "antibody.pdb")
-
+    def paratope_str(self):
         #get the paratope residue ids
         res_ids = map(lambda a:str(a.resnum),self.find_paratope())
 
-        return self.gen_str(source_fp, res_ids)
+        return self.gen_str(self.atb.src, res_ids)
 
-
-    def write_epitope(self, complex_dir, paraepi_dir):
+    def write_epitope(self, paraepi_dir):
         #get the epitope string
-        string = self.epitope_str(complex_dir)
+        string = self.epitope_str()
 
         #get the epitope path
         output_fp = os.path.join(paraepi_dir, self.c_id, "epitope.pdb")
@@ -169,9 +162,9 @@ class ParaEpiIOTrait(FindParaEpiTrait):
         f.write(string)
         f.close()
 
-    def write_paratope(self, complex_dir, paraepi_dir):
+    def write_paratope(self, paraepi_dir):
         #get the paratope string
-        string = self.paratope_str(complex_dir)
+        string = self.paratope_str()
 
         #get the paratope path
         output_fp = os.path.join(paraepi_dir, self.c_id, "paratope.pdb")
